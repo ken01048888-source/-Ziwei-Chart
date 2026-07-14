@@ -142,7 +142,8 @@
             <!-- 命盤主體 4x4 Grid -->
             <div class="relative w-full aspect-square max-w-[800px] mx-auto bg-white border border-gray-500 shadow-md z-10">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
-                <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);">
+                <!-- 修改為 1.2fr : 1fr : 1fr : 1.2fr，將空間讓給外圍的 12 宮位 -->
+                <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.2fr; grid-template-rows: 1.2fr 1fr 1fr 1.2fr;">
                 </div>
             </div>
 
@@ -192,11 +193,12 @@
             yin: { area: '4/1/5/2', bg: 'bg-wood' }, chou: { area: '4/2/5/3', bg: 'bg-earth' }, zi: { area: '4/3/5/4', bg: 'bg-water' }, hai: { area: '4/4/5/5', bg: 'bg-water' }
         };
         
+        // 配合新的 1.2 : 1 : 1 : 1.2 網格，重新校準連線中心點 (轉為百分比)
         const coords = {
-            si: {x: 12.5, y: 12.5}, wu: {x: 37.5, y: 12.5}, wei: {x: 62.5, y: 12.5}, shen: {x: 87.5, y: 12.5},
-            chen: {x: 12.5, y: 37.5}, you: {x: 87.5, y: 37.5},
-            mao: {x: 12.5, y: 62.5}, xu: {x: 87.5, y: 62.5},
-            yin: {x: 12.5, y: 87.5}, chou: {x: 37.5, y: 87.5}, zi: {x: 62.5, y: 87.5}, hai: {x: 87.5, y: 87.5}
+            si: {x: 13.64, y: 13.64}, wu: {x: 38.63, y: 13.64}, wei: {x: 61.37, y: 13.64}, shen: {x: 86.36, y: 13.64},
+            chen: {x: 13.64, y: 38.63}, you: {x: 86.36, y: 38.63},
+            mao: {x: 13.64, y: 61.37}, xu: {x: 86.36, y: 61.37},
+            yin: {x: 13.64, y: 86.36}, chou: {x: 38.63, y: 86.36}, zi: {x: 61.37, y: 86.36}, hai: {x: 86.36, y: 86.36}
         };
 
         // 庚干四化正統：陽武同相
@@ -608,34 +610,34 @@
                 
                 const isBodyPalace = state.lunar ? (bIndex === state.bodyBranch) : false;
 
-                // 1. 疊宮標籤：橫向排列 (flex-wrap) 節省垂直空間，並進一步縮小手機版字體
+                // 1. 疊宮標籤：進一步縮小
                 let overlapsHtml = '';
-                const badgeClass = "font-bold text-[6px] sm:text-[9px] leading-none px-[2px] py-[1.5px] sm:px-1 sm:py-[2px] rounded shadow-sm border whitespace-nowrap";
+                const badgeClass = "font-bold text-[5.5px] sm:text-[8px] leading-none px-[1px] py-[0px] sm:px-1 sm:py-[1px] rounded shadow-sm border whitespace-nowrap";
                 if (dayName) overlapsHtml += `<span class="text-[#b45309] bg-orange-50 border-orange-200 ${badgeClass}">流日${dayName}</span>`;
                 if (mName) overlapsHtml += `<span class="text-blue-600 bg-blue-50 border-blue-200 ${badgeClass}">流月${mName}</span>`;
                 if (yName) overlapsHtml += `<span class="text-teal-600 bg-teal-50 border-teal-200 ${badgeClass}">流年${yName}</span>`;
                 if (dName) overlapsHtml += `<span class="text-purple-700 bg-purple-50 border-purple-200 ${badgeClass}">大限${dName}</span>`;
 
-                // 2. 主輔星：縮小字體與四化間距，避免向下延伸
+                // 2. 主輔星：主星降至 8px，爭取更多顯示空間
                 const renderStar = (name, isMajor) => {
                     const hN = cell.huaN[name]; const hD = cell.huaD[name];
                     const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
                     return `
                         <div class="flex flex-col items-center shrink-0">
-                            <span class="text-vertical font-bold leading-[1.1] ${isMajor ? 'text-red-700 text-[9px] sm:text-[14px] md:text-[16px]' : 'text-gray-800 text-[7px] sm:text-[10px] md:text-[11px]'}">${name}</span>
+                            <span class="text-vertical font-bold leading-[1.1] ${isMajor ? 'text-red-700 text-[8px] sm:text-[12px] md:text-[14px]' : 'text-gray-800 text-[6.5px] sm:text-[9px] md:text-[10px]'}">${name}</span>
                             <div class="flex flex-col mt-[1px] sm:mt-1 gap-[1px]">
-                                ${hN ? `<span class="hua-badge hua-natal text-[5px] sm:text-[8px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hN}</span>` : ''}
-                                ${hD ? `<span class="hua-badge hua-decade text-[5px] sm:text-[8px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hD}</span>` : ''}
-                                ${hY ? `<span class="hua-badge hua-year text-[5px] sm:text-[8px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hY}</span>` : ''}
-                                ${hM ? `<span class="hua-badge hua-month text-[5px] sm:text-[8px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hM}</span>` : ''}
-                                ${hDay ? `<span class="hua-badge hua-day text-[5px] sm:text-[8px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hDay}</span>` : ''}
+                                ${hN ? `<span class="hua-badge hua-natal text-[5px] sm:text-[7px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hN}</span>` : ''}
+                                ${hD ? `<span class="hua-badge hua-decade text-[5px] sm:text-[7px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hD}</span>` : ''}
+                                ${hY ? `<span class="hua-badge hua-year text-[5px] sm:text-[7px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hY}</span>` : ''}
+                                ${hM ? `<span class="hua-badge hua-month text-[5px] sm:text-[7px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hM}</span>` : ''}
+                                ${hDay ? `<span class="hua-badge hua-day text-[5px] sm:text-[7px] px-[1px] py-[0px] sm:px-1 sm:py-[1px]">${hDay}</span>` : ''}
                             </div>
                         </div>`;
                 };
 
                 // 3. 過客星曜：微縮
                 const renderTransit = (t) => {
-                    return `<span class="transit-badge text-[6px] sm:text-[9px] px-[1px] py-[0px] sm:px-1 sm:py-[1px] mb-[1px] whitespace-nowrap ${t.color}">${t.name}</span>`;
+                    return `<span class="transit-badge text-[5.5px] sm:text-[8px] px-[1px] py-[0px] sm:px-1 sm:py-[1px] mb-[1px] whitespace-nowrap ${t.color}">${t.name}</span>`;
                 }
 
                 const div = document.createElement('div');
@@ -649,29 +651,29 @@
                         ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                     </div>
                     
-                    <!-- 4. 限制星星區塊的 bottom，絕對不會超過底部疊宮標籤 -->
-                    <div class="absolute top-3.5 sm:top-6 left-0.5 sm:left-1 right-0.5 sm:right-1 bottom-9 sm:bottom-12 flex justify-start gap-px sm:gap-1 flex-wrap content-start z-10 overflow-hidden">
+                    <!-- 4. 下放 bottom 限制至 bottom-5 (擴增垂直顯示區域)，確保運線全開不被截斷 -->
+                    <div class="absolute top-[14px] sm:top-6 left-0.5 sm:left-1 right-0.5 sm:right-1 bottom-5 sm:bottom-8 flex justify-start gap-[1px] sm:gap-1 flex-wrap content-start z-10 overflow-hidden">
                         ${cell.major.map(s => renderStar(s, true)).join('')}
                         ${cell.minor.map(s => renderStar(s, false)).join('')}
                     </div>
 
                     <!-- 限制 Transit 星曜區塊的 bottom -->
-                    <div class="absolute top-3.5 sm:top-6 right-0.5 sm:right-1 bottom-9 sm:bottom-12 flex justify-end gap-[1px] flex-wrap max-w-[45%] z-10 overflow-hidden content-start">
+                    <div class="absolute top-[14px] sm:top-6 right-0.5 sm:right-1 bottom-5 sm:bottom-8 flex justify-end gap-[1px] flex-wrap max-w-[45%] z-10 overflow-hidden content-start">
                         ${cell.transit.map(t => renderTransit(t)).join('')}
                     </div>
 
-                    <!-- 疊宮標籤區改為橫向排列 (flex-wrap) 節省高度 -->
-                    <div class="absolute bottom-0.5 sm:bottom-1 right-0.5 sm:right-1 left-2 flex flex-col items-end gap-[1px] text-right bg-white/70 p-0.5 rounded backdrop-blur-sm z-20">
+                    <!-- 疊宮標籤區改為橫向排列，加入 bg-white/80 避免與底下的星曜線條混淆 -->
+                    <div class="absolute bottom-0.5 sm:bottom-1 right-0.5 sm:right-1 left-1.5 flex flex-col items-end gap-[1px] text-right bg-white/80 p-0.5 rounded backdrop-blur-sm z-20">
                         <div class="flex flex-wrap justify-end gap-[1px] w-full">
                             ${overlapsHtml}
                             ${isBodyPalace ? `<span class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white font-black text-[6px] sm:text-[9px] px-1 sm:px-2 py-[1.5px] sm:py-[2px] rounded shadow-sm border border-blue-400 animate-pulse whitespace-nowrap">身宮</span>` : ''}
                         </div>
-                        <div class="text-[10px] sm:text-[14px] md:text-lg font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-200 mt-[1px]">
+                        <div class="text-[9px] sm:text-[12px] md:text-[16px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-200 mt-[1px]">
                             ${nName}
                         </div>
                     </div>
 
-                    <div class="absolute bottom-0.5 left-0.5 text-[6px] sm:text-[8px] text-gray-400 font-bold z-10">
+                    <div class="absolute bottom-0.5 left-0.5 text-[5px] sm:text-[8px] text-gray-400 font-bold z-10">
                         ${state.lunar ? `${cell.ageStart}-${cell.ageEnd}` : ''}
                     </div>
                 `;
@@ -685,8 +687,8 @@
                     if (!state.lunar) {
                         center.innerHTML = `
                             <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
-                                <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-xl sm:text-3xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-24 sm:w-40 mb-2 sm:mb-6 pointer-events-auto" oninput="updateName()">
-                                <p class="text-[10px] sm:text-sm font-bold text-gray-400 tracking-widest mt-2 sm:mt-4">請輸入生辰資料並排盤</p>
+                                <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-lg sm:text-2xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-20 sm:w-32 mb-1 sm:mb-4 pointer-events-auto" oninput="updateName()">
+                                <p class="text-[9px] sm:text-sm font-bold text-gray-400 tracking-widest mt-1 sm:mt-4">請輸入生辰資料並排盤</p>
                             </div>
                         `;
                     } else {
@@ -694,14 +696,15 @@
                         const hourText = hourSelect.options[hourSelect.selectedIndex].text.split('(')[0];
                         const yyGenderStr = `${state.yinYang}${state.gender === 'M' ? '男' : '女'}`;
                         
+                        // 中心區域因應網格壓縮，稍微調降內部字體與邊距
                         center.innerHTML = `
-                            <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
-                                <p class="text-[10px] sm:text-sm font-black text-gray-600 mb-1 sm:mb-2 border-b border-gray-300 pb-0.5 sm:pb-1 w-full text-center tracking-widest">${yyGenderStr}命</p>
+                            <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-2">
+                                <p class="text-[8px] sm:text-xs font-black text-gray-600 mb-0.5 sm:mb-2 border-b border-gray-300 pb-0.5 sm:pb-1 w-full text-center tracking-widest">${yyGenderStr}命</p>
 
-                                <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-xl sm:text-3xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-24 sm:w-40 mb-2 sm:mb-6 pointer-events-auto" oninput="updateName()">
+                                <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-lg sm:text-2xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-20 sm:w-32 mb-1 sm:mb-4 pointer-events-auto" oninput="updateName()">
                                 
-                                <div class="flex flex-col gap-0.5 sm:gap-2 text-[9px] sm:text-sm font-bold text-gray-700 w-full text-center tracking-wide">
-                                    <p>陽曆: ${state.solarDate} <br class="block sm:hidden">${hourText}</p>
+                                <div class="flex flex-col gap-0.5 sm:gap-2 text-[8px] sm:text-sm font-bold text-gray-700 w-full text-center tracking-wide">
+                                    <p>陽曆: <br class="block sm:hidden">${state.solarDate} ${hourText}</p>
                                     <p>農曆: <br class="block sm:hidden">${state.lunar.getYearInGanZhi()}年${state.lunar.getMonthInChinese()}月${state.lunar.getDayInChinese()}<br class="block sm:hidden"> ${branchNames[state.hourIndex]}時</p>
                                 </div>
                             </div>
