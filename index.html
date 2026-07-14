@@ -104,14 +104,14 @@
                 <!-- 第二排：生辰輸入 (隱藏原生Date輸入，保留數字輸入框) -->
                 <div class="flex gap-1 sm:gap-2 w-full flex-wrap items-center">
                     <!-- 隱藏的日期字串，供JS使用 -->
-                    <input type="hidden" id="birth-date" value="1980-07-18">
+                    <input type="hidden" id="birth-date" value="">
                     
                     <div class="flex items-center gap-0.5 sm:gap-1 bg-gray-50 border border-gray-300 rounded px-1.5 sm:px-2 py-1 sm:py-1.5 focus-within:border-amber-500 shrink-0">
-                        <input type="number" id="birth-year" value="1980" class="bg-transparent outline-none w-10 sm:w-12 text-center text-[11px] sm:text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
+                        <input type="number" id="birth-year" value="" placeholder="年" class="bg-transparent outline-none w-10 sm:w-12 text-center text-[11px] sm:text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
                         <span class="text-gray-500 text-[10px] sm:text-xs">年</span>
-                        <input type="number" id="birth-month" value="7" min="1" max="12" class="bg-transparent outline-none w-6 sm:w-8 text-center text-[11px] sm:text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
+                        <input type="number" id="birth-month" value="" placeholder="月" min="1" max="12" class="bg-transparent outline-none w-6 sm:w-8 text-center text-[11px] sm:text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
                         <span class="text-gray-500 text-[10px] sm:text-xs">月</span>
-                        <input type="number" id="birth-day" value="18" min="1" max="31" class="bg-transparent outline-none w-6 sm:w-8 text-center text-[11px] sm:text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
+                        <input type="number" id="birth-day" value="" placeholder="日" min="1" max="31" class="bg-transparent outline-none w-6 sm:w-8 text-center text-[11px] sm:text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
                         <span class="text-gray-500 text-[10px] sm:text-xs">日</span>
                     </div>
 
@@ -168,10 +168,14 @@
 
     <script>
         function syncDateFromNumbers() {
-            const y = document.getElementById('birth-year').value.padStart(4, '0');
-            const m = document.getElementById('birth-month').value.padStart(2, '0');
-            const d = document.getElementById('birth-day').value.padStart(2, '0');
-            document.getElementById('birth-date').value = `${y}-${m}-${d}`;
+            const y = document.getElementById('birth-year').value;
+            const m = document.getElementById('birth-month').value;
+            const d = document.getElementById('birth-day').value;
+            if (y && m && d) {
+                document.getElementById('birth-date').value = `${y.padStart(4, '0')}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+            } else {
+                document.getElementById('birth-date').value = '';
+            }
         }
 
         const branches = ['zi', 'chou', 'yin', 'mao', 'chen', 'si', 'wu', 'wei', 'shen', 'you', 'xu', 'hai'];
@@ -252,6 +256,25 @@
             state.solarDate = document.getElementById('birth-date').value;
             const inputHourVal = parseInt(document.getElementById('birth-hour').value);
             
+            const yearStr = document.getElementById('birth-year').value;
+            const monthStr = document.getElementById('birth-month').value;
+            const dayStr = document.getElementById('birth-day').value;
+
+            if (!yearStr || !monthStr || !dayStr) {
+                state.lunar = null;
+                state.stemsMap = Array(12).fill('');
+                state.board.forEach(cell => {
+                    cell.major = []; cell.minor = []; cell.transit = [];
+                    cell.huaN = {}; cell.huaD = {}; cell.huaY = {}; cell.huaM = {}; cell.huaDay = {};
+                    cell.ageStart = ''; cell.ageEnd = '';
+                });
+                state.decades = []; state.years = [];
+                state.selDecade = null; state.selYear = null; state.selMonth = null; state.selDay = null;
+                renderTimelines();
+                renderBoard();
+                return;
+            }
+
             state.hourIndex = (inputHourVal === 23) ? 0 : inputHourVal;
             
             const [y, m, d] = state.solarDate.split('-').map(Number);
@@ -563,6 +586,7 @@
         }
 
         function getPalaceName(lifeBranch, targetBranch, isShort = false) {
+            if (!state.lunar) return '';
             const diff = (lifeBranch - targetBranch + 12) % 12;
             return isShort ? palacesShort[diff] : palaces[diff];
         }
@@ -582,7 +606,7 @@
                 const mName = (state.selYear && state.selMonth) ? getPalaceName(state.monthLifeBranch, bIndex, true) : '';
                 const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex, true) : '';
                 
-                const isBodyPalace = (bIndex === state.bodyBranch);
+                const isBodyPalace = state.lunar ? (bIndex === state.bodyBranch) : false;
 
                 let overlapsHtml = '';
                 if (dayName) overlapsHtml += `<span class="text-[#b45309] font-bold text-[8px] sm:text-[10px] leading-tight bg-orange-50 px-0.5 sm:px-1 rounded shadow-sm border border-orange-200">流日${dayName}</span>`;
@@ -595,7 +619,7 @@
                     const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
                     return `
                         <div class="flex flex-col items-center shrink-0">
-                            <span class="text-vertical font-bold leading-tight ${isMajor ? 'text-red-700 text-[13px] sm:text-[18px] md:text-[20px]' : 'text-gray-800 text-[9px] sm:text-[11px] md:text-[12px]'}">${name}</span>
+                            <span class="text-vertical font-bold leading-tight ${isMajor ? 'text-red-700 text-[12px] sm:text-[16px] md:text-[18px]' : 'text-gray-800 text-[9px] sm:text-[11px] md:text-[12px]'}">${name}</span>
                             <div class="flex flex-col mt-[1px] sm:mt-1 gap-[1px]">
                                 ${hN ? `<span class="hua-badge hua-natal text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hN}</span>` : ''}
                                 ${hD ? `<span class="hua-badge hua-decade text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hD}</span>` : ''}
@@ -639,7 +663,7 @@
                     </div>
 
                     <div class="absolute bottom-0.5 left-0.5 text-[7px] sm:text-[8px] text-gray-400 font-bold z-10">
-                        ${cell.ageStart}-${cell.ageEnd}
+                        ${state.lunar ? `${cell.ageStart}-${cell.ageEnd}` : ''}
                     </div>
                 `;
                 grid.appendChild(div);
@@ -649,22 +673,31 @@
                     center.className = "col-span-2 row-span-2 bg-white/40 backdrop-blur-sm border-b border-r border-[#9ca3af] flex flex-col justify-center items-center relative shadow-inner z-10 pointer-events-none";
                     center.style.gridArea = "2/2/4/4"; 
                     
-                    const hourSelect = document.getElementById('birth-hour');
-                    const hourText = hourSelect.options[hourSelect.selectedIndex].text.split('(')[0];
-                    const yyGenderStr = `${state.yinYang}${state.gender === 'M' ? '男' : '女'}`;
-                    
-                    center.innerHTML = `
-                        <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
-                            <p class="text-[10px] sm:text-sm font-black text-gray-600 mb-1 sm:mb-2 border-b border-gray-300 pb-0.5 sm:pb-1 w-full text-center tracking-widest">${yyGenderStr}命</p>
-
-                            <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-xl sm:text-3xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-16 sm:w-40 mb-2 sm:mb-6 pointer-events-auto" oninput="updateName()">
-                            
-                            <div class="flex flex-col gap-0.5 sm:gap-2 text-[9px] sm:text-sm font-bold text-gray-700 w-full text-center tracking-wide">
-                                <p>陽曆: ${state.solarDate} <br class="block sm:hidden">${hourText}</p>
-                                <p>農曆: <br class="block sm:hidden">${state.lunar.getYearInGanZhi()}年${state.lunar.getMonthInChinese()}月${state.lunar.getDayInChinese()}<br class="block sm:hidden"> ${branchNames[state.hourIndex]}時</p>
+                    if (!state.lunar) {
+                        center.innerHTML = `
+                            <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
+                                <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-xl sm:text-3xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-24 sm:w-40 mb-2 sm:mb-6 pointer-events-auto" oninput="updateName()">
+                                <p class="text-[10px] sm:text-sm font-bold text-gray-400 tracking-widest mt-2 sm:mt-4">請輸入生辰資料並排盤</p>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    } else {
+                        const hourSelect = document.getElementById('birth-hour');
+                        const hourText = hourSelect.options[hourSelect.selectedIndex].text.split('(')[0];
+                        const yyGenderStr = `${state.yinYang}${state.gender === 'M' ? '男' : '女'}`;
+                        
+                        center.innerHTML = `
+                            <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
+                                <p class="text-[10px] sm:text-sm font-black text-gray-600 mb-1 sm:mb-2 border-b border-gray-300 pb-0.5 sm:pb-1 w-full text-center tracking-widest">${yyGenderStr}命</p>
+
+                                <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-xl sm:text-3xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-24 sm:w-40 mb-2 sm:mb-6 pointer-events-auto" oninput="updateName()">
+                                
+                                <div class="flex flex-col gap-0.5 sm:gap-2 text-[9px] sm:text-sm font-bold text-gray-700 w-full text-center tracking-wide">
+                                    <p>陽曆: ${state.solarDate} <br class="block sm:hidden">${hourText}</p>
+                                    <p>農曆: <br class="block sm:hidden">${state.lunar.getYearInGanZhi()}年${state.lunar.getMonthInChinese()}月${state.lunar.getDayInChinese()}<br class="block sm:hidden"> ${branchNames[state.hourIndex]}時</p>
+                                </div>
+                            </div>
+                        `;
+                    }
                     grid.appendChild(center);
                 }
             });
@@ -731,6 +764,16 @@
         function showInterpretation() {
             const panel = document.getElementById('interpretation-panel');
             panel.classList.remove('hidden');
+
+            if (!state.lunar) {
+                document.getElementById('interpretation-content').innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full py-10 text-gray-400">
+                        <i class="fa-solid fa-inbox text-4xl mb-3"></i>
+                        <p class="text-sm font-bold">請先輸入生辰資料並進行排盤</p>
+                    </div>
+                `;
+                return;
+            }
             
             const lifeB = state.lifeBranch;
             const wealthB = (lifeB - 4 + 12) % 12; // 財帛
