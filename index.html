@@ -608,30 +608,33 @@
                 
                 const isBodyPalace = state.lunar ? (bIndex === state.bodyBranch) : false;
 
+                // 1. 縮小手機版疊宮標籤字體與內距 (text-[7px] 並改用 leading-none)
                 let overlapsHtml = '';
-                if (dayName) overlapsHtml += `<span class="text-[#b45309] font-bold text-[8px] sm:text-[10px] leading-tight bg-orange-50 px-0.5 sm:px-1 rounded shadow-sm border border-orange-200">流日${dayName}</span>`;
-                if (mName) overlapsHtml += `<span class="text-blue-600 font-bold text-[8px] sm:text-[10px] leading-tight bg-blue-50 px-0.5 sm:px-1 rounded shadow-sm border border-blue-200">流月${mName}</span>`;
-                if (yName) overlapsHtml += `<span class="text-teal-600 font-bold text-[8px] sm:text-[10px] leading-tight bg-teal-50 px-0.5 sm:px-1 rounded shadow-sm border border-teal-200">流年${yName}</span>`;
-                if (dName) overlapsHtml += `<span class="text-purple-700 font-bold text-[8px] sm:text-[10px] leading-tight bg-purple-50 px-0.5 sm:px-1 rounded shadow-sm border border-purple-200">大限${dName}</span>`;
+                if (dayName) overlapsHtml += `<span class="text-[#b45309] font-bold text-[7px] sm:text-[10px] leading-none bg-orange-50 px-0.5 sm:px-1 py-[1.5px] sm:py-[2px] rounded shadow-sm border border-orange-200 mb-[1px]">流日${dayName}</span>`;
+                if (mName) overlapsHtml += `<span class="text-blue-600 font-bold text-[7px] sm:text-[10px] leading-none bg-blue-50 px-0.5 sm:px-1 py-[1.5px] sm:py-[2px] rounded shadow-sm border border-blue-200 mb-[1px]">流月${mName}</span>`;
+                if (yName) overlapsHtml += `<span class="text-teal-600 font-bold text-[7px] sm:text-[10px] leading-none bg-teal-50 px-0.5 sm:px-1 py-[1.5px] sm:py-[2px] rounded shadow-sm border border-teal-200 mb-[1px]">流年${yName}</span>`;
+                if (dName) overlapsHtml += `<span class="text-purple-700 font-bold text-[7px] sm:text-[10px] leading-none bg-purple-50 px-0.5 sm:px-1 py-[1.5px] sm:py-[2px] rounded shadow-sm border border-purple-200 mb-[1px]">大限${dName}</span>`;
 
+                // 2. 縮小主輔星字體，避免四化全開時被遮蔽
                 const renderStar = (name, isMajor) => {
                     const hN = cell.huaN[name]; const hD = cell.huaD[name];
                     const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
                     return `
                         <div class="flex flex-col items-center shrink-0">
-                            <span class="text-vertical font-bold leading-tight ${isMajor ? 'text-red-700 text-[12px] sm:text-[16px] md:text-[18px]' : 'text-gray-800 text-[9px] sm:text-[11px] md:text-[12px]'}">${name}</span>
+                            <span class="text-vertical font-bold leading-tight ${isMajor ? 'text-red-700 text-[10px] sm:text-[14px] md:text-[16px]' : 'text-gray-800 text-[8px] sm:text-[10px] md:text-[11px]'}">${name}</span>
                             <div class="flex flex-col mt-[1px] sm:mt-1 gap-[1px]">
-                                ${hN ? `<span class="hua-badge hua-natal text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hN}</span>` : ''}
-                                ${hD ? `<span class="hua-badge hua-decade text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hD}</span>` : ''}
-                                ${hY ? `<span class="hua-badge hua-year text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hY}</span>` : ''}
-                                ${hM ? `<span class="hua-badge hua-month text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hM}</span>` : ''}
-                                ${hDay ? `<span class="hua-badge hua-day text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hDay}</span>` : ''}
+                                ${hN ? `<span class="hua-badge hua-natal text-[6px] sm:text-[9px] px-[2px] py-[0.5px] sm:px-1 sm:py-[1px]">${hN}</span>` : ''}
+                                ${hD ? `<span class="hua-badge hua-decade text-[6px] sm:text-[9px] px-[2px] py-[0.5px] sm:px-1 sm:py-[1px]">${hD}</span>` : ''}
+                                ${hY ? `<span class="hua-badge hua-year text-[6px] sm:text-[9px] px-[2px] py-[0.5px] sm:px-1 sm:py-[1px]">${hY}</span>` : ''}
+                                ${hM ? `<span class="hua-badge hua-month text-[6px] sm:text-[9px] px-[2px] py-[0.5px] sm:px-1 sm:py-[1px]">${hM}</span>` : ''}
+                                ${hDay ? `<span class="hua-badge hua-day text-[6px] sm:text-[9px] px-[2px] py-[0.5px] sm:px-1 sm:py-[1px]">${hDay}</span>` : ''}
                             </div>
                         </div>`;
                 };
 
+                // 3. 縮小流年過客星曜
                 const renderTransit = (t) => {
-                    return `<span class="transit-badge text-[8px] sm:text-[11px] ${t.color}">${t.name}</span>`;
+                    return `<span class="transit-badge text-[7px] sm:text-[10px] px-[2px] py-[0.5px] sm:px-1 sm:py-[1px] mb-[1px] ${t.color}">${t.name}</span>`;
                 }
 
                 const div = document.createElement('div');
@@ -645,19 +648,20 @@
                         ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                     </div>
                     
-                    <div class="absolute top-5 sm:top-6 left-0.5 sm:left-1 right-0.5 sm:right-1 flex justify-start gap-0.5 sm:gap-1 flex-wrap content-start h-[55%] z-10">
+                    <!-- 4. 調整 top 距離與 h 比例，釋放下方空間給疊宮標籤 -->
+                    <div class="absolute top-4 sm:top-6 left-0.5 sm:left-1 right-0.5 sm:right-1 flex justify-start gap-0.5 sm:gap-1 flex-wrap content-start h-[60%] sm:h-[55%] z-10 overflow-hidden">
                         ${cell.major.map(s => renderStar(s, true)).join('')}
                         ${cell.minor.map(s => renderStar(s, false)).join('')}
                     </div>
 
-                    <div class="absolute top-5 sm:top-6 right-0.5 sm:right-1 flex justify-end gap-[1px] flex-wrap max-w-[50%] z-10">
+                    <div class="absolute top-4 sm:top-6 right-0.5 sm:right-1 flex justify-end gap-[1px] flex-wrap max-w-[50%] z-10">
                         ${cell.transit.map(t => renderTransit(t)).join('')}
                     </div>
 
-                    <div class="absolute bottom-1 right-1 flex flex-col items-end gap-[1px] text-right bg-white/70 p-0.5 rounded backdrop-blur-sm z-10">
+                    <div class="absolute bottom-1 right-1 flex flex-col items-end gap-[1px] text-right bg-white/70 p-0.5 rounded backdrop-blur-sm z-20">
                         ${overlapsHtml}
-                        ${isBodyPalace ? `<div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white font-black text-[9px] sm:text-[12px] px-1 sm:px-2 py-[1px] sm:py-0.5 rounded shadow-lg border border-blue-400 mb-0.5 sm:mb-1 animate-pulse">身宮</div>` : ''}
-                        <div class="text-[12px] sm:text-[16px] md:text-lg font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-200 mt-[1px] sm:mt-[2px]">
+                        ${isBodyPalace ? `<div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white font-black text-[8px] sm:text-[12px] px-1 sm:px-2 py-[1px] sm:py-0.5 rounded shadow-lg border border-blue-400 mb-[1px] sm:mb-1 animate-pulse">身宮</div>` : ''}
+                        <div class="text-[11px] sm:text-[16px] md:text-lg font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-200 mt-[1px] sm:mt-[2px]">
                             ${nName}
                         </div>
                     </div>
