@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: 'Noto Serif TC', serif;
-            background-color: #f7f6f2;
+            background-color: #f7f6f2; /* 宣紙底色 */
             color: #1a1a1a;
             overscroll-behavior: none;
         }
@@ -44,34 +44,27 @@
         .bg-water { background-color: #f0f9ff; }
         .bg-earth { background-color: #fffbeb; }
 
+        /* 四化與運限標籤 */
         .hua-badge {
             display: inline-block;
-            font-size: 10px;
             font-weight: 900;
             color: white;
-            padding: 1px 3px;
             border-radius: 2px;
-            margin-top: 2px;
             line-height: 1.1;
             box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
-        .hua-natal { background-color: #b91c1c; border: 1px solid #991b1b; }
-        .hua-decade { background-color: #7e22ce; border: 1px solid #581c87; }
-        .hua-year { background-color: #0d9488; border: 1px solid #0f766e; }
-        .hua-month { background-color: #2563eb; border: 1px solid #1e3a8a; }
-        .hua-day { background-color: #d97706; border: 1px solid #b45309; }
+        .hua-natal { background-color: #b91c1c; border: 1px solid #991b1b; } 
+        .hua-decade { background-color: #7e22ce; border: 1px solid #581c87; } 
+        .hua-year { background-color: #0d9488; border: 1px solid #0f766e; } 
+        .hua-month { background-color: #2563eb; border: 1px solid #1e3a8a; } 
+        .hua-day { background-color: #d97706; border: 1px solid #b45309; } 
 
         .transit-badge {
             display: inline-block;
-            font-size: 11px;
-            font-weight: 900;
-            padding: 1.5px 4px;
-            border-radius: 3px;
-            margin-right: 2px;
-            margin-bottom: 2px;
+            font-weight: bold;
+            border-radius: 2px;
             line-height: 1.1;
-            border: 1.5px solid;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+            border: 1px solid;
         }
 
         /* 按鈕激活態 */
@@ -81,95 +74,99 @@
         .btn-active-day { background-color: #b45309 !important; color: white !important; font-weight: bold; border-color: #92400e !important; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col pt-1 pb-10">
+<!-- 縮小上下 padding，以利手機一頁瀏覽 -->
+<body class="min-h-screen flex flex-col pt-1 pb-4">
 
-    <div class="flex flex-col lg:flex-row w-full gap-4 max-w-[1400px] mx-auto px-1 md:px-4">
-        <div class="w-full lg:w-[65%] flex flex-col gap-2">
+    <!-- 整體縮小 gap -->
+    <div class="flex flex-col lg:flex-row w-full gap-2 lg:gap-4 max-w-[1400px] mx-auto px-1 md:px-4">
+        
+        <!-- 左半部：命盤與控制列 -->
+        <div class="w-full lg:w-[65%] flex flex-col gap-1.5 sm:gap-2">
             
-            <header class="bg-white border border-gray-300 rounded p-2 shadow-sm flex flex-col gap-3 z-30 relative">
-                <div class="flex flex-wrap items-center justify-between gap-3 w-full">
+            <!-- 頂部控制列 -->
+            <header class="bg-white border border-gray-300 rounded p-1.5 sm:p-2 shadow-sm flex flex-col gap-1.5 sm:gap-3 z-30 relative">
+                <!-- 第一排：姓名與性別 -->
+                <div class="flex flex-wrap items-center justify-between gap-1.5 w-full">
                     <div class="flex items-center gap-2">
-                        <span class="text-sm font-black tracking-widest text-gray-800 shrink-0">命盤</span>
-                        <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 px-2 py-1 rounded">
-                            <label class="text-xs font-bold text-gray-600">姓名</label>
-                            <input type="text" id="input-name" value="女命測試" class="bg-transparent outline-none text-sm font-bold text-gray-800 w-24 border-b border-gray-300 focus:border-amber-600" oninput="updateName()">
+                        <span class="text-xs sm:text-sm font-black tracking-widest text-gray-800 shrink-0 hidden sm:block">命盤</span>
+                        <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+                            <label class="text-[10px] sm:text-xs font-bold text-gray-600">姓名</label>
+                            <!-- 移除預設女命測試，改為純空白 -->
+                            <input type="text" id="input-name" value="" placeholder="請輸入" class="bg-transparent outline-none text-[11px] sm:text-sm font-bold text-gray-800 w-16 sm:w-24 border-b border-gray-300 focus:border-amber-600" oninput="updateName()">
                         </div>
                     </div>
-                    <div class="flex bg-gray-100 rounded p-1 border border-gray-200">
-                        <button id="btn-male" class="px-3 py-1 text-xs font-bold rounded text-gray-500 hover:text-gray-800" onclick="setGender('M')">男</button>
-                        <button id="btn-female" class="px-3 py-1 text-xs font-bold rounded shadow bg-pink-700 text-white" onclick="setGender('F')">女</button>
+                    <div class="flex bg-gray-100 rounded p-0.5 sm:p-1 border border-gray-200">
+                        <button id="btn-male" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded shadow bg-blue-700 text-white" onclick="setGender('M')">男</button>
+                        <button id="btn-female" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800" onclick="setGender('F')">女</button>
                     </div>
                 </div>
                 
-                <div class="flex gap-2 w-full flex-wrap items-center">
-                    <input type="date" id="birth-date" value="1980-07-18" class="bg-gray-50 border border-gray-300 rounded px-2 py-1.5 text-xs outline-none focus:ring-1 focus:ring-amber-500 shrink-0 hidden sm:block" onchange="syncDateInputs(this.value)">
+                <!-- 第二排：生辰輸入 (隱藏原生Date輸入，保留數字輸入框) -->
+                <div class="flex gap-1 sm:gap-2 w-full flex-wrap items-center">
+                    <!-- 隱藏的日期字串，供JS使用 -->
+                    <input type="hidden" id="birth-date" value="1980-07-18">
                     
-                    <div class="flex items-center gap-1 bg-gray-50 border border-gray-300 rounded px-2 py-1.5 focus-within:border-amber-500 shrink-0">
-                        <input type="number" id="birth-year" value="1980" class="bg-transparent outline-none w-12 text-center text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
-                        <span class="text-gray-500 text-xs">年</span>
-                        <input type="number" id="birth-month" value="7" min="1" max="12" class="bg-transparent outline-none w-8 text-center text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
-                        <span class="text-gray-500 text-xs">月</span>
-                        <input type="number" id="birth-day" value="18" min="1" max="31" class="bg-transparent outline-none w-8 text-center text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
-                        <span class="text-gray-500 text-xs">日</span>
+                    <div class="flex items-center gap-0.5 sm:gap-1 bg-gray-50 border border-gray-300 rounded px-1.5 sm:px-2 py-1 sm:py-1.5 focus-within:border-amber-500 shrink-0">
+                        <input type="number" id="birth-year" value="1980" class="bg-transparent outline-none w-10 sm:w-12 text-center text-[11px] sm:text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
+                        <span class="text-gray-500 text-[10px] sm:text-xs">年</span>
+                        <input type="number" id="birth-month" value="7" min="1" max="12" class="bg-transparent outline-none w-6 sm:w-8 text-center text-[11px] sm:text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
+                        <span class="text-gray-500 text-[10px] sm:text-xs">月</span>
+                        <input type="number" id="birth-day" value="18" min="1" max="31" class="bg-transparent outline-none w-6 sm:w-8 text-center text-[11px] sm:text-xs font-bold text-gray-800" onchange="syncDateFromNumbers()">
+                        <span class="text-gray-500 text-[10px] sm:text-xs">日</span>
                     </div>
 
-                    <select id="birth-hour" class="bg-gray-50 border border-gray-300 rounded px-2 py-1.5 text-xs outline-none focus:ring-1 focus:ring-amber-500 shrink-0">
-                        <option value="0">早子時 (00:00~00:59)</option>
-                        <option value="1">丑時 (01:00~02:59)</option>
-                        <option value="2">寅時 (03:00~04:59)</option>
-                        <option value="3">卯時 (05:00~06:59)</option>
-                        <option value="4">辰時 (07:00~08:59)</option>
-                        <option value="5">巳時 (09:00~10:59)</option>
-                        <option value="6">午時 (11:00~12:59)</option>
-                        <option value="7">未時 (13:00~14:59)</option>
-                        <option value="8">申時 (15:00~16:59)</option>
-                        <option value="9">酉時 (17:00~18:59)</option>
-                        <option value="10">戌時 (19:00~20:59)</option>
-                        <option value="11">亥時 (21:00~22:59)</option>
-                        <option value="23" selected>晚子時 (23:00~23:59)</option>
+                    <select id="birth-hour" class="bg-gray-50 border border-gray-300 rounded px-1 sm:px-2 py-1 sm:py-1.5 text-[10px] sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 shrink-0">
+                        <option value="0">早子時(00-01)</option>
+                        <option value="1">丑時(01-03)</option>
+                        <option value="2">寅時(03-05)</option>
+                        <option value="3">卯時(05-07)</option>
+                        <option value="4">辰時(07-09)</option>
+                        <option value="5">巳時(09-11)</option>
+                        <option value="6">午時(11-13)</option>
+                        <option value="7">未時(13-15)</option>
+                        <option value="8">申時(15-17)</option>
+                        <option value="9">酉時(17-19)</option>
+                        <option value="10">戌時(19-21)</option>
+                        <option value="11">亥時(21-23)</option>
+                        <option value="23" selected>晚子時(23-00)</option>
                     </select>
                     
-                    <button onclick="initApp()" class="bg-gray-800 text-white text-xs font-bold px-4 py-1.5 rounded shrink-0 hover:bg-black shadow">重新排盤</button>
+                    <button onclick="initApp()" class="bg-gray-800 text-white text-[10px] sm:text-xs font-bold px-2 sm:px-4 py-1 sm:py-1.5 rounded shrink-0 hover:bg-black shadow">排盤</button>
                     
-                    <button onclick="showInterpretation()" class="ml-auto bg-gradient-to-r from-purple-700 to-purple-600 hover:from-purple-800 hover:to-purple-700 text-white text-xs font-bold px-4 py-1.5 rounded shadow-md transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-book-open"></i> 本命盤解說
+                    <button onclick="showInterpretation()" class="ml-auto bg-gradient-to-r from-purple-700 to-purple-600 hover:from-purple-800 hover:to-purple-700 text-white text-[10px] sm:text-xs font-bold px-2 sm:px-4 py-1 sm:py-1.5 rounded shadow-md transition-all flex items-center gap-1">
+                        <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">解說</span>
                     </button>
                 </div>
             </header>
 
+            <!-- 命盤主體 4x4 Grid -->
             <div class="relative w-full aspect-square max-w-[800px] mx-auto bg-white border border-gray-500 shadow-md z-10">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
                 <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);">
                 </div>
             </div>
 
-            <footer class="bg-white border border-gray-300 rounded p-3 shadow-sm max-w-[800px] mx-auto w-full z-20 relative flex flex-col gap-3 mb-6 mt-2">
-                <div class="text-xs text-gray-500 font-bold px-1 flex justify-between border-b border-gray-100 pb-1.5">
-                    <span><i class="fa-regular fa-clock mr-1"></i> 運線時間軸 (點擊切換運勢疊宮與流年星曜)</span>
+            <!-- 下方時間軸 (緊湊型設計) -->
+            <footer class="bg-white border border-gray-300 rounded p-1.5 sm:p-3 shadow-sm max-w-[800px] mx-auto w-full z-20 relative flex flex-col gap-1.5 sm:gap-3 mb-2">
+                <div class="text-[9px] sm:text-xs text-gray-500 font-bold px-1 flex justify-between border-b border-gray-100 pb-1">
+                    <span><i class="fa-regular fa-clock mr-1"></i> 運線時間軸 (點擊切換疊宮與星曜)</span>
                     <span id="current-time-display" class="text-amber-700"></span>
                 </div>
-                <div class="flex flex-wrap gap-1.5" id="timeline-decades"></div>
-                <div class="flex flex-wrap gap-1.5" id="timeline-years"></div>
-                <div class="border-t border-gray-100 pt-2 flex flex-wrap gap-1.5" id="timeline-months"></div>
-                <div class="border-t border-gray-100 pt-2 flex flex-wrap gap-1.5" id="timeline-days"></div>
+                <div class="flex flex-wrap gap-1 sm:gap-1.5" id="timeline-decades"></div>
+                <div class="flex flex-wrap gap-1 sm:gap-1.5" id="timeline-years"></div>
+                <div class="border-t border-gray-100 pt-1.5 flex flex-wrap gap-1 sm:gap-1.5" id="timeline-months"></div>
+                <div class="border-t border-gray-100 pt-1.5 flex flex-wrap gap-1 sm:gap-1.5" id="timeline-days"></div>
             </footer>
         </div>
 
-        <aside id="interpretation-panel" class="w-full lg:w-[35%] bg-white border border-gray-300 rounded-lg p-5 shadow-md flex flex-col hidden h-fit mt-2 lg:mt-0 sticky top-4 z-40">
+        <!-- 右半部：深度解說面板 -->
+        <aside id="interpretation-panel" class="w-full lg:w-[35%] bg-white border border-gray-300 rounded-lg p-3 sm:p-5 shadow-md flex flex-col hidden h-fit mt-1 lg:mt-0 sticky top-2 z-40">
             <div id="interpretation-content"></div>
         </aside>
 
     </div>
 
     <script>
-        function syncDateInputs(dateVal) {
-            if(!dateVal) return;
-            const [y, m, d] = dateVal.split('-');
-            document.getElementById('birth-year').value = parseInt(y);
-            document.getElementById('birth-month').value = parseInt(m);
-            document.getElementById('birth-day').value = parseInt(d);
-        }
-
         function syncDateFromNumbers() {
             const y = document.getElementById('birth-year').value.padStart(4, '0');
             const m = document.getElementById('birth-month').value.padStart(2, '0');
@@ -198,6 +195,7 @@
             yin: {x: 12.5, y: 87.5}, chou: {x: 37.5, y: 87.5}, zi: {x: 62.5, y: 87.5}, hai: {x: 87.5, y: 87.5}
         };
 
+        // 庚干四化正統：陽武同相
         const huaTable = {
             '甲': ['廉貞', '破軍', '武曲', '太陽'], '乙': ['天機', '天梁', '紫微', '太陰'],
             '丙': ['天同', '天機', '文昌', '廉貞'], '丁': ['太陰', '天同', '天機', '巨門'],
@@ -210,7 +208,7 @@
         const uiOrder = ['si', 'wu', 'wei', 'shen', 'chen', 'you', 'mao', 'xu', 'yin', 'chou', 'zi', 'hai'];
 
         let state = {
-            userName: "女命測試",
+            userName: "", // 初始姓名空白
             gender: 'F', yinYang: '陽', lunar: null, lifeBranch: 0, bodyBranch: 0, elementJu: 0, stemsMap: [],
             solarDate: '1980-07-18', hourIndex: 23,
             decades: [], years: [],
@@ -220,27 +218,32 @@
         };
 
         function updateName() {
-            state.userName = document.getElementById('input-name').value || '命主';
+            state.userName = document.getElementById('input-name').value;
+            const display = document.getElementById('user-name-input');
+            if(display) display.value = state.userName;
+            const interpName = document.getElementById('interp-name-display');
+            if(interpName) interpName.innerText = state.userName || '命主';
         }
 
         function setGender(g) {
             state.gender = g;
-            document.getElementById('btn-male').className = g === 'M' ? "px-3 py-1 text-xs font-bold rounded shadow bg-blue-700 text-white" : "px-3 py-1 text-xs font-bold rounded text-gray-500 hover:text-gray-800";
-            document.getElementById('btn-female').className = g === 'F' ? "px-3 py-1 text-xs font-bold rounded shadow bg-pink-700 text-white" : "px-3 py-1 text-xs font-bold rounded text-gray-500 hover:text-gray-800";
+            document.getElementById('btn-male').className = g === 'M' ? "px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded shadow bg-blue-700 text-white" : "px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800";
+            document.getElementById('btn-female').className = g === 'F' ? "px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded shadow bg-pink-700 text-white" : "px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800";
             initApp();
         }
 
+        // 動態計算五行局定紫微
         function getZiweiBranch(day, ju) {
             let x = 0;
             while ((day + x) % ju !== 0) {
                 x++;
             }
             let q = (day + x) / ju;
-            let base = (2 + q - 1) % 12; // 寅起始(2)
+            let base = (2 + q - 1) % 12; 
             if (x % 2 === 0) {
-                return (base + x) % 12; // 偶數順進
+                return (base + x) % 12; 
             } else {
-                return (base - x + 12) % 12; // 奇數逆退
+                return (base - x + 12) % 12; 
             }
         }
 
@@ -250,6 +253,7 @@
             const inputHourVal = parseInt(document.getElementById('birth-hour').value);
             
             state.hourIndex = (inputHourVal === 23) ? 0 : inputHourVal;
+            
             const [y, m, d] = state.solarDate.split('-').map(Number);
             
             let solarHourForLunar = (inputHourVal === 23) ? 23 : (inputHourVal === 0 ? 0 : inputHourVal * 2);
@@ -333,16 +337,14 @@
             addMinor(1 + month - 1, '天姚'); addMinor(9 + month - 1, '天刑');
             addMinor(11 - hour, '地空'); addMinor(11 + hour, '地劫');
 
+            const huoStartMap = [2, 3, 1, 9]; 
+            const lingStartMap = [10, 10, 3, 10]; 
             const ybMod = yearBranchIdx % 4;
-            const huoBaseMap = [2, 3, 1, 9]; 
-            const lingBaseMap = [10, 10, 3, 10]; 
-            addMinor((huoBaseMap[ybMod] + hour) % 12, '火星');
-            addMinor((lingBaseMap[ybMod] + hour) % 12, '鈴星');
+            addMinor((huoStartMap[ybMod] + hour) % 12, '火星');
+            addMinor((lingStartMap[ybMod] + hour) % 12, '鈴星');
             
-            const monthBranchIdx = (1 + month) % 12; 
-            const mbMod = monthBranchIdx % 4;
             const maBaseMap = [2, 11, 8, 5]; 
-            addMinor(maBaseMap[mbMod], '天馬');
+            addMinor(maBaseMap[(month - 1) % 4], '天馬');
 
             const gaiBaseMap = [4, 1, 10, 7];
             addMinor(gaiBaseMap[ybMod], '華蓋');
@@ -356,7 +358,7 @@
             const jieKongMap = [ [8, 9], [6, 7], [4, 5], [2, 3], [0, 1], [8, 9], [6, 7], [4, 5], [2, 3], [0, 1] ];
             const [jk1, jk2] = jieKongMap[yearStemIdx];
             if (yearStemIdx % 2 === 0) {
-                addMinor(jk2, '截空');
+                addMinor(jk2, '截空'); // 陽干取陽支(索引偶數)，但在 map 中 jk2 才是對應的正空
             } else {
                 addMinor(jk1, '截空');
             }
@@ -449,7 +451,7 @@
             state.decades.forEach((d, index) => {
                 const isSel = state.selDecade && state.selDecade.branch === d.branch;
                 const btn = document.createElement('button');
-                btn.className = `px-2 py-1 rounded text-[11px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-decade shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
+                btn.className = `px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[9px] sm:text-[11px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-decade shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
                 const cnNum = ['一','二','三','四','五','六','七','八','九','十'];
                 btn.innerHTML = `${cnNum[index]}限<br>${d.stem}${branchNames[d.branch]} ${d.start}~${d.end}`;
                 btn.onclick = () => {
@@ -465,7 +467,7 @@
             state.years.forEach(y => {
                 const isSel = state.selYear && state.selYear.year === y.year;
                 const btn = document.createElement('button');
-                btn.className = `px-2 py-1 rounded text-[11px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-year shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
+                btn.className = `px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[9px] sm:text-[11px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-year shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
                 btn.innerHTML = `${y.year}年<br>${y.stem}${branchNames[y.branch]} ${y.age}歲`;
                 btn.onclick = () => {
                     state.selYear = isSel ? null : y;
@@ -479,7 +481,7 @@
             for(let i=1; i<=12; i++) {
                 const isSel = state.selMonth === i;
                 const btn = document.createElement('button');
-                btn.className = `px-3 py-1 rounded text-[11px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-month shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
+                btn.className = `px-2 sm:px-3 py-0.5 sm:py-1 rounded text-[9px] sm:text-[11px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-month shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
                 btn.innerText = `${i}月`;
                 btn.onclick = () => {
                     state.selMonth = isSel ? null : i;
@@ -493,7 +495,7 @@
             for(let i=1; i<=31; i++) {
                 const isSel = state.selDay === i;
                 const btn = document.createElement('button');
-                btn.className = `px-2 py-1 rounded text-[10px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-day shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
+                btn.className = `px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[8px] sm:text-[10px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-day shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
                 btn.innerText = `${i}日`;
                 btn.onclick = () => {
                     state.selDay = isSel ? null : i;
@@ -583,60 +585,60 @@
                 const isBodyPalace = (bIndex === state.bodyBranch);
 
                 let overlapsHtml = '';
-                if (dayName) overlapsHtml += `<span class="text-[#b45309] font-bold text-[10px] leading-tight bg-orange-50 px-1 rounded shadow-sm border border-orange-200">流日${dayName}</span>`;
-                if (mName) overlapsHtml += `<span class="text-blue-600 font-bold text-[10px] leading-tight bg-blue-50 px-1 rounded shadow-sm border border-blue-200">流月${mName}</span>`;
-                if (yName) overlapsHtml += `<span class="text-teal-600 font-bold text-[10px] leading-tight bg-teal-50 px-1 rounded shadow-sm border border-teal-200">流年${yName}</span>`;
-                if (dName) overlapsHtml += `<span class="text-purple-700 font-bold text-[10px] leading-tight bg-purple-50 px-1 rounded shadow-sm border border-purple-200">大限${dName}</span>`;
+                if (dayName) overlapsHtml += `<span class="text-[#b45309] font-bold text-[8px] sm:text-[10px] leading-tight bg-orange-50 px-0.5 sm:px-1 rounded shadow-sm border border-orange-200">流日${dayName}</span>`;
+                if (mName) overlapsHtml += `<span class="text-blue-600 font-bold text-[8px] sm:text-[10px] leading-tight bg-blue-50 px-0.5 sm:px-1 rounded shadow-sm border border-blue-200">流月${mName}</span>`;
+                if (yName) overlapsHtml += `<span class="text-teal-600 font-bold text-[8px] sm:text-[10px] leading-tight bg-teal-50 px-0.5 sm:px-1 rounded shadow-sm border border-teal-200">流年${yName}</span>`;
+                if (dName) overlapsHtml += `<span class="text-purple-700 font-bold text-[8px] sm:text-[10px] leading-tight bg-purple-50 px-0.5 sm:px-1 rounded shadow-sm border border-purple-200">大限${dName}</span>`;
 
                 const renderStar = (name, isMajor) => {
                     const hN = cell.huaN[name]; const hD = cell.huaD[name];
                     const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
                     return `
                         <div class="flex flex-col items-center shrink-0">
-                            <span class="text-vertical font-bold leading-tight ${isMajor ? 'text-red-700 text-[20px]' : 'text-gray-800 text-[12px]'}">${name}</span>
-                            <div class="flex flex-col mt-1 gap-[1px]">
-                                ${hN ? `<span class="hua-badge hua-natal">${hN}</span>` : ''}
-                                ${hD ? `<span class="hua-badge hua-decade">${hD}</span>` : ''}
-                                ${hY ? `<span class="hua-badge hua-year">${hY}</span>` : ''}
-                                ${hM ? `<span class="hua-badge hua-month">${hM}</span>` : ''}
-                                ${hDay ? `<span class="hua-badge hua-day">${hDay}</span>` : ''}
+                            <span class="text-vertical font-bold leading-tight ${isMajor ? 'text-red-700 text-[13px] sm:text-[18px] md:text-[20px]' : 'text-gray-800 text-[9px] sm:text-[11px] md:text-[12px]'}">${name}</span>
+                            <div class="flex flex-col mt-[1px] sm:mt-1 gap-[1px]">
+                                ${hN ? `<span class="hua-badge hua-natal text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hN}</span>` : ''}
+                                ${hD ? `<span class="hua-badge hua-decade text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hD}</span>` : ''}
+                                ${hY ? `<span class="hua-badge hua-year text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hY}</span>` : ''}
+                                ${hM ? `<span class="hua-badge hua-month text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hM}</span>` : ''}
+                                ${hDay ? `<span class="hua-badge hua-day text-[7px] sm:text-[10px] px-[2px] py-[1px] sm:px-1 sm:py-[1px]">${hDay}</span>` : ''}
                             </div>
                         </div>`;
                 };
 
                 const renderTransit = (t) => {
-                    return `<span class="transit-badge ${t.color}">${t.name}</span>`;
+                    return `<span class="transit-badge text-[8px] sm:text-[11px] ${t.color}">${t.name}</span>`;
                 }
 
                 const div = document.createElement('div');
                 div.id = `palace-${key}`;
-                div.className = `palace-cell p-1 overflow-hidden ${conf.bg} border-[#a19f98] ${idx%4!==3 ? 'border-r' : ''} ${idx<8 ? 'border-b' : ''}`;
+                div.className = `palace-cell p-0.5 sm:p-1 overflow-hidden ${conf.bg} border-[#a19f98] ${idx%4!==3 ? 'border-r' : ''} ${idx<8 ? 'border-b' : ''}`;
                 div.style.gridArea = conf.area;
                 div.onclick = () => selectPalace(key);
 
                 div.innerHTML = `
-                    <div class="absolute top-1 left-1 text-[11px] font-bold text-gray-500 bg-gray-100 px-1 rounded shadow-sm border border-gray-200 z-10">
+                    <div class="absolute top-0.5 sm:top-1 left-0.5 sm:left-1 text-[8px] sm:text-[11px] font-bold text-gray-500 bg-gray-100 px-0.5 sm:px-1 rounded shadow-sm border border-gray-200 z-10">
                         ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                     </div>
                     
-                    <div class="absolute top-6 left-1 right-1 flex justify-start gap-1 flex-wrap content-start h-[55%] z-10">
+                    <div class="absolute top-5 sm:top-6 left-0.5 sm:left-1 right-0.5 sm:right-1 flex justify-start gap-0.5 sm:gap-1 flex-wrap content-start h-[55%] z-10">
                         ${cell.major.map(s => renderStar(s, true)).join('')}
                         ${cell.minor.map(s => renderStar(s, false)).join('')}
                     </div>
 
-                    <div class="absolute top-6 right-1 flex justify-end gap-[1px] flex-wrap max-w-[50%] z-10">
+                    <div class="absolute top-5 sm:top-6 right-0.5 sm:right-1 flex justify-end gap-[1px] flex-wrap max-w-[50%] z-10">
                         ${cell.transit.map(t => renderTransit(t)).join('')}
                     </div>
 
                     <div class="absolute bottom-1 right-1 flex flex-col items-end gap-[1px] text-right bg-white/70 p-0.5 rounded backdrop-blur-sm z-10">
                         ${overlapsHtml}
-                        ${isBodyPalace ? `<div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white font-black text-[12px] px-2 py-0.5 rounded shadow-lg border border-blue-400 mb-1 animate-pulse">身宮</div>` : ''}
-                        <div class="text-lg font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-200 mt-[2px]">
+                        ${isBodyPalace ? `<div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white font-black text-[9px] sm:text-[12px] px-1 sm:px-2 py-[1px] sm:py-0.5 rounded shadow-lg border border-blue-400 mb-0.5 sm:mb-1 animate-pulse">身宮</div>` : ''}
+                        <div class="text-[12px] sm:text-[16px] md:text-lg font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-200 mt-[1px] sm:mt-[2px]">
                             ${nName}
                         </div>
                     </div>
 
-                    <div class="absolute bottom-0.5 left-0.5 text-[8px] text-gray-400 font-bold z-10">
+                    <div class="absolute bottom-0.5 left-0.5 text-[7px] sm:text-[8px] text-gray-400 font-bold z-10">
                         ${cell.ageStart}-${cell.ageEnd}
                     </div>
                 `;
@@ -648,18 +650,18 @@
                     center.style.gridArea = "2/2/4/4"; 
                     
                     const hourSelect = document.getElementById('birth-hour');
-                    const hourText = hourSelect.options[hourSelect.selectedIndex].text.split(' ')[0];
+                    const hourText = hourSelect.options[hourSelect.selectedIndex].text.split('(')[0];
                     const yyGenderStr = `${state.yinYang}${state.gender === 'M' ? '男' : '女'}`;
                     
                     center.innerHTML = `
-                        <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-4">
-                            <p class="text-sm font-black text-gray-600 mb-2 border-b border-gray-300 pb-1 w-full text-center tracking-widest">${yyGenderStr}命</p>
+                        <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
+                            <p class="text-[10px] sm:text-sm font-black text-gray-600 mb-1 sm:mb-2 border-b border-gray-300 pb-0.5 sm:pb-1 w-full text-center tracking-widest">${yyGenderStr}命</p>
 
-                            <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-3xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-40 mb-6 pointer-events-auto" oninput="updateName()">
+                            <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-xl sm:text-3xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-16 sm:w-40 mb-2 sm:mb-6 pointer-events-auto" oninput="updateName()">
                             
-                            <div class="flex flex-col gap-2 text-sm font-bold text-gray-700 w-full text-center tracking-wide">
-                                <p>陽曆： ${state.solarDate} ${hourText}</p>
-                                <p>農曆： ${state.lunar.getYearInGanZhi()}年${state.lunar.getMonthInChinese()}月${state.lunar.getDayInChinese()} ${branchNames[state.hourIndex]}時</p>
+                            <div class="flex flex-col gap-0.5 sm:gap-2 text-[9px] sm:text-sm font-bold text-gray-700 w-full text-center tracking-wide">
+                                <p>陽曆: ${state.solarDate} <br class="block sm:hidden">${hourText}</p>
+                                <p>農曆: <br class="block sm:hidden">${state.lunar.getYearInGanZhi()}年${state.lunar.getMonthInChinese()}月${state.lunar.getDayInChinese()}<br class="block sm:hidden"> ${branchNames[state.hourIndex]}時</p>
                             </div>
                         </div>
                     `;
@@ -738,80 +740,73 @@
             const wealthInfo = getPalaceStarsInfo(wealthB);
             const careerInfo = getPalaceStarsInfo(careerB);
 
-            const analyzeExtras = (info, typeName) => {
+            // 合併三方四正星曜
+            const allStars = [...new Set([...lifeInfo.stars, ...wealthInfo.stars, ...careerInfo.stars])];
+            const allMinors = [...new Set([...lifeInfo.minors, ...wealthInfo.minors, ...careerInfo.minors])];
+            const allHua = { ...lifeInfo.hua, ...wealthInfo.hua, ...careerInfo.hua };
+
+            const analyzeCore = (stars, minors, hua) => {
+                let analysis = [];
+                let hasShattering = stars.some(s => ['七殺','破軍','貪狼'].includes(s));
+                let hasLeader = stars.some(s => ['紫微','天府','太陽'].includes(s));
+                let hasSoft = stars.some(s => ['天同','太陰','天相'].includes(s));
+                
+                if (hasShattering) analysis.push("💥 您具備「殺破狼」的強大開創與突破氣場，不甘於現狀，行動力與野心極強。");
+                if (hasLeader) analysis.push("👑 命格中帶有「帝王星」格局，自帶威嚴與領導力，注重體面，天生具備統御與管理天賦。");
+                if (hasSoft) analysis.push("🕊️ 星系中包含柔和之星，使您在衝刺之餘，仍保有細膩、重感情與善於協調的一面。");
+
                 let extras = [];
-                Object.values(info.hua).forEach(h => {
-                    if (h === '祿') extras.push(`⭐ 帶有【化祿】：天生自帶福澤，在${typeName}展現出隨和、人緣佳、資源豐富的順遂特質。`);
-                    if (h === '權') extras.push(`⭐ 帶有【化權】：掌控慾強，在${typeName}展現出高度的企圖心、行動力與領導威嚴。`);
-                    if (h === '科') extras.push(`⭐ 帶有【化科】：重視名聲與修養，在${typeName}常有貴人相助，行事斯文有條理。`);
-                    if (h === '忌') extras.push(`⭐ 帶有【化忌】：代表一種執念與考驗，在${typeName}需經歷挫折或過度操心，是將阻力化為助力的關鍵修行。`);
+                Object.values(hua).forEach(h => {
+                    if (h === '祿') extras.push(`⭐ 命盤鐵三角中見【化祿】，一生資源與人緣相對順遂，具備化險為夷的福澤。`);
+                    if (h === '權') extras.push(`⭐ 命盤鐵三角中見【化權】，事業企圖心與掌控慾強烈，能展現出高度的執行威嚴。`);
+                    if (h === '科') extras.push(`⭐ 命盤鐵三角中見【化科】，重視名聲修養，常有貴人相助，行事斯文有條理。`);
+                    if (h === '忌') extras.push(`⭐ 命盤鐵三角中見【化忌】，代表一種執念與修行，需經歷挫折或過度操心，將阻力化為助力。`);
                 });
                 
-                if (info.minors.includes('祿存')) extras.push(`💰 帶有【祿存】：具有儲蓄與累積的特質，在${typeName}能穩紮穩打地累積資源。`);
-                if (info.minors.includes('紅鸞') || info.minors.includes('天喜')) extras.push(`🌸 帶有【桃花星】：個人魅力極強，在${typeName}容易吸引他人目光，適合藉由人脈與親和力拓展格局。`);
-                if (info.minors.includes('擎羊') || info.minors.includes('陀羅')) extras.push(`⚡ 帶有【羊/陀】：性格帶有剛烈或糾結的一面，在${typeName}需具備破釜沉舟的毅力，能吃苦耐勞。`);
-                
-                return extras.length > 0 ? `<div class="mt-2 text-xs bg-white p-2 rounded border border-gray-200">` + extras.join('<br>') + `</div>` : '';
+                if (minors.includes('祿存')) extras.push(`💰 帶有【祿存】：具備極佳的儲蓄與累積特質，能穩紮穩打地累積財富。`);
+                if (minors.includes('紅鸞') || minors.includes('天喜')) extras.push(`🌸 帶有【桃花星】：個人魅力與親和力極強，容易吸引他人目光，利於人脈拓展。`);
+                if (minors.includes('擎羊') || minors.includes('陀羅')) extras.push(`⚡ 帶有【羊/陀】：性格中帶有剛烈或糾結的一面，但也賦予您破釜沉舟的毅力。`);
+
+                return { core: analysis.join('<br>'), extras: extras.join('<br>') };
             };
 
-            const getDesc = (info, typeName) => {
-                let baseDesc = "";
-                if (info.stars.length === 0 && !info.isBorrowed) {
-                    baseDesc = '【空宮】受環境影響極大，可塑性強，擅長借力使力。';
-                } else {
-                    baseDesc = info.stars.map(s => `【${s}】星入駐，展現出其獨特天賦與行事風格。`).join(' ');
-                }
-                
-                let extraDesc = analyzeExtras(info, typeName);
-
-                if (info.isBorrowed) {
-                    return `<span class="text-amber-700 font-bold"><em>(本宮無主星，借對宮星曜能量)</em></span><br>${baseDesc}${extraDesc}<br><span class="text-[11px] text-gray-500 block mt-1">※ 空宮特質：像海綿一樣吸收環境能量，行事靈活，深處受對宮牽引。</span>`;
-                }
-                return baseDesc + extraDesc;
-            };
+            const result = analyzeCore(allStars, allMinors, allHua);
+            const interpNameDisplay = state.userName || '命主';
 
             const content = `
-                <div class="flex justify-between items-center border-b-2 border-amber-800 pb-2 mb-4">
-                    <h3 class="text-lg font-black text-amber-800"><i class="fa-solid fa-scroll mr-2"></i>體用哲學·命格解析</h3>
+                <div class="flex justify-between items-center border-b-2 border-amber-800 pb-2 mb-3 sm:mb-4">
+                    <h3 class="text-base sm:text-lg font-black text-amber-800"><i class="fa-solid fa-scroll mr-2"></i>三方四正·深度解析</h3>
                     <button onclick="document.getElementById('interpretation-panel').classList.add('hidden')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-times"></i></button>
                 </div>
                 
-                <p class="text-[13px] text-gray-700 leading-relaxed mb-4">
-                    <span class="font-bold text-amber-700" id="interp-name-display">${state.userName}</span> 您好！以「體用哲學」來觀照，命宮為先天之『體』，財帛與官祿為後天之『用』。這三者構成了您人生發展的核心鐵三角：
+                <p class="text-[12px] sm:text-[13px] text-gray-700 leading-relaxed mb-4">
+                    <span class="font-bold text-amber-700" id="interp-name-display">${interpNameDisplay}</span> 您好！在紫微斗數中，我們將您的「命宮(性格本質)」、「財帛宮(求財手段)」、「官祿宮(事業態度)」合併稱為『三方四正』。這三股氣場交織出您專屬的職場與人生格局：
                 </p>
 
-                <div class="flex flex-col gap-4 overflow-y-auto pr-1 hide-scrollbar" style="max-height: 65vh;">
-                    <!-- 命宮 -->
+                <div class="flex flex-col gap-3 sm:gap-4 overflow-y-auto pr-1 hide-scrollbar" style="max-height: 65vh;">
+                    
+                    <!-- 核心主星群 -->
                     <div>
-                        <h4 class="text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-user-astronaut text-red-600 w-5"></i>【命宮】生命之『體』· 核心性格</h4>
-                        <div class="text-[13px] text-gray-700 bg-red-50/50 p-3 rounded-r-lg border-l-4 border-red-600 shadow-sm leading-relaxed">
-                            <strong class="text-red-800">主星：${lifeInfo.stars.length ? lifeInfo.stars.join('、') : '空宮'}</strong><br>
-                            ${getDesc(lifeInfo, "性格本質與人生格局")}
+                        <h4 class="text-xs sm:text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-star text-amber-600 w-5"></i>【核心主星群】綜合氣場</h4>
+                        <div class="text-[12px] sm:text-[13px] text-gray-700 bg-amber-50/50 p-2 sm:p-3 rounded-r-lg border-l-4 border-amber-500 shadow-sm leading-relaxed">
+                            <strong class="text-amber-800">匯聚主星：${allStars.length ? allStars.join('、') : '空宮格局'}</strong><br>
+                            ${allStars.length ? result.core : '您的三方四正空宮較多，像海綿一樣適應力極強，行事靈活，深處受環境與對宮牽引。'}
                         </div>
                     </div>
 
-                    <!-- 財帛宮 -->
+                    <!-- 輔星與四化能量 -->
                     <div>
-                        <h4 class="text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-coins text-amber-600 w-5"></i>【財帛宮】行為之『用』· 求財手段</h4>
-                        <div class="text-[13px] text-gray-700 bg-amber-50/50 p-3 rounded-r-lg border-l-4 border-amber-500 shadow-sm leading-relaxed">
-                            <strong class="text-amber-800">主星：${wealthInfo.stars.length ? wealthInfo.stars.join('、') : '空宮'}</strong><br>
-                            ${getDesc(wealthInfo, "賺錢方式與價值觀")}
+                        <h4 class="text-xs sm:text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-bolt text-red-600 w-5"></i>【關鍵能量】四化與輔星</h4>
+                        <div class="text-[12px] sm:text-[13px] text-gray-700 bg-red-50/50 p-2 sm:p-3 rounded-r-lg border-l-4 border-red-600 shadow-sm leading-relaxed">
+                            ${result.extras ? result.extras : '目前格局平穩，無過度強烈的煞忌或吉曜干擾，行事以和為貴。'}
                         </div>
                     </div>
 
-                    <!-- 官祿宮 -->
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-briefcase text-blue-600 w-5"></i>【官祿宮】行為之『用』· 事業發展</h4>
-                        <div class="text-[13px] text-gray-700 bg-blue-50/50 p-3 rounded-r-lg border-l-4 border-blue-500 shadow-sm leading-relaxed">
-                            <strong class="text-blue-800">主星：${careerInfo.stars.length ? careerInfo.stars.join('、') : '空宮'}</strong><br>
-                            ${getDesc(careerInfo, "事業企圖心與工作態度")}
-                        </div>
-                    </div>
-
+                    <!-- 總結 -->
                     <div class="mt-1">
-                        <h4 class="text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-diagram-project text-green-600 w-5"></i>【鐵三角】綜合點評</h4>
-                        <p class="text-[13px] text-gray-700 leading-relaxed bg-gray-100 p-3 rounded-lg border border-gray-200 text-justify">
-                            您的「命宮」為統御中心，決定了您性格的本質。當這股能量投射於現實社會時，「官祿宮」展現了您對待工作的態度與野心，而「財帛宮」則賦予了您創造資源的手段。這三方氣場的交織，展現了您獨一無二的人生軌跡。
+                        <h4 class="text-xs sm:text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-diagram-project text-blue-600 w-5"></i>【職場與發展】總結點評</h4>
+                        <p class="text-[12px] sm:text-[13px] text-gray-700 leading-relaxed bg-gray-100 p-2 sm:p-3 rounded-lg border border-gray-200 text-justify">
+                            綜合您的三方氣場，您在職場上展現出的態度與求財方式是一體兩面的。當命宮的意志投射於現實時，官祿宮賦予了您對待事業的野心，而財帛宮提供了您獲取資源的手段。善用上述的主星與四化特質，將能助您在人生道路上趨吉避凶、發揮最大潛能。
                         </p>
                     </div>
                 </div>
