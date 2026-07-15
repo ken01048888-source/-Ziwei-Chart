@@ -44,63 +44,75 @@
         .bg-water { background-color: #f0f9ff; }
         .bg-earth { background-color: #fffbeb; }
 
-        /* 四化標籤 (貼在星曜下方) */
+        /* 四化標籤 (極致壓縮版) */
         .hua-badge {
             display: inline-block;
             font-weight: 900;
             color: white;
             border-radius: 1px;
             line-height: 1;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.2);
             text-align: center;
             font-size: 7px;
-            padding: 1px 2px;
+            padding: 1px;
             margin-top: 1px;
+            width: 100%;
         }
-        @media (min-width: 640px) { .hua-badge { font-size: 9px; padding: 1px 3px; } }
-        .hua-natal { background-color: #b91c1c; border: 1px solid #991b1b; } 
-        .hua-decade { background-color: #7e22ce; border: 1px solid #581c87; } 
-        .hua-year { background-color: #0d9488; border: 1px solid #0f766e; } 
-        .hua-month { background-color: #2563eb; border: 1px solid #1e3a8a; } 
-        .hua-day { background-color: #d97706; border: 1px solid #b45309; } 
+        @media (min-width: 640px) { .hua-badge { font-size: 9px; padding: 1px 2px; } }
+        .hua-natal { background-color: #b91c1c; } 
+        .hua-decade { background-color: #7e22ce; } 
+        .hua-year { background-color: #0d9488; } 
+        .hua-month { background-color: #2563eb; } 
+        .hua-day { background-color: #d97706; } 
 
         /* 過客星曜標籤 (右上角) */
         .transit-badge {
             display: inline-block;
             font-weight: bold;
-            border-radius: 2px;
+            border-radius: 1px;
             line-height: 1;
             border: 1px solid;
             white-space: nowrap;
             font-size: 7px;
-            padding: 1px 2px;
+            padding: 1px;
             margin-bottom: 1px;
         }
-        @media (min-width: 640px) { .transit-badge { font-size: 9px; } }
+        @media (min-width: 640px) { .transit-badge { font-size: 9px; padding: 1px 2px; } }
 
-        /* 疊宮標籤 (右下角，仿專業軟體極簡風) */
+        /* 疊宮標籤 (右下角堆疊) */
         .mini-overlap {
-            font-size: 7px;
+            font-size: 6.5px;
             line-height: 1;
-            padding: 1px 2px;
+            padding: 1px;
             border: 1px solid;
             border-radius: 2px;
             margin-bottom: 1px;
             font-weight: bold;
             white-space: nowrap;
+            text-align: center;
         }
-        @media (min-width: 640px) { .mini-overlap { font-size: 9px; padding: 1px 3px; margin-bottom: 2px; } }
+        @media (min-width: 640px) { .mini-overlap { font-size: 8px; padding: 1px 2px; margin-bottom: 2px; } }
         .b-day { color: #d97706; border-color: #fcd34d; background-color: #fffbeb; }
         .b-month { color: #2563eb; border-color: #bfdbfe; background-color: #eff6ff; }
         .b-year { color: #0d9488; border-color: #99f6e4; background-color: #f0fdfa; }
         .b-dec { color: #7e22ce; border-color: #e9d5ff; background-color: #faf5ff; }
         .b-body { color: #ffffff; border-color: #60a5fa; background-color: #3b82f6; }
 
-        /* 按鈕激活態 */
-        .btn-active-decade { background-color: #7e22ce !important; color: white !important; font-weight: bold; border-color: #581c87 !important; }
-        .btn-active-year { background-color: #0d9488 !important; color: white !important; font-weight: bold; border-color: #0f766e !important; }
-        .btn-active-month { background-color: #2563eb !important; color: white !important; font-weight: bold; border-color: #1e3a8a !important; }
-        .btn-active-day { background-color: #b45309 !important; color: white !important; font-weight: bold; border-color: #92400e !important; }
+        /* 緊湊型按鈕狀態 */
+        .btn-timeline {
+            background-color: #f9fafb;
+            color: #4b5563;
+            transition: all 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .btn-timeline:hover { background-color: #e5e7eb; }
+        .btn-active-decade { background-color: #7e22ce !important; color: white !important; font-weight: bold; }
+        .btn-active-year { background-color: #0d9488 !important; color: white !important; font-weight: bold; }
+        .btn-active-month { background-color: #2563eb !important; color: white !important; font-weight: bold; }
+        .btn-active-day { background-color: #b45309 !important; color: white !important; font-weight: bold; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col pt-1 pb-4">
@@ -158,31 +170,29 @@
                     
                     <button onclick="initApp()" class="bg-gray-800 text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 sm:py-1.5 rounded shrink-0 hover:bg-black shadow transition-colors">排盤</button>
                     
-                    <button onclick="showInterpretation()" class="ml-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[9px] sm:text-xs font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded shadow-md transition-all flex items-center gap-1">
-                        <i class="fa-regular fa-address-card"></i> <span class="inline-block">個人特質</span>
+                    <button onclick="showInterpretation()" class="ml-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded shadow-md transition-all flex items-center gap-1">
+                        <i class="fa-regular fa-address-card"></i> <span class="hidden sm:inline">個人特質</span>
                     </button>
                 </div>
             </header>
 
-            <!-- 命盤主體 4x4 Grid -->
+            <!-- 命盤主體 4x4 Grid (手機端微長方形，強化垂直空間) -->
             <div class="relative w-full aspect-[4/5] sm:aspect-square max-w-[800px] mx-auto bg-white border-t border-l border-gray-500 shadow-md z-10">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
                 <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.2fr; grid-template-rows: 1.2fr 1fr 1fr 1.2fr;">
                 </div>
             </div>
 
-            <!-- 下方時間軸 (恢復經典按鈕樣式) -->
-            <footer class="bg-white border border-gray-300 rounded p-1.5 sm:p-3 shadow-sm max-w-[800px] mx-auto w-full z-20 relative flex flex-col gap-1.5 sm:gap-2 mb-2 overflow-hidden">
-                <div class="text-[9px] sm:text-xs text-gray-500 font-bold px-1 flex justify-between border-b border-gray-100 pb-1">
-                    <span><i class="fa-solid fa-list-ul mr-1"></i> 運線切換板 (點擊檢視疊加運勢)</span>
+            <!-- 下方時間軸 -->
+            <footer class="bg-white border border-gray-300 rounded shadow-sm max-w-[800px] mx-auto w-full z-20 relative flex flex-col overflow-hidden">
+                <div class="bg-gray-100 text-[9px] sm:text-xs text-gray-600 font-bold px-2 py-0.5 flex justify-between border-b border-gray-300">
+                    <span><i class="fa-solid fa-list-ul mr-1"></i> 運線切換板</span>
                     <span id="current-time-display" class="text-amber-700"></span>
                 </div>
-                
-                <div class="flex flex-nowrap overflow-x-auto hide-scrollbar gap-1" id="timeline-decades"></div>
-                <div class="flex flex-nowrap overflow-x-auto hide-scrollbar gap-1" id="timeline-years"></div>
-                <div class="flex flex-nowrap overflow-x-auto hide-scrollbar gap-1 border-t border-gray-100 pt-1.5" id="timeline-months"></div>
-                <!-- 流日保持 Grid (15格兩行) 以免橫向滾動太長 -->
-                <div class="grid gap-0.5 sm:gap-1 w-full border-t border-gray-100 pt-1.5" style="grid-template-columns: repeat(15, minmax(0, 1fr));" id="timeline-days"></div>
+                <div class="grid grid-cols-10 gap-px bg-gray-300 border-b border-gray-300" id="timeline-decades"></div>
+                <div class="grid grid-cols-10 gap-px bg-gray-300 border-b border-gray-300" id="timeline-years"></div>
+                <div class="grid grid-cols-12 gap-px bg-gray-300 border-b border-gray-300" id="timeline-months"></div>
+                <div class="grid gap-px bg-gray-300" style="grid-template-columns: repeat(15, minmax(0, 1fr));" id="timeline-days"></div>
             </footer>
         </div>
 
@@ -194,23 +204,29 @@
     </div>
 
     <script>
-        // 初始化日期下拉選單 (預設為空)
+        // 初始化：全部強迫預設為「請選擇」空值
         function initDateSelects() {
             const yearSelect = document.getElementById('birth-year');
             const monthSelect = document.getElementById('birth-month');
+            const daySelect = document.getElementById('birth-day');
+            const hourSelect = document.getElementById('birth-hour');
             
+            yearSelect.innerHTML = '';
             yearSelect.add(new Option('請選擇', '', true, true));
             const currentYear = new Date().getFullYear();
             for (let y = currentYear - 80; y <= currentYear + 20; y++) {
                 yearSelect.add(new Option(y, y));
             }
 
+            monthSelect.innerHTML = '';
             monthSelect.add(new Option('請選擇', '', true, true));
             for (let m = 1; m <= 12; m++) {
                 monthSelect.add(new Option(m.toString().padStart(2, '0'), m));
             }
 
-            updateDays();
+            daySelect.innerHTML = '';
+            daySelect.add(new Option('請選擇', '', true, true));
+            hourSelect.value = "";
         }
 
         function updateDays() {
@@ -305,8 +321,11 @@
             const d = document.getElementById('birth-day').value;
             const hStr = document.getElementById('birth-hour').value;
 
+            // 若有欄位未填寫，則清空命盤
             if (!y || !m || !d || hStr === "") {
-                return; // 未填寫完整不排盤
+                state.lunar = null;
+                renderBoard();
+                return;
             }
 
             state.solarDate = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
@@ -505,17 +524,14 @@
         function renderTimelines() {
             const divDecade = document.getElementById('timeline-decades');
             divDecade.innerHTML = '';
+            if(!state.lunar) return; // 空狀態不渲染時間軸按鈕
+            
             state.decades.forEach((d, index) => {
                 const isSel = state.selDecade && state.selDecade.branch === d.branch;
-                const btn = document.createElement('button');
-                btn.className = `px-2 py-0.5 sm:py-1 rounded text-[9px] sm:text-[11px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-decade shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
-                const cnNum = ['一','二','三','四','五','六','七','八','九','十'];
-                btn.innerHTML = `${cnNum[index]}限<br>${d.start}~${d.end}`;
-                btn.onclick = () => {
-                    if (isSel) { state.selDecade = null; } 
-                    else { state.selDecade = d; }
-                    updateTimeState();
-                };
+                const btn = document.createElement('div');
+                btn.className = `btn-timeline py-[1.5px] sm:py-[3px] ${isSel ? 'btn-active-decade' : ''}`;
+                btn.innerHTML = `<span class="text-[7px] sm:text-[9px] leading-none mb-[1px]">${d.start}-${d.end}</span><span class="text-[8px] sm:text-[10px] leading-none">${d.stem}${branchNames[d.branch]}</span>`;
+                btn.onclick = () => { state.selDecade = isSel ? null : d; updateTimeState(); };
                 divDecade.appendChild(btn);
             });
 
@@ -523,45 +539,32 @@
             divYear.innerHTML = '';
             state.years.forEach(y => {
                 const isSel = state.selYear && state.selYear.year === y.year;
-                const btn = document.createElement('button');
-                btn.className = `px-2 py-0.5 sm:py-1 rounded text-[9px] sm:text-[11px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-year shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
-                btn.innerHTML = `${y.stem}${branchNames[y.branch]}<br>${y.year}`;
-                btn.onclick = () => {
-                    state.selYear = isSel ? null : y;
-                    updateTimeState();
-                };
+                const btn = document.createElement('div');
+                btn.className = `btn-timeline py-[1.5px] sm:py-[3px] ${isSel ? 'btn-active-year' : ''}`;
+                btn.innerHTML = `<span class="text-[7px] sm:text-[9px] leading-none mb-[1px]">${y.year}</span><span class="text-[8px] sm:text-[10px] leading-none">${y.stem}${branchNames[y.branch]}</span>`;
+                btn.onclick = () => { state.selYear = isSel ? null : y; updateTimeState(); };
                 divYear.appendChild(btn);
             });
 
             const divMonth = document.getElementById('timeline-months');
             divMonth.innerHTML = '';
-            const lunarMonths = ['正','二','三','四','五','六','七','八','九','十','冬','臘'];
             for(let i=1; i<=12; i++) {
                 const isSel = state.selMonth === i;
-                const btn = document.createElement('button');
-                btn.className = `px-2.5 sm:px-3 py-0.5 sm:py-1 rounded text-[9px] sm:text-[11px] whitespace-nowrap border transition-all ${isSel ? 'btn-active-month shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
-                btn.innerText = `${lunarMonths[i-1]}月`;
-                btn.onclick = () => {
-                    state.selMonth = isSel ? null : i;
-                    updateTimeState();
-                };
+                const btn = document.createElement('div');
+                btn.className = `btn-timeline py-[2px] sm:py-[4px] ${isSel ? 'btn-active-month' : ''}`;
+                btn.innerHTML = `<span class="text-[8px] sm:text-[10px] leading-none">${i}月</span>`;
+                btn.onclick = () => { state.selMonth = isSel ? null : i; updateTimeState(); };
                 divMonth.appendChild(btn);
             }
 
             const divDay = document.getElementById('timeline-days');
             divDay.innerHTML = '';
-            const lunarDays = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
-                               '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十',
-                               '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
-            for(let i=1; i<=30; i++) {
+            for(let i=1; i<=30; i++) { 
                 const isSel = state.selDay === i;
-                const btn = document.createElement('button');
-                btn.className = `w-full py-0.5 sm:py-1 rounded text-[8px] sm:text-[10px] text-center border transition-all flex justify-center items-center ${isSel ? 'btn-active-day shadow-md' : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-200'}`;
-                btn.innerText = `${lunarDays[i-1]}`;
-                btn.onclick = () => {
-                    state.selDay = isSel ? null : i;
-                    updateTimeState();
-                };
+                const btn = document.createElement('div');
+                btn.className = `btn-timeline py-[2px] sm:py-[4px] ${isSel ? 'btn-active-day' : ''}`;
+                btn.innerHTML = `<span class="text-[7px] sm:text-[9px] leading-none">${i}</span>`;
+                btn.onclick = () => { state.selDay = isSel ? null : i; updateTimeState(); };
                 divDay.appendChild(btn);
             }
         }
@@ -623,7 +626,7 @@
             return isShort ? palacesShort[diff] : palaces[diff];
         }
 
-        // 神級排版渲染：絕對領域劃分，保證不遮蔽
+        // 神級排版渲染：絕對領域劃分法，保證主星不遮蔽運線標籤
         function renderBoard() {
             const grid = document.getElementById('board-grid');
             grid.innerHTML = ''; 
@@ -633,81 +636,88 @@
                 const cell = state.board[bIndex];
                 const conf = gridConfig[key];
 
-                const nName = getPalaceName(state.lifeBranch, bIndex);
-                const dName = state.selDecade ? getPalaceName(state.decadeLifeBranch, bIndex, true) : '';
-                const yName = state.selYear ? getPalaceName(state.yearLifeBranch, bIndex, true) : '';
-                const mName = (state.selYear && state.selMonth) ? getPalaceName(state.monthLifeBranch, bIndex, true) : '';
-                const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex, true) : '';
-                const isBodyPalace = state.lunar ? (bIndex === state.bodyBranch) : false;
+                if (!state.lunar) {
+                    // 空盤狀態渲染
+                    const div = document.createElement('div');
+                    div.className = `palace-cell p-0.5 overflow-hidden ${conf.bg}`;
+                    div.style.gridArea = conf.area;
+                    grid.appendChild(div);
+                } else {
+                    const nName = getPalaceName(state.lifeBranch, bIndex);
+                    const dName = state.selDecade ? getPalaceName(state.decadeLifeBranch, bIndex, true) : '';
+                    const yName = state.selYear ? getPalaceName(state.yearLifeBranch, bIndex, true) : '';
+                    const mName = (state.selYear && state.selMonth) ? getPalaceName(state.monthLifeBranch, bIndex, true) : '';
+                    const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex, true) : '';
+                    const isBodyPalace = (bIndex === state.bodyBranch);
 
-                // 疊宮標籤：極致精簡的純文字框線
-                const badges = [];
-                if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName}</div>`);
-                if (mName) badges.push(`<div class="mini-overlap b-month">月${mName}</div>`);
-                if (yName) badges.push(`<div class="mini-overlap b-year">年${yName}</div>`);
-                if (dName) badges.push(`<div class="mini-overlap b-dec">限${dName}</div>`);
-                if (isBodyPalace) badges.push(`<div class="mini-overlap b-body shadow-sm">身宮</div>`);
-                
-                let overlapsHtml = `<div class="absolute bottom-[18px] sm:bottom-[22px] right-0.5 flex flex-col items-end z-20">` + badges.join('') + `</div>`;
-
-                // 星曜渲染：化曜圖示緊貼文字下方
-                const renderStar = (name, isMajor) => {
-                    const hN = cell.huaN[name]; const hD = cell.huaD[name];
-                    const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
-                    return `
-                        <div class="flex flex-col items-center shrink-0">
-                            <span class="text-vertical font-bold leading-tight ${isMajor ? 'text-red-700 text-[11px] sm:text-[14px] md:text-[15px]' : 'text-gray-800 text-[9px] sm:text-[12px] md:text-[13px]'}">${name}</span>
-                            <div class="flex flex-col mt-[1px] gap-0">
-                                ${hN ? `<span class="hua-badge hua-natal">${hN}</span>` : ''}
-                                ${hD ? `<span class="hua-badge hua-decade">${hD}</span>` : ''}
-                                ${hY ? `<span class="hua-badge hua-year">${hY}</span>` : ''}
-                                ${hM ? `<span class="hua-badge hua-month">${hM}</span>` : ''}
-                                ${hDay ? `<span class="hua-badge hua-day">${hDay}</span>` : ''}
-                            </div>
-                        </div>`;
-                };
-
-                // 過客星曜：獨立區域
-                const renderTransit = (t) => `<span class="transit-badge ${t.color}">${t.name}</span>`;
-
-                const div = document.createElement('div');
-                div.id = `palace-${key}`;
-                div.className = `palace-cell p-0.5 sm:p-1 overflow-hidden ${conf.bg}`;
-                div.style.gridArea = conf.area;
-                div.onclick = () => selectPalace(key);
-
-                div.innerHTML = `
-                    <!-- 左上：地支 -->
-                    <div class="absolute top-0.5 sm:top-1 left-0.5 sm:left-1 text-[8px] sm:text-[10px] font-bold text-gray-500 z-10">
-                        ${state.stemsMap[bIndex]}${branchNames[bIndex]}
-                    </div>
+                    // 疊宮標籤：極簡化堆疊
+                    const badges = [];
+                    if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName}</div>`);
+                    if (mName) badges.push(`<div class="mini-overlap b-month">月${mName}</div>`);
+                    if (yName) badges.push(`<div class="mini-overlap b-year">年${yName}</div>`);
+                    if (dName) badges.push(`<div class="mini-overlap b-dec">限${dName}</div>`);
+                    if (isBodyPalace) badges.push(`<div class="mini-overlap b-body shadow-sm">身宮</div>`);
                     
-                    <!-- ★ 修正：左側至中間 主副星「強制單行」 -->
-                    <!-- flex-nowrap 禁止換行，overflow-hidden 隱藏超出部分以防破壞版面 -->
-                    <div class="absolute top-4 sm:top-5 left-0.5 right-[40%] flex justify-start gap-[1px] flex-nowrap z-10 overflow-hidden h-[65%]">
-                        ${cell.major.map(s => renderStar(s, true)).join('')}
-                        ${cell.minor.map(s => renderStar(s, false)).join('')}
-                    </div>
+                    // 將標籤固定在右下角，並由下往上排 (保留最下方給本命宮位名稱)
+                    let overlapsHtml = `<div class="absolute bottom-[16px] sm:bottom-[20px] right-0.5 w-[38%] flex flex-col items-end z-20">` + badges.join('') + `</div>`;
 
-                    <!-- 右上：過客星曜 (流年限羊陀) -->
-                    <div class="absolute top-4 sm:top-5 right-0.5 flex flex-col items-end gap-[1px] max-w-[40%] z-10 overflow-hidden">
-                        ${cell.transit.map(t => renderTransit(t)).join('')}
-                    </div>
+                    // 星曜渲染：緊密結合四化標籤
+                    const renderStar = (name, isMajor) => {
+                        const hN = cell.huaN[name]; const hD = cell.huaD[name];
+                        const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
+                        return `
+                            <div class="flex flex-col items-center w-[12px] sm:w-[15px] shrink-0">
+                                <span class="text-vertical font-bold leading-none ${isMajor ? 'text-red-700 text-[11px] sm:text-[13px] md:text-[15px]' : 'text-gray-800 text-[9px] sm:text-[11px] md:text-[13px]'}">${name}</span>
+                                <div class="flex flex-col mt-[2px] gap-0 w-full px-[1px]">
+                                    ${hN ? `<span class="hua-badge hua-natal">${hN}</span>` : ''}
+                                    ${hD ? `<span class="hua-badge hua-decade">${hD}</span>` : ''}
+                                    ${hY ? `<span class="hua-badge hua-year">${hY}</span>` : ''}
+                                    ${hM ? `<span class="hua-badge hua-month">${hM}</span>` : ''}
+                                    ${hDay ? `<span class="hua-badge hua-day">${hDay}</span>` : ''}
+                                </div>
+                            </div>`;
+                    };
 
-                    <!-- 右下：疊宮標籤 (由下往上疊加) -->
-                    ${overlapsHtml}
+                    const renderTransit = (t) => `<span class="transit-badge ${t.color}">${t.name}</span>`;
 
-                    <!-- 最右下角：本命宮位名稱 -->
-                    <div class="absolute bottom-0 right-0.5 text-[11px] sm:text-[14px] md:text-[16px] font-black text-red-800 tracking-widest z-10">
-                        ${nName}
-                    </div>
+                    const div = document.createElement('div');
+                    div.id = `palace-${key}`;
+                    div.className = `palace-cell overflow-hidden ${conf.bg}`;
+                    div.style.gridArea = conf.area;
+                    div.onclick = () => selectPalace(key);
 
-                    <!-- 左下：年齡區間 -->
-                    <div class="absolute bottom-0.5 left-0.5 text-[7px] sm:text-[9px] text-gray-400 font-bold z-10">
-                        ${state.lunar ? `${cell.ageStart}-${cell.ageEnd}` : ''}
-                    </div>
-                `;
-                grid.appendChild(div);
+                    div.innerHTML = `
+                        <!-- 左上：天干地支 -->
+                        <div class="absolute top-0.5 sm:top-1 left-0.5 sm:left-1 text-[8px] sm:text-[10px] font-bold text-gray-500 z-10">
+                            ${state.stemsMap[bIndex]}${branchNames[bIndex]}
+                        </div>
+                        
+                        <!-- 絕對領域：左側星曜區 (嚴格限制寬度，絕不越過 60% 邊界) -->
+                        <div class="absolute top-3.5 sm:top-5 left-0.5 w-[58%] bottom-3.5 flex justify-start gap-[1px] flex-wrap content-start z-10 overflow-hidden">
+                            ${cell.major.map(s => renderStar(s, true)).join('')}
+                            ${cell.minor.map(s => renderStar(s, false)).join('')}
+                        </div>
+
+                        <!-- 絕對領域：右上角過客星曜區 (嚴格限制寬度 40%) -->
+                        <div class="absolute top-1 right-0.5 w-[40%] flex justify-end gap-[1px] flex-wrap content-start z-10">
+                            ${cell.transit.map(t => renderTransit(t)).join('')}
+                        </div>
+
+                        <!-- 絕對領域：右下角疊宮標籤區 -->
+                        ${overlapsHtml}
+
+                        <!-- 最右下角：本命宮位名稱 -->
+                        <div class="absolute bottom-0 right-0.5 text-[10px] sm:text-[14px] md:text-[16px] font-black text-red-800 tracking-widest z-10 leading-none pb-[2px]">
+                            ${nName}
+                        </div>
+
+                        <!-- 左下角：大限年齡 -->
+                        <div class="absolute bottom-0.5 left-0.5 text-[7px] sm:text-[9px] text-gray-400 font-bold z-10">
+                            ${cell.ageStart}-${cell.ageEnd}
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                }
 
                 // 中宮
                 if(idx === 3) {
@@ -744,7 +754,7 @@
                 }
             });
 
-            if(activePalace) selectPalace(activePalace, true); 
+            if(activePalace && state.lunar) selectPalace(activePalace, true); 
         }
 
         let activePalace = null;
@@ -819,7 +829,7 @@
                 Object.values(hua).forEach(h => {
                     if (h === '祿') extras.push(`⭐ **福澤與機遇 (化祿)**：您的核心氣場中帶有自然的資源吸引力。在遇到困難時，常能化險為夷，或得到周遭人脈的善意回饋。`);
                     if (h === '權') extras.push(`⭐ **掌控與企圖 (化權)**：您對事業或目標的掌控慾望較強。行事果決，能夠展現出高度的執行力與不容置疑的威嚴。`);
-                    if (h === '科') extras.push(`⭐ **名聲與修養 (化科)**：您相當重視自己的名譽與外在形象。行事斯文有條理，生命中常能遇到賞識您的貴人。`);
+                    if (h === '科') extras.push(`⭐ **名聲與修養 (化科)**：您相當重視自己的名譽與外長形象。行事斯文有條理，生命中常能遇到賞識您的貴人。`);
                     if (h === '忌') extras.push(`⭐ **執念與轉化 (化忌)**：您內心深處對某些事物有著強烈的渴望或執著（空缺感）。這會讓您經歷挫折，但若能將這份焦慮轉化為動力，將是您成功的最大關鍵。`);
                 });
                 
@@ -875,7 +885,7 @@
 
         window.onload = () => {
             initDateSelects();
-            // 不再呼叫 initApp()，讓畫面保持完全空白，直到使用者點擊排盤
+            renderBoard(); // 初始渲染純淨空盤
         };
     </script>
 </body>
