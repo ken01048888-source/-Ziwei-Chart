@@ -646,6 +646,8 @@
             document.querySelectorAll('.star-wrapper, .transit-wrapper, .overlap-wrapper, .body-palace-wrapper, .stem-wrapper, .age-wrapper').forEach(el => {
                 if(el.classList.contains('body-palace-wrapper')) {
                     el.style.transform = 'translateX(-50%) scale(1)';
+                } else if(el.classList.contains('overlap-wrapper') || el.classList.contains('transit-wrapper')) {
+                    el.style.transform = 'scale(1)';
                 } else {
                     el.style.transform = 'scale(1)';
                 }
@@ -663,7 +665,7 @@
             // 2. 過客星曜區 (垂直/水平防遮蔽)
             document.querySelectorAll('.transit-wrapper').forEach(wrapper => {
                 const cell = wrapper.closest('.palace-cell');
-                const maxHeight = cell.clientHeight * 0.50; 
+                const maxHeight = cell.clientHeight * 0.45; 
                 const maxWidth = cell.clientWidth * 0.40;  
                 const contentHeight = wrapper.scrollHeight;
                 const contentWidth = wrapper.scrollWidth;
@@ -721,7 +723,7 @@
             }, 100);
         });
 
-        // 神級排版：主輔字體統一、疊宮完美堆疊、過客移至中間區域、智慧縮放防遮蔽
+        // 神級排版：主輔字體統一、疊宮完美堆疊、過客移至中間偏右、智慧縮放防遮蔽
         function renderBoard() {
             const grid = document.getElementById('board-grid');
             grid.innerHTML = ''; 
@@ -757,8 +759,8 @@
                             ${badges.join('')}
                         </div>`;
 
-                    // 身宮獨立置中
-                    let bodyPalaceHtml = isBodyPalace ? `<div class="body-palace-wrapper absolute bottom-[2px] left-1/2 -translate-x-1/2 text-[14px] sm:text-[18px] md:text-[20px] font-black text-blue-700 tracking-widest z-10 leading-none bg-white/70 rounded px-[2px] pb-[1px] origin-bottom transition-transform duration-200">身宮</div>` : '';
+                    // 身宮獨立置中 (介於大限與本命宮位中間區域，稍微偏下)
+                    let bodyPalaceHtml = isBodyPalace ? `<div class="body-palace-wrapper absolute bottom-[22px] sm:bottom-[26px] left-1/2 -translate-x-1/2 text-[14px] sm:text-[18px] md:text-[20px] font-black text-blue-700 tracking-widest z-10 leading-none bg-white/80 backdrop-blur-sm rounded px-[2px] pb-[1px] origin-bottom transition-transform duration-200">身宮</div>` : '';
 
                     // 主輔星字體統一尺寸：絕對不換列
                     const renderStar = (name, isMajor) => {
@@ -782,10 +784,12 @@
                             </div>`;
                     };
 
-                    // ★ 過客星曜：移至中間區域 (right-[25%] top-[20%])，避開主星四化
+                    // ★ 過客星曜：移至中間偏右區域 (避開主星四化)
+                    // 使用 flex-row-reverse 讓它們從右向左長出，每一直列由上至下
                     let transitHtml = '';
                     if (cell.transit && cell.transit.length > 0) {
-                        transitHtml = `<div class="transit-wrapper absolute right-[25%] sm:right-[30%] top-[20%] flex flex-row-reverse items-start justify-start gap-[1px] sm:gap-[2px] z-10 pointer-events-none origin-top-right transition-transform duration-200">`;
+                        // 起始點右側 35%，底部 24px (避免擋到疊宮)
+                        transitHtml = `<div class="transit-wrapper absolute right-[35%] sm:right-[40%] bottom-[20px] sm:bottom-[24px] flex flex-row-reverse items-end justify-center gap-[1px] sm:gap-[2px] z-10 pointer-events-none origin-bottom-right transition-transform duration-200">`;
                         
                         // 1. 分出鸞喜與祿羊陀
                         const luanXi = cell.transit.filter(t => t.name.includes('鸞') || t.name.includes('喜'));
@@ -795,7 +799,7 @@
                         if (luYangTuo.length > 0) {
                             for (let i = 0; i < luYangTuo.length; i += 2) {
                                 const pair = luYangTuo.slice(i, i + 2);
-                                transitHtml += `<div class="flex flex-col justify-center gap-[2px]">`;
+                                transitHtml += `<div class="flex flex-col justify-end gap-[2px]">`;
                                 pair.forEach(t => {
                                     const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
                                     transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
@@ -806,7 +810,7 @@
 
                         // 3. 渲染 鸞喜 (獨立一列，在祿羊陀的左邊)
                         if (luanXi.length > 0) {
-                            transitHtml += `<div class="flex flex-col justify-center gap-[2px]">`;
+                            transitHtml += `<div class="flex flex-col justify-end gap-[2px]">`;
                             luanXi.forEach(t => {
                                 const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
                                 transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
@@ -829,21 +833,21 @@
                             ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                         </div>
                         
-                        <!-- 核心星曜區：寬度縮減為 68%，避免與中間的過客星曜重疊 -->
-                        <div class="absolute top-5 sm:top-6 left-[2px] w-[68%] bottom-6 flex justify-start z-10 overflow-visible">
+                        <!-- 核心星曜區：寬度縮減為 65%，避免與中間的過客星曜重疊 -->
+                        <div class="absolute top-5 sm:top-6 left-[2px] w-[65%] bottom-6 flex justify-start z-10 overflow-visible">
                             <div class="star-wrapper w-max flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap content-start origin-top-left transition-transform duration-200">
                                 ${cell.major.map(s => renderStar(s, true)).join('')}
                                 ${cell.minor.map(s => renderStar(s, false)).join('')}
                             </div>
                         </div>
 
-                        <!-- 絕對領域：移至中間區域的直排過客星曜 -->
+                        <!-- 絕對領域：移至中間靠近身宮區域的直排過客星曜 -->
                         ${transitHtml}
 
                         <!-- 底部右下：疊宮標籤直接壓在本命宮位上 -->
                         ${overlapsHtml}
                         
-                        <!-- 底部正中央：身宮 -->
+                        <!-- 底部中間偏下：身宮 -->
                         ${bodyPalaceHtml}
 
                         <!-- 左下：大限年齡 -->
