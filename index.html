@@ -29,7 +29,7 @@
             word-break: keep-all;
         }
 
-        /* 網格座標與底色 */
+        /* 網格座標與底色 - 改用 inset box-shadow 完美解決外框不完整裁切問題 */
         .palace-cell {
             position: relative;
             cursor: pointer;
@@ -56,7 +56,6 @@
             text-align: center;
             font-size: 8px;
             padding: 1px;
-            margin-top: 1px;
             width: 100%;
         }
         @media (min-width: 640px) { .hua-badge { font-size: 11px; padding: 1px 3px; } }
@@ -83,7 +82,7 @@
 
         /* 疊宮與本命宮統一標籤 (大小一致，堆疊顯示) */
         .mini-overlap {
-            font-size: 11px; 
+            font-size: 12px; 
             line-height: 1.2;
             padding: 1px 2px; 
             border: 1px solid;
@@ -95,7 +94,7 @@
             width: fit-content; 
             letter-spacing: 1px;
         }
-        @media (min-width: 640px) { .mini-overlap { font-size: 14px; padding: 1px 3px; } }
+        @media (min-width: 640px) { .mini-overlap { font-size: 15px; padding: 1px 3px; } }
         .b-day { color: #d97706; border-color: #fcd34d; background-color: #fffbeb; }
         .b-month { color: #2563eb; border-color: #bfdbfe; background-color: #eff6ff; }
         .b-year { color: #0d9488; border-color: #99f6e4; background-color: #f0fdfa; }
@@ -482,6 +481,7 @@
                 state.board[(yLuB + 1) % 12].transit.push({name: '流羊', color: 'text-teal-700 bg-teal-50 border-teal-200'});
                 state.board[(yLuB - 1 + 12) % 12].transit.push({name: '流陀', color: 'text-teal-700 bg-teal-50 border-teal-200'});
 
+                // 流年疊加：流鸞、流喜
                 const yHongB = (3 - state.selYear.branch + 12) % 12;
                 state.board[yHongB].transit.push({name: '流鸞', color: 'text-teal-700 bg-teal-50 border-teal-200'});
                 state.board[(yHongB + 6) % 12].transit.push({name: '流喜', color: 'text-teal-700 bg-teal-50 border-teal-200'});
@@ -640,27 +640,88 @@
             return palaces[diff];
         }
 
-        // 自動縮放字體以防爆框
+        // 動態智慧縮放引擎 (防遮蔽)
         function autoScalePalaceText() {
+            // 先重置所有的縮放
+            document.querySelectorAll('.star-wrapper, .transit-wrapper, .overlap-wrapper, .body-palace-wrapper, .stem-wrapper, .age-wrapper').forEach(el => {
+                if(el.classList.contains('body-palace-wrapper')) {
+                    el.style.transform = 'translateX(-50%) scale(1)';
+                } else {
+                    el.style.transform = 'scale(1)';
+                }
+            });
+
+            // 1. 星曜區 (水平防遮蔽)
             document.querySelectorAll('.star-wrapper').forEach(wrapper => {
-                wrapper.style.transform = `scale(1)`;
                 const parentWidth = wrapper.parentElement.clientWidth;
                 const contentWidth = wrapper.scrollWidth;
-                
                 if (contentWidth > parentWidth && parentWidth > 0) {
-                    const scale = parentWidth / contentWidth;
-                    wrapper.style.transform = `scale(${scale * 0.95})`; 
+                    wrapper.style.transform = `scale(${(parentWidth / contentWidth) * 0.95})`; 
+                }
+            });
+
+            // 2. 過客星曜區 (垂直/水平防遮蔽)
+            document.querySelectorAll('.transit-wrapper').forEach(wrapper => {
+                const cell = wrapper.closest('.palace-cell');
+                const maxHeight = cell.clientHeight * 0.50; 
+                const maxWidth = cell.clientWidth * 0.40;  
+                const contentHeight = wrapper.scrollHeight;
+                const contentWidth = wrapper.scrollWidth;
+                
+                let scale = 1;
+                if (contentHeight > maxHeight && maxHeight > 0) scale = Math.min(scale, maxHeight / contentHeight);
+                if (contentWidth > maxWidth && maxWidth > 0) scale = Math.min(scale, maxWidth / contentWidth);
+                
+                if (scale < 1) wrapper.style.transform = `scale(${scale * 0.95})`; 
+            });
+
+            // 3. 疊宮標籤區 (垂直/水平防遮蔽)
+            document.querySelectorAll('.overlap-wrapper').forEach(wrapper => {
+                const cell = wrapper.closest('.palace-cell');
+                const maxHeight = cell.clientHeight * 0.55; 
+                const maxWidth = cell.clientWidth * 0.75;
+                const contentHeight = wrapper.scrollHeight;
+                const contentWidth = wrapper.scrollWidth;
+
+                let scale = 1;
+                if (contentHeight > maxHeight && maxHeight > 0) scale = Math.min(scale, maxHeight / contentHeight);
+                if (contentWidth > maxWidth && maxWidth > 0) scale = Math.min(scale, maxWidth / contentWidth);
+
+                if (scale < 1) wrapper.style.transform = `scale(${scale * 0.95})`; 
+            });
+            
+            // 4. 身宮區 (水平防遮蔽)
+            document.querySelectorAll('.body-palace-wrapper').forEach(wrapper => {
+                const cellWidth = wrapper.closest('.palace-cell').clientWidth;
+                const maxWidth = cellWidth * 0.6;
+                const contentWidth = wrapper.scrollWidth;
+                
+                if (contentWidth > maxWidth && maxWidth > 0) {
+                    const scale = maxWidth / contentWidth;
+                    wrapper.style.transform = `translateX(-50%) scale(${scale * 0.95})`; 
+                }
+            });
+
+            // 5. 天干地支與歲數 (水平防遮蔽)
+            document.querySelectorAll('.stem-wrapper, .age-wrapper').forEach(wrapper => {
+                const cellWidth = wrapper.closest('.palace-cell').clientWidth;
+                const maxWidth = cellWidth * 0.35;
+                const contentWidth = wrapper.scrollWidth;
+                if (contentWidth > maxWidth && maxWidth > 0) {
+                    wrapper.style.transform = `scale(${(maxWidth / contentWidth) * 0.95})`;
                 }
             });
         }
 
+        let resizeTimer;
         window.addEventListener('resize', () => {
-            if (state.lunar) {
-                requestAnimationFrame(autoScalePalaceText);
-            }
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (state.lunar) requestAnimationFrame(autoScalePalaceText);
+            }, 100);
         });
 
-        // 渲染宮位
+        // 神級排版：主輔字體統一、疊宮完美堆疊、過客移至中間區域、智慧縮放防遮蔽
         function renderBoard() {
             const grid = document.getElementById('board-grid');
             grid.innerHTML = ''; 
@@ -683,6 +744,7 @@
                     const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex) : '';
                     const isBodyPalace = (bIndex === state.bodyBranch);
 
+                    // 疊宮標籤：由下往上推疊
                     const badges = [];
                     if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName.substring(0,1)}</div>`);
                     if (mName) badges.push(`<div class="mini-overlap b-month">月${mName.substring(0,1)}</div>`);
@@ -691,20 +753,23 @@
                     badges.push(`<div class="mini-overlap b-natal">${nName}</div>`);
                     
                     let overlapsHtml = `
-                        <div class="absolute bottom-[2px] right-[2px] flex flex-col items-end gap-[1px] z-20 pointer-events-none pb-[1px]">
+                        <div class="overlap-wrapper absolute bottom-[2px] right-[2px] flex flex-col items-end gap-[1px] z-20 pointer-events-none origin-bottom-right transition-transform duration-200 pb-[1px]">
                             ${badges.join('')}
                         </div>`;
 
-                    let bodyPalaceHtml = isBodyPalace ? `<div class="absolute bottom-[2px] left-1/2 -translate-x-1/2 text-[14px] sm:text-[18px] md:text-[20px] font-black text-blue-700 tracking-widest z-10 leading-none bg-white/70 rounded px-[2px] pb-[1px]">身宮</div>` : '';
+                    // 身宮獨立置中
+                    let bodyPalaceHtml = isBodyPalace ? `<div class="body-palace-wrapper absolute bottom-[2px] left-1/2 -translate-x-1/2 text-[14px] sm:text-[18px] md:text-[20px] font-black text-blue-700 tracking-widest z-10 leading-none bg-white/70 rounded px-[2px] pb-[1px] origin-bottom transition-transform duration-200">身宮</div>` : '';
 
+                    // 主輔星字體統一尺寸：絕對不換列
                     const renderStar = (name, isMajor) => {
                         const hN = cell.huaN[name]; const hD = cell.huaD[name];
                         const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
                         const charHtml = name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
+                        const starSizeClass = 'text-[13px] sm:text-[16px] md:text-[18px]';
                         
                         return `
                             <div class="flex flex-col items-center shrink-0">
-                                <div class="flex flex-col items-center font-black ${isMajor ? 'text-red-700 text-[13px] sm:text-[16px] md:text-[18px]' : 'text-gray-800 text-[13px] sm:text-[16px] md:text-[18px]'}">
+                                <div class="flex flex-col items-center font-black ${isMajor ? 'text-red-700' : 'text-gray-800'} ${starSizeClass}">
                                     ${charHtml}
                                 </div>
                                 <div class="flex flex-col gap-0 w-full px-[1px] mt-[4px] sm:mt-[6px]">
@@ -717,24 +782,31 @@
                             </div>`;
                     };
 
+                    // ★ 過客星曜：移至中間區域 (right-[25%] top-[20%])，避開主星四化
                     let transitHtml = '';
                     if (cell.transit && cell.transit.length > 0) {
-                        transitHtml = `<div class="absolute right-[2px] top-[15%] flex flex-row-reverse items-start justify-start gap-[1px] sm:gap-[2px] z-10 pointer-events-none">`;
+                        transitHtml = `<div class="transit-wrapper absolute right-[25%] sm:right-[30%] top-[20%] flex flex-row-reverse items-start justify-start gap-[1px] sm:gap-[2px] z-10 pointer-events-none origin-top-right transition-transform duration-200">`;
                         
+                        // 1. 分出鸞喜與祿羊陀
                         const luanXi = cell.transit.filter(t => t.name.includes('鸞') || t.name.includes('喜'));
                         const luYangTuo = cell.transit.filter(t => !(t.name.includes('鸞') || t.name.includes('喜')));
                         
+                        // 2. 渲染 祿羊陀 (每2顆一列)
                         if (luYangTuo.length > 0) {
-                            transitHtml += `<div class="flex flex-col gap-[1px] sm:gap-[2px]">`;
-                            luYangTuo.forEach(t => {
-                                const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                                transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
-                            });
-                            transitHtml += `</div>`;
+                            for (let i = 0; i < luYangTuo.length; i += 2) {
+                                const pair = luYangTuo.slice(i, i + 2);
+                                transitHtml += `<div class="flex flex-col justify-center gap-[2px]">`;
+                                pair.forEach(t => {
+                                    const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
+                                    transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
+                                });
+                                transitHtml += `</div>`;
+                            }
                         }
 
+                        // 3. 渲染 鸞喜 (獨立一列，在祿羊陀的左邊)
                         if (luanXi.length > 0) {
-                            transitHtml += `<div class="flex flex-col gap-[1px] sm:gap-[2px]">`;
+                            transitHtml += `<div class="flex flex-col justify-center gap-[2px]">`;
                             luanXi.forEach(t => {
                                 const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
                                 transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
@@ -752,31 +824,40 @@
                     div.onclick = () => selectPalace(key);
 
                     div.innerHTML = `
-                        <div class="absolute top-0.5 sm:top-1 left-0.5 sm:left-1 text-[12px] sm:text-[14px] font-bold text-gray-500 z-10">
+                        <!-- 左上：天干地支 -->
+                        <div class="stem-wrapper absolute top-0.5 sm:top-1 left-0.5 sm:left-1 text-[12px] sm:text-[14px] font-bold text-gray-500 z-10 origin-top-left transition-transform duration-200">
                             ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                         </div>
                         
-                        <div class="absolute top-5 sm:top-6 left-[2px] w-[75%] bottom-6 flex justify-start z-10 overflow-visible">
+                        <!-- 核心星曜區：寬度縮減為 68%，避免與中間的過客星曜重疊 -->
+                        <div class="absolute top-5 sm:top-6 left-[2px] w-[68%] bottom-6 flex justify-start z-10 overflow-visible">
                             <div class="star-wrapper w-max flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap content-start origin-top-left transition-transform duration-200">
                                 ${cell.major.map(s => renderStar(s, true)).join('')}
                                 ${cell.minor.map(s => renderStar(s, false)).join('')}
                             </div>
                         </div>
 
+                        <!-- 絕對領域：移至中間區域的直排過客星曜 -->
                         ${transitHtml}
+
+                        <!-- 底部右下：疊宮標籤直接壓在本命宮位上 -->
                         ${overlapsHtml}
+                        
+                        <!-- 底部正中央：身宮 -->
                         ${bodyPalaceHtml}
 
-                        <div class="absolute bottom-0.5 left-0.5 text-[10px] sm:text-[13px] text-gray-500 font-bold z-10 bg-white/50 rounded px-[1px]">
+                        <!-- 左下：大限年齡 -->
+                        <div class="age-wrapper absolute bottom-0.5 left-0.5 text-[10px] sm:text-[13px] text-gray-500 font-bold z-10 bg-white/50 rounded px-[1px] origin-bottom-left transition-transform duration-200">
                             ${cell.ageStart}-${cell.ageEnd}
                         </div>
                     `;
                     grid.appendChild(div);
                 }
 
+                // 中宮
                 if(idx === 3) {
                     const center = document.createElement('div');
-                    center.className = "col-span-2 row-span-2 m-2 sm:m-4 bg-white/80 backdrop-blur-sm border border-[#9ca3af] shadow-md flex flex-col justify-center items-center relative z-10 pointer-events-none rounded";
+                    center.className = "col-span-2 row-span-2 m-[2px] sm:m-[4px] bg-white/80 backdrop-blur-sm border border-[#9ca3af] shadow-md flex flex-col justify-center items-center relative z-10 pointer-events-none rounded";
                     center.style.gridArea = "2/2/4/4"; 
                     
                     if (!state.lunar) {
@@ -809,7 +890,10 @@
             });
 
             if (state.lunar) {
-                requestAnimationFrame(autoScalePalaceText);
+                // 等待 DOM 渲染完畢後，執行智慧防遮蔽縮放
+                setTimeout(() => {
+                    requestAnimationFrame(autoScalePalaceText);
+                }, 50);
             }
             if(activePalace && state.lunar) selectPalace(activePalace, true); 
         }
