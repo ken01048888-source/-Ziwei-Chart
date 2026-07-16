@@ -75,7 +75,7 @@
 
         /* 疊宮標籤 - 垂直堆疊用 */
         .mini-overlap {
-            font-size: 10px; /* ★ 疊宮字體再縮小 */
+            font-size: 8px; /* ★ 疊宮字體再縮小 */
             line-height: 1.1;
             padding: 1px 2px; 
             border: 1px solid;
@@ -84,8 +84,10 @@
             font-weight: bold;
             white-space: nowrap;
             text-align: right; /* 靠右對齊 */
+            box-sizing: border-box;
+            width: fit-content;
         }
-        @media (min-width: 640px) { .mini-overlap { font-size: 11px; padding: 1px 3px; margin-bottom: 2px; } }
+        @media (min-width: 640px) { .mini-overlap { font-size: 9px; } }
         
         /* 恢復運線疊宮色彩 */
         .b-day { color: #d97706; border-color: #fcd34d; background-color: #fffbeb; }
@@ -93,11 +95,8 @@
         .b-year { color: #0d9488; border-color: #99f6e4; background-color: #f0fdfa; }
         .b-dec { color: #7e22ce; border-color: #e9d5ff; background-color: #faf5ff; }
         .b-body { color: #ffffff; border-color: #60a5fa; background-color: #3b82f6; }
-            box-sizing: border-box;
-            width: fit-content;
-        }
 
-        /* 運線按鈕狀態 */
+        /* 運線按鈕狀態 (保留原本 Grid 排版設計) */
         .btn-timeline { background-color: #f9fafb; color: #4b5563; transition: all 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         .btn-timeline:hover { background-color: #e5e7eb; }
         .btn-active-decade { background-color: #7e22ce !important; color: white !important; font-weight: bold; }
@@ -751,10 +750,10 @@
                             <!-- 身宮置中底 -->
                             ${bodyPalaceHtml}
                             
-                            <!-- 右下角本命與疊宮 (垂直排列) ★ 本命與疊宮皆統一為 text-[10px] -->
+                            <!-- 右下角本命與疊宮 (垂直排列) ★ 本命與疊宮皆統一再縮小 -->
                             <div class="flex flex-col items-end text-right shrink-0 z-10 max-w-[65%]">
                                 ${overlapsHtml}
-                                <div class="text-[10px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap mt-[1px]">
+                                <div class="text-[9px] sm:text-[10px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap mt-[1px]">
                                     ${nName}
                                 </div>
                             </div>
