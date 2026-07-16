@@ -46,7 +46,6 @@
         .bg-water { background-color: #f0f9ff; }
         .bg-earth { background-color: #fffbeb; }
 
-        /* 天干五行彩色邊框 */
         .border-wood { border-color: #16a34a; background-color: rgba(240, 253, 244, 0.9); color: #15803d; }
         .border-fire { border-color: #dc2626; background-color: rgba(254, 242, 242, 0.9); color: #b91c1c; }
         .border-metal { border-color: #4b5563; background-color: rgba(249, 250, 251, 0.9); color: #1f2937; }
@@ -153,7 +152,7 @@
         <div class="w-full lg:w-[65%] flex flex-col gap-1.5 sm:gap-2">
             
             <header class="bg-white border border-gray-300 rounded p-1.5 sm:p-2 shadow-sm flex flex-col gap-1.5 sm:gap-2 z-30 relative">
-                <!-- 第一排：姓名與性別 (移至一起) + 本命解析置頂 -->
+                <!-- 第一排：姓名與性別 + 本命解析置頂 -->
                 <div class="flex flex-wrap items-center justify-between gap-1.5 w-full">
                     <div class="flex items-center gap-2">
                         <span class="text-xs sm:text-sm font-black tracking-widest text-gray-800 shrink-0 hidden sm:block">紫微排盤</span>
@@ -161,14 +160,12 @@
                             <label class="text-[11px] sm:text-xs font-bold text-gray-600">姓名</label>
                             <input type="text" id="input-name" value="" placeholder="請輸入" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 w-16 sm:w-24 border-b border-gray-300 focus:border-amber-600" oninput="updateName()">
                         </div>
-                        <!-- 男女性別按鈕移至姓名後方 -->
                         <div class="flex bg-gray-100 rounded p-0.5 border border-gray-200">
                             <button id="btn-male" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded shadow bg-blue-700 text-white" onclick="setGender('M')">男</button>
                             <button id="btn-female" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800" onclick="setGender('F')">女</button>
                         </div>
                     </div>
                     
-                    <!-- 原性別處改放：本命解析按鈕 -->
                     <button onclick="showInterpretation()" class="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[10px] sm:text-xs font-bold px-3 py-1 sm:py-1.5 rounded shadow-md transition-all flex items-center gap-1">
                         <i class="fa-solid fa-book-open"></i> <span>本命盤解析</span>
                     </button>
@@ -209,10 +206,10 @@
                 </div>
             </header>
 
-            <!-- 命盤主體 4x4 正方 Grid (極大化四周，壓縮中宮留白) -->
+            <!-- 命盤主體 4x4 正方 Grid -->
             <div class="relative w-full aspect-square max-w-[800px] mx-auto bg-white shadow-md z-10 border-t border-l border-[#9ca3af]">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
-                <!-- 網格均分為 4x4，12宮長寬一致 -->
+                <!-- 網格均分為 4x4，12宮長寬完全一致 -->
                 <div id="board-grid" class="w-full h-full absolute inset-0 grid grid-cols-4 grid-rows-4">
                     <!-- JS 生成 -->
                 </div>
@@ -238,7 +235,23 @@
 
     </div>
 
+    <!-- 自訂防呆錯誤訊息對話框 -->
+    <div id="msg-box" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+        <div class="bg-white rounded-lg p-5 shadow-xl flex flex-col items-center gap-4 min-w-[250px] transform transition-transform scale-95">
+            <div class="text-red-600 text-3xl"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <div class="text-gray-800 font-bold text-sm" id="msg-content"></div>
+            <button onclick="document.getElementById('msg-box').classList.add('hidden')" class="bg-gray-800 text-white px-6 py-1.5 rounded font-bold hover:bg-black">確定</button>
+        </div>
+    </div>
+
     <script>
+        function showMsg(msg) {
+            document.getElementById('msg-content').innerText = msg;
+            const box = document.getElementById('msg-box');
+            box.classList.remove('hidden');
+            setTimeout(() => box.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
+        }
+
         function initDateSelects() {
             const yearSelect = document.getElementById('birth-year');
             const monthSelect = document.getElementById('birth-month');
@@ -354,67 +367,72 @@
             const d = document.getElementById('birth-day').value;
             const hStr = document.getElementById('birth-hour').value;
 
+            // 防呆處理
             if (!y || !m || !d || hStr === "") {
-                state.lunar = null;
-                renderBoard();
+                showMsg("請選擇完整的生辰（年、月、日、時）才能進行排盤喔！");
                 return;
             }
 
-            state.solarDate = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-            const inputHourVal = parseInt(hStr);
+            try {
+                state.solarDate = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+                const inputHourVal = parseInt(hStr);
 
-            state.hourIndex = (inputHourVal === 23) ? 0 : inputHourVal;
-            
-            let solarHourForLunar = (inputHourVal === 23) ? 23 : (inputHourVal === 0 ? 0 : inputHourVal * 2);
-            const solar = Solar.fromYmdHms(parseInt(y), parseInt(m), parseInt(d), solarHourForLunar, 30, 0); 
-            state.lunar = solar.getLunar();
-            
-            const yearStemIdx = state.lunar.getYearGanIndex();
-            state.yinYang = yearStemIdx % 2 === 0 ? '陽' : '陰';
-            
-            const monthAbs = Math.abs(state.lunar.getMonth());
-            state.lifeBranch = (2 + monthAbs - 1 - state.hourIndex + 12) % 12;
-            state.bodyBranch = (2 + monthAbs - 1 + state.hourIndex) % 12;     
-            
-            const wuHuMap = [2, 4, 6, 8, 0];
-            const startStem = wuHuMap[yearStemIdx % 5];
-            state.stemsMap = [];
-            for (let i = 0; i < 12; i++) {
-                if(i < 2) state.stemsMap[i] = stems[(startStem + 10 + i) % 10];
-                else state.stemsMap[i] = stems[(startStem + i - 2) % 10];
-            }
-            
-            const lifeStemIdx = stems.indexOf(state.stemsMap[state.lifeBranch]);
-            const juMap = [[4, 2, 6, 5, 3], [2, 6, 5, 3, 4], [6, 5, 3, 4, 2], [5, 3, 4, 2, 6], [3, 4, 2, 6, 5]];
-            let juCol = Math.floor(state.lifeBranch / 2);
-            if (juCol > 2) juCol -= 3;
-            state.elementJu = juMap[Math.floor(lifeStemIdx / 2)][juCol];
+                state.hourIndex = (inputHourVal === 23) ? 0 : inputHourVal;
+                
+                let solarHourForLunar = (inputHourVal === 23) ? 23 : (inputHourVal === 0 ? 0 : inputHourVal * 2);
+                const solar = Solar.fromYmdHms(parseInt(y), parseInt(m), parseInt(d), solarHourForLunar, 30, 0); 
+                state.lunar = solar.getLunar();
+                
+                const yearStemIdx = state.lunar.getYearGanIndex();
+                state.yinYang = yearStemIdx % 2 === 0 ? '陽' : '陰';
+                
+                const monthAbs = Math.abs(state.lunar.getMonth());
+                state.lifeBranch = (2 + monthAbs - 1 - state.hourIndex + 12) % 12;
+                state.bodyBranch = (2 + monthAbs - 1 + state.hourIndex) % 12;     
+                
+                const wuHuMap = [2, 4, 6, 8, 0];
+                const startStem = wuHuMap[yearStemIdx % 5];
+                state.stemsMap = [];
+                for (let i = 0; i < 12; i++) {
+                    if(i < 2) state.stemsMap[i] = stems[(startStem + 10 + i) % 10];
+                    else state.stemsMap[i] = stems[(startStem + i - 2) % 10];
+                }
+                
+                const lifeStemIdx = stems.indexOf(state.stemsMap[state.lifeBranch]);
+                const juMap = [[4, 2, 6, 5, 3], [2, 6, 5, 3, 4], [6, 5, 3, 4, 2], [5, 3, 4, 2, 6], [3, 4, 2, 6, 5]];
+                let juCol = Math.floor(state.lifeBranch / 2);
+                if (juCol > 2) juCol -= 3;
+                state.elementJu = juMap[Math.floor(lifeStemIdx / 2)][juCol];
 
-            state.board.forEach(cell => {
-                cell.major = []; cell.minor = []; cell.transit = [];
-                cell.huaN = {}; cell.huaD = {}; cell.huaY = {}; cell.huaM = {}; cell.huaDay = {};
-            });
+                state.board.forEach(cell => {
+                    cell.major = []; cell.minor = []; cell.transit = [];
+                    cell.huaN = {}; cell.huaD = {}; cell.huaY = {}; cell.huaM = {}; cell.huaDay = {};
+                });
 
-            const isForward = (state.yinYang === '陽' && state.gender === 'M') || (state.yinYang === '陰' && state.gender === 'F');
-            let age = state.elementJu;
-            for(let i=0; i<12; i++) {
-                const b = (state.lifeBranch + (isForward ? i : -i) + 12) % 12;
-                state.board[b].ageStart = age;
-                state.board[b].ageEnd = age + 9;
-                age += 10;
-            }
+                const isForward = (state.yinYang === '陽' && state.gender === 'M') || (state.yinYang === '陰' && state.gender === 'F');
+                let age = state.elementJu;
+                for(let i=0; i<12; i++) {
+                    const b = (state.lifeBranch + (isForward ? i : -i) + 12) % 12;
+                    state.board[b].ageStart = age;
+                    state.board[b].ageEnd = age + 9;
+                    age += 10;
+                }
 
-            const lunarDay = state.lunar.getDay();
-            const yearBranchIdx = state.lunar.getYearZhiIndex();
-            placeStars(yearStemIdx, yearBranchIdx, monthAbs, state.hourIndex, lunarDay);
-            
-            state.selDecade = null; state.selYear = null; state.selMonth = null; state.selDay = null;
-            
-            buildTimelineData();
-            updateTimeState();
-            
-            if(!document.getElementById('interpretation-panel').classList.contains('hidden')) {
-                showInterpretation();
+                const lunarDay = state.lunar.getDay();
+                const yearBranchIdx = state.lunar.getYearZhiIndex();
+                placeStars(yearStemIdx, yearBranchIdx, monthAbs, state.hourIndex, lunarDay);
+                
+                state.selDecade = null; state.selYear = null; state.selMonth = null; state.selDay = null;
+                
+                buildTimelineData();
+                updateTimeState();
+                
+                if(!document.getElementById('interpretation-panel').classList.contains('hidden')) {
+                    showInterpretation();
+                }
+            } catch (error) {
+                showMsg("排盤發生異常，請確認日期是否正確：" + error.message);
+                console.error(error);
             }
         }
 
@@ -479,6 +497,17 @@
             else addMinor(jk1, '截空');
 
             applyHua(stems[yearStemIdx], 'huaN');
+        }
+
+        function applyHua(stem, targetObjStr) {
+            if(!stem) return;
+            const [lu, quan, ke, ji] = huaTable[stem];
+            state.board.forEach(cell => {
+                if(cell.major.includes(lu) || cell.minor.includes(lu)) cell[targetObjStr][lu] = '祿';
+                if(cell.major.includes(quan) || cell.minor.includes(quan)) cell[targetObjStr][quan] = '權';
+                if(cell.major.includes(ke) || cell.minor.includes(ke)) cell[targetObjStr][ke] = '科';
+                if(cell.major.includes(ji) || cell.minor.includes(ji)) cell[targetObjStr][ji] = '忌';
+            });
         }
 
         function calcTransitStars(monthStem, dayStem) {
@@ -656,7 +685,7 @@
             return palaces[diff];
         }
 
-        // 精細化自動縮放引擎 (鎖定格子尺寸測量，避免過度縮小)
+        // 精細化同步自動縮放引擎：用 Flex 容器作為一體計算
         function autoScalePalaceText() {
             document.querySelectorAll('.palace-cell').forEach(cell => {
                 const content = cell.querySelector('.palace-content');
@@ -698,7 +727,7 @@
             }, 100);
         });
 
-        // 核心渲染：Flexbox 彈性包裹 + 中宮綁定 + 身宮水平
+        // 核心渲染：Flexbox 彈性包裹 + 中宮固定置中 + 身宮水平
         function renderBoard() {
             const grid = document.getElementById('board-grid');
             grid.innerHTML = ''; 
@@ -1008,7 +1037,14 @@
 
         window.onload = () => {
             initDateSelects();
-            renderBoard(); 
+            // 預設日期，讓使用者一進來就看到完整的盤面，證明系統完全正常
+            document.getElementById('birth-year').value = "1983";
+            updateDays();
+            document.getElementById('birth-month').value = "1";
+            updateDays();
+            document.getElementById('birth-day').value = "4";
+            document.getElementById('birth-hour').value = "1"; // 丑時
+            initApp(); 
         };
     </script>
 </body>
