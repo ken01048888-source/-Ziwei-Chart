@@ -15,6 +15,8 @@
             background-color: #f7f6f2; 
             color: #1a1a1a;
             overscroll-behavior: none;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
         
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -37,18 +39,18 @@
         .bg-water { background-color: #f0f9ff; }
         .bg-earth { background-color: #fffbeb; }
 
-        /* 四化標籤 */
+        /* 四化標籤：強迫與星曜等寬，字體極小化 */
         .hua-badge {
             display: inline-block;
             font-weight: 900;
             color: white;
             border-radius: 1px;
-            line-height: 1.1;
+            line-height: 1;
             text-align: center;
-            font-size: 8px; /* ★ 再縮小字體 */
-            padding: 1px 0px; /* 移除左右 padding 以免爆框 */
+            font-size: 8px; 
+            padding: 1px 0px; 
             margin-top: 1px;
-            width: 100%; /* ★ 強制等同於外層星曜寬度 */
+            width: 100%; 
             box-sizing: border-box;
         }
         @media (min-width: 640px) { .hua-badge { font-size: 9px; } }
@@ -58,36 +60,35 @@
         .hua-month { background-color: #2563eb; } 
         .hua-day { background-color: #d97706; } 
 
-        /* 過客星曜 直式標籤 - 水平排列容器 */
+        /* 過客星曜 橫式標籤 - 右上角水平排列 */
         .transit-badge {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: inline-block;
             font-weight: bold;
             border-radius: 2px;
             line-height: 1.1;
             border: 1px solid;
-            font-size: 8px; /* ★ 縮小字體 */
-            padding: 1px;
-            text-align: center;
+            font-size: 8px; 
+            padding: 0px 2px;
+            white-space: nowrap;
+            margin-left: 1px;
         }
         @media (min-width: 640px) { .transit-badge { font-size: 9px; } }
 
-        /* 疊宮標籤 - 垂直堆疊用 */
+        /* 疊宮標籤 - 右下角垂直堆疊 */
         .mini-overlap {
-            font-size: 8px; /* ★ 疊宮字體再縮小 */
-            line-height: 1.1;
-            padding: 1px 2px; 
+            font-size: 8px; 
+            line-height: 1;
+            padding: 0px 2px; 
             border: 1px solid;
             border-radius: 2px;
-            margin-bottom: 1px;
+            margin-bottom: 0px; 
             font-weight: bold;
             white-space: nowrap;
-            text-align: right; /* 靠右對齊 */
+            text-align: right; 
             box-sizing: border-box;
             width: fit-content;
         }
-        @media (min-width: 640px) { .mini-overlap { font-size: 9px; } }
+        @media (min-width: 640px) { .mini-overlap { font-size: 9px; padding: 1px 2px; margin-bottom: 1px; } }
         
         /* 恢復運線疊宮色彩 */
         .b-day { color: #d97706; border-color: #fcd34d; background-color: #fffbeb; }
@@ -103,6 +104,9 @@
         .btn-active-year { background-color: #0d9488 !important; color: white !important; font-weight: bold; }
         .btn-active-month { background-color: #2563eb !important; color: white !important; font-weight: bold; }
         .btn-active-day { background-color: #b45309 !important; color: white !important; font-weight: bold; }
+        
+        .pulse-body { animation: pulseBody 2s infinite; }
+        @keyframes pulseBody { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col pt-1 pb-4">
@@ -170,7 +174,7 @@
             <div class="relative w-full aspect-square max-w-[800px] mx-auto bg-white shadow-md z-10 border-t border-l border-[#9ca3af]">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
                 <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);">
-                    <!-- JS 生成 -->
+                    <!-- JS 生成 12 宮與中宮 -->
                 </div>
             </div>
 
@@ -211,6 +215,7 @@
             setTimeout(() => box.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
         }
 
+        // 初始化日期選項 (留白)
         function initDateSelects() {
             const yearSelect = document.getElementById('birth-year');
             const monthSelect = document.getElementById('birth-month');
@@ -256,16 +261,17 @@
             }
         }
 
+        // 基本常數
         const branches = ['zi', 'chou', 'yin', 'mao', 'chen', 'si', 'wu', 'wei', 'shen', 'you', 'xu', 'hai'];
         const branchNames = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
         const stems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
         const palaces = ["命宮", "兄弟", "夫妻", "子女", "財帛", "疾厄", "遷移", "交友", "官祿", "田宅", "福德", "父母"];
         
         const gridConfig = {
-            si: { area: '1/1/2/2', bg: 'bg-fire', element: 'fire' }, wu: { area: '1/2/2/3', bg: 'bg-fire', element: 'fire' }, wei: { area: '1/3/2/4', bg: 'bg-earth', element: 'earth' }, shen: { area: '1/4/2/5', bg: 'bg-metal', element: 'metal' },
-            chen: { area: '2/1/3/2', bg: 'bg-earth', element: 'earth' }, you: { area: '2/4/3/5', bg: 'bg-metal', element: 'metal' },
-            mao: { area: '3/1/4/2', bg: 'bg-wood', element: 'wood' }, xu: { area: '3/4/4/5', bg: 'bg-earth', element: 'earth' },
-            yin: { area: '4/1/5/2', bg: 'bg-wood', element: 'wood' }, chou: { area: '4/2/5/3', bg: 'bg-earth', element: 'earth' }, zi: { area: '4/3/5/4', bg: 'bg-water', element: 'water' }, hai: { area: '4/4/5/5', bg: 'bg-water', element: 'water' }
+            si: { area: '1/1/2/2', bg: 'bg-fire' }, wu: { area: '1/2/2/3', bg: 'bg-fire' }, wei: { area: '1/3/2/4', bg: 'bg-earth' }, shen: { area: '1/4/2/5', bg: 'bg-metal' },
+            chen: { area: '2/1/3/2', bg: 'bg-earth' }, you: { area: '2/4/3/5', bg: 'bg-metal' },
+            mao: { area: '3/1/4/2', bg: 'bg-wood' }, xu: { area: '3/4/4/5', bg: 'bg-earth' },
+            yin: { area: '4/1/5/2', bg: 'bg-wood' }, chou: { area: '4/2/5/3', bg: 'bg-earth' }, zi: { area: '4/3/5/4', bg: 'bg-water' }, hai: { area: '4/4/5/5', bg: 'bg-water' }
         };
         
         const coords = {
@@ -668,23 +674,16 @@
                 const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex) : '';
                 const isBodyPalace = (bIndex === state.bodyBranch);
 
-                // 疊宮標籤：垂直堆疊 (由下往上)
+                // 疊宮標籤：由下往上垂直堆疊 (Flex Column)
                 const badges = [];
                 if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName.substring(0,1)}</div>`);
                 if (mName) badges.push(`<div class="mini-overlap b-month">月${mName.substring(0,1)}</div>`);
                 if (yName) badges.push(`<div class="mini-overlap b-year">流${yName.substring(0,1)}</div>`);
                 if (dName) badges.push(`<div class="mini-overlap b-dec">大${dName.substring(0,1)}</div>`);
                 
-                // 垂直堆疊
-                let overlapsHtml = `
-                    <div class="flex flex-col items-end justify-end gap-[1px] sm:gap-[2px] mb-[1px]">
-                        ${badges.join('')}
-                    </div>`;
+                let overlapsHtml = badges.join('');
 
-                // 身宮：水平放置且貼齊字體，置於底部中央
-                let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 whitespace-nowrap" style="font-size: 10px; letter-spacing: 1px;">身宮</div>` : '<div></div>';
-
-                // ★ 星曜固定字體大小: 12px (主星), 11px (副星)
+                // ★ 星曜設定：主星 12px, 副星 11px
                 const renderStar = (name, isMajor) => {
                     const hN = cell.huaN[name]; const hD = cell.huaD[name];
                     const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
@@ -692,29 +691,26 @@
                     const starSizeClass = isMajor ? 'text-[12px]' : 'text-[11px]'; 
                     
                     return `
-                        <div class="flex flex-col items-start shrink-0 min-w-min"> <!-- ★ w-min 確保容器與內部字體同寬，靠左對齊 items-start -->
+                        <div class="flex flex-col items-start shrink-0 w-min"> 
                             <div class="flex flex-col items-center font-black ${isMajor ? 'text-red-700' : 'text-gray-800'} ${starSizeClass} w-full">
                                 ${charHtml}
                             </div>
-                            <div class="flex flex-col gap-0 w-full mt-[2px] sm:mt-[4px]">
-                                ${hN ? `<span class="hua-badge hua-natal w-full">${hN}</span>` : ''}
-                                ${hD ? `<span class="hua-badge hua-decade w-full">${hD}</span>` : ''}
-                                ${hY ? `<span class="hua-badge hua-year w-full">${hY}</span>` : ''}
-                                ${hM ? `<span class="hua-badge hua-month w-full">${hM}</span>` : ''}
-                                ${hDay ? `<span class="hua-badge hua-day w-full">${hDay}</span>` : ''}
+                            <div class="flex flex-col gap-0 w-full mt-[1px]">
+                                ${hN ? `<span class="hua-badge hua-natal">${hN}</span>` : ''}
+                                ${hD ? `<span class="hua-badge hua-decade">${hD}</span>` : ''}
+                                ${hY ? `<span class="hua-badge hua-year">${hY}</span>` : ''}
+                                ${hM ? `<span class="hua-badge hua-month">${hM}</span>` : ''}
+                                ${hDay ? `<span class="hua-badge hua-day">${hDay}</span>` : ''}
                             </div>
                         </div>`;
                 };
 
-                // 過客星曜：右上角「水平」排列，不換行
+                // 過客星曜：右上角水平排列 (flex-row flex-nowrap)
                 let transitHtml = '';
                 if (cell.transit && cell.transit.length > 0) {
-                    transitHtml = `<div class="flex flex-row items-start justify-end gap-[1px] sm:gap-[2px] z-10 flex-nowrap overflow-visible">`;
                     cell.transit.forEach(t => {
-                        const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                        transitHtml += `<div class="transit-badge shrink-0 ${t.color}">${charHtml}</div>`;
+                        transitHtml += `<div class="transit-badge shrink-0 ${t.color}">${t.name}</div>`;
                     });
-                    transitHtml += `</div>`;
                 }
 
                 const div = document.createElement('div');
@@ -723,39 +719,36 @@
                 div.style.gridArea = conf.area;
                 div.onclick = () => selectPalace(key);
 
-                // 完全基於 Flexbox 的宮位內容佈局
+                // 採用絕對定位切分 5 大區域，保證完全不互擠！
                 div.innerHTML = `
-                    <div class="palace-content flex flex-col justify-between h-full w-full origin-top-left p-1 box-border">
-                        <!-- 第一排：天干地支與右上水平排列過客星曜 -->
-                        <div class="flex justify-between items-start w-full gap-1">
-                            <div class="text-[10px] font-bold z-10 shrink-0 text-gray-700"> <!-- ★ 拔除框線，字體縮小至 10px -->
-                                ${state.stemsMap[bIndex]}${branchNames[bIndex]}
-                            </div>
-                            ${transitHtml}
+                    <div class="h-full w-full relative p-0.5 sm:p-1 box-border">
+                        <!-- 1. 左上角：無框天干地支 -->
+                        <div class="absolute top-[2px] sm:top-[4px] left-[2px] sm:left-[4px] text-[10px] font-bold text-gray-700 leading-none z-10 pointer-events-none">
+                            ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                         </div>
                         
-                        <!-- 第二排：主輔星曜群 (靠左對齊，縮小間距) -->
-                        <div class="flex justify-start gap-[1px] flex-nowrap w-full flex-1 pt-0.5 sm:pt-1 overflow-visible">
+                        <!-- 2. 右上角：過客星曜 (水平橫排) -->
+                        <div class="absolute top-[2px] sm:top-[4px] right-[2px] sm:right-[4px] flex flex-row justify-end gap-[1px] flex-nowrap z-10 pointer-events-none">
+                            ${transitHtml}
+                        </div>
+
+                        <!-- 3. 中間偏左：星曜區 (超過隱藏，不擠壓底部) -->
+                        <div class="absolute top-[16px] sm:top-[20px] bottom-[20px] sm:bottom-[24px] left-[2px] sm:left-[4px] right-[2px] sm:right-[4px] flex justify-start gap-[1px] overflow-hidden z-10 pointer-events-none pr-[30%]">
                             ${cell.major.map(s => renderStar(s, true)).join('')}
                             ${cell.minor.map(s => renderStar(s, false)).join('')}
                         </div>
 
-                        <!-- 第三排：大限歲數、身宮、本命與疊宮 -->
-                        <div class="flex justify-between items-end w-full pb-0.5 gap-1 relative">
-                            <!-- 歲數 -->
-                            <div class="text-[9px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 whitespace-nowrap">
-                                ${cell.ageStart}-${cell.ageEnd}
-                            </div>
-                            
-                            <!-- 身宮置中底 -->
-                            ${bodyPalaceHtml}
-                            
-                            <!-- 右下角本命與疊宮 (垂直排列) ★ 本命與疊宮皆統一再縮小 -->
-                            <div class="flex flex-col items-end text-right shrink-0 z-10 max-w-[65%]">
-                                ${overlapsHtml}
-                                <div class="text-[9px] sm:text-[10px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap mt-[1px]">
-                                    ${nName}
-                                </div>
+                        <!-- 4. 左下角：歲數 -->
+                        <div class="absolute bottom-[2px] sm:bottom-[4px] left-[2px] sm:left-[4px] text-[8px] sm:text-[9px] text-gray-500 font-bold leading-none z-10 pointer-events-none bg-white/40 backdrop-blur-[1px] rounded p-[1px]">
+                            ${cell.ageStart}-${cell.ageEnd}
+                        </div>
+
+                        <!-- 5. 右下角：疊宮與本命 (垂直堆疊) -->
+                        <div class="absolute bottom-[2px] sm:bottom-[4px] right-[2px] sm:right-[4px] flex flex-col items-end gap-[1px] z-30 pointer-events-none bg-white/40 backdrop-blur-[1px] rounded-tl-sm p-[1px]">
+                            ${overlapsHtml}
+                            ${isBodyPalace ? `<div class="pulse-body font-black text-blue-700 bg-white/80 rounded px-1 text-center whitespace-nowrap leading-none mt-[1px]" style="font-size: 8px;">身宮</div>` : ''}
+                            <div class="text-[10px] sm:text-[11px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap leading-none mt-[1px]">
+                                ${nName}
                             </div>
                         </div>
                     </div>
