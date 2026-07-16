@@ -51,19 +51,18 @@
             border-radius: 1px;
             line-height: 1.1;
             text-align: center;
-            font-size: 8px;
-            padding: 1px;
+            font-size: 11px;
+            padding: 1px 3px;
             margin-top: 1px;
             width: 100%;
         }
-        @media (min-width: 640px) { .hua-badge { font-size: 11px; padding: 1px 3px; } }
         .hua-natal { background-color: #b91c1c; } 
         .hua-decade { background-color: #7e22ce; } 
         .hua-year { background-color: #0d9488; } 
         .hua-month { background-color: #2563eb; } 
         .hua-day { background-color: #d97706; } 
 
-        /* 過客星曜 直式標籤 - 改為水平排列的容器使用 */
+        /* 過客星曜 直式標籤 - 改為水平排列的容器使用 (固定字體大小) */
         .transit-badge {
             display: flex;
             flex-direction: column;
@@ -72,17 +71,16 @@
             border-radius: 2px;
             line-height: 1.1;
             border: 1px solid;
-            font-size: 9px;
-            padding: 1px;
+            font-size: 10px; /* 固定為 10px */
+            padding: 2px;
             text-align: center;
         }
-        @media (min-width: 640px) { .transit-badge { font-size: 13px; padding: 2px; } }
 
-        /* 疊宮標籤 - 垂直堆疊用 */
+        /* 疊宮標籤 - 垂直堆疊用 (固定字體大小) */
         .mini-overlap {
-            font-size: 9px;
+            font-size: 11px; /* 固定為 11px */
             line-height: 1.2;
-            padding: 1px 2px; 
+            padding: 1px 3px; 
             border: 1px solid;
             border-radius: 2px;
             font-weight: 900;
@@ -91,11 +89,6 @@
             letter-spacing: 1px;
             width: fit-content;
         }
-        @media (min-width: 640px) { .mini-overlap { font-size: 13px; padding: 1px 3px; } }
-        .b-day { color: #d97706; border-color: #fcd34d; background-color: #fffbeb; }
-        .b-month { color: #2563eb; border-color: #bfdbfe; background-color: #eff6ff; }
-        .b-year { color: #0d9488; border-color: #99f6e4; background-color: #f0fdfa; }
-        .b-dec { color: #7e22ce; border-color: #e9d5ff; background-color: #faf5ff; }
 
         /* 身宮呼吸燈效果 */
         @keyframes pulseGlow {
@@ -655,51 +648,6 @@
             return palaces[diff];
         }
 
-        // 精細化自動縮放引擎
-        function autoScalePalaceText() {
-            document.querySelectorAll('.palace-cell').forEach(cell => {
-                const content = cell.querySelector('.palace-content');
-                if (!content) return;
-                
-                // 1. 強制重置比例，準備測量原始大小
-                content.style.transform = 'none';
-                content.style.width = '100%';
-                content.style.height = '100%';
-                content.style.transformOrigin = 'top left';
-
-                // 2. 強制瀏覽器重繪 (Reflow)
-                void content.offsetWidth; 
-
-                // 3. 測量真正溢出的尺寸
-                const scrollW = content.scrollWidth;
-                const scrollH = content.scrollHeight;
-                const safeW = cell.clientWidth;
-                const safeH = cell.clientHeight;
-
-                let scale = 1;
-                // 只有當內容確實大於格子時，才等比例縮小
-                if (scrollW > safeW && safeW > 0) scale = Math.min(scale, safeW / scrollW);
-                if (scrollH > safeH && safeH > 0) scale = Math.min(scale, safeH / scrollH);
-
-                // 4. 精確到小數點後三位進行微縮
-                if (scale < 1) {
-                    const preciseScale = Math.floor(scale * 1000) / 1000;
-                    content.style.transform = `scale(${preciseScale})`;
-                    // 同步反向放大容器寬高，確保縮放後仍填滿整個格子
-                    content.style.width = `${100 / preciseScale}%`;
-                    content.style.height = `${100 / preciseScale}%`;
-                }
-            });
-        }
-
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                if (state.lunar) requestAnimationFrame(autoScalePalaceText);
-            }, 100);
-        });
-
         function renderBoard() {
             const grid = document.getElementById('board-grid');
             grid.innerHTML = ''; 
@@ -741,11 +689,12 @@
                 // 身宮：水平放置且貼齊字體，置於底部中央
                 let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 whitespace-nowrap" style="font-size: 11px; letter-spacing: 1px;">身宮</div>` : '<div></div>';
 
+                // 星曜固定字體大小: 13px (主星), 12px (副星)
                 const renderStar = (name, isMajor) => {
                     const hN = cell.huaN[name]; const hD = cell.huaD[name];
                     const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
                     const charHtml = name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                    const starSizeClass = 'text-[15px] sm:text-[18px] md:text-[22px]';
+                    const starSizeClass = isMajor ? 'text-[13px]' : 'text-[12px]';
                     
                     return `
                         <div class="flex flex-col items-center shrink-0">
@@ -816,7 +765,7 @@
                             <!-- 右下角本命與疊宮 (垂直排列) -->
                             <div class="flex flex-col items-end text-right shrink-0 z-10 max-w-[65%]">
                                 ${overlapsHtml}
-                                <div class="text-[12px] sm:text-[15px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap mt-[1px]">
+                                <div class="text-[11px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap mt-[1px]">
                                     ${nName}
                                 </div>
                             </div>
@@ -858,10 +807,6 @@
             }
             grid.appendChild(center);
 
-            // 確保 DOM 生成後再執行精細縮放計算
-            if (state.lunar) {
-                setTimeout(() => { requestAnimationFrame(autoScalePalaceText); }, 50);
-            }
             if(activePalace && state.lunar) selectPalace(activePalace, true); 
         }
 
@@ -992,7 +937,7 @@
 
         window.onload = () => {
             initDateSelects();
-            renderBoard(); // 初始渲染空白盤 (預設空白)
+            renderBoard(); // 初始渲染空白盤
         };
     </script>
 </body>
