@@ -151,6 +151,7 @@
         <!-- 左半部：命盤與控制列 -->
         <div class="w-full lg:w-[65%] flex flex-col gap-1.5 sm:gap-2">
             
+            <!-- 頂部控制列 -->
             <header class="bg-white border border-gray-300 rounded p-1.5 sm:p-2 shadow-sm flex flex-col gap-1.5 sm:gap-2 z-30 relative">
                 <!-- 第一排：姓名與性別 + 本命解析置頂 -->
                 <div class="flex flex-wrap items-center justify-between gap-1.5 w-full">
@@ -691,30 +692,34 @@
                 const content = cell.querySelector('.palace-content');
                 if (!content) return;
                 
-                // 1. 歸零並鎖定外框尺寸來測量真實溢出
+                // 1. 歸零為100%原始比例，確保獲取最真實的佈局狀態
                 content.style.transform = 'none';
-                content.style.width = cell.clientWidth + 'px';
-                content.style.height = cell.clientHeight + 'px';
+                content.style.width = '100%';
+                content.style.height = '100%';
 
-                // 2. 取得實際內容需要的最大長寬
+                // 強制瀏覽器重新計算佈局 (Force Reflow)
+                void content.offsetWidth;
+
+                // 2. 取得實際內容撐開後需要的最大長寬
                 const scrollW = content.scrollWidth;
                 const scrollH = content.scrollHeight;
 
-                // 3. 計算精細比例，保留 1px 緩衝
+                // 3. 取得目前格子實際能給予的安全範圍
                 let scale = 1;
-                const safeW = cell.clientWidth - 1;
-                const safeH = cell.clientHeight - 1;
+                const safeW = cell.clientWidth;
+                const safeH = cell.clientHeight;
 
+                // 4. 計算精細比例，僅在「真正溢出」時才縮小
                 if (scrollW > safeW && safeW > 0) scale = Math.min(scale, safeW / scrollW);
                 if (scrollH > safeH && safeH > 0) scale = Math.min(scale, safeH / scrollH);
 
-                // 4. 套用精細比例
+                // 5. 套用精細比例
                 if (scale < 1) {
                     const preciseScale = Math.floor(scale * 1000) / 1000;
                     content.style.transform = `scale(${preciseScale})`;
-                    // 反向放大內部容器，讓 Flex 依然能填滿格子
-                    content.style.width = `${(cell.clientWidth / preciseScale)}px`;
-                    content.style.height = `${(cell.clientHeight / preciseScale)}px`;
+                    // 反向放大內部容器，讓 Flexbox 依舊能撐滿原始格子的可視範圍
+                    content.style.width = `${100 / preciseScale}%`;
+                    content.style.height = `${100 / preciseScale}%`;
                 }
             });
         }
@@ -727,12 +732,13 @@
             }, 100);
         });
 
-        // 核心渲染：Flexbox 彈性包裹 + 中宮固定置中 + 身宮水平
+        // 核心渲染：分離 12 宮與中宮的生成邏輯
         function renderBoard() {
             const grid = document.getElementById('board-grid');
             grid.innerHTML = ''; 
 
-            uiOrder.forEach((key, idx) => {
+            // 第一階段：單純渲染 12 個外圍宮位
+            uiOrder.forEach((key) => {
                 const bIndex = branches.indexOf(key);
                 const cell = state.board[bIndex];
                 const conf = gridConfig[key];
@@ -742,164 +748,162 @@
                     div.className = `palace-cell overflow-hidden ${conf.bg}`;
                     div.style.gridArea = conf.area;
                     grid.appendChild(div);
-                } else {
-                    const nName = getPalaceName(state.lifeBranch, bIndex);
-                    const dName = state.selDecade ? getPalaceName(state.decadeLifeBranch, bIndex) : '';
-                    const yName = state.selYear ? getPalaceName(state.yearLifeBranch, bIndex) : '';
-                    const mName = (state.selYear && state.selMonth) ? getPalaceName(state.monthLifeBranch, bIndex) : '';
-                    const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex) : '';
-                    const isBodyPalace = (bIndex === state.bodyBranch);
+                    return; // 空白盤面直接跳過內容渲染
+                }
 
-                    // 疊宮標籤：統一格式
-                    const badges = [];
-                    if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName.substring(0,1)}</div>`);
-                    if (mName) badges.push(`<div class="mini-overlap b-month">月${mName.substring(0,1)}</div>`);
-                    if (yName) badges.push(`<div class="mini-overlap b-year">流${yName.substring(0,1)}</div>`);
-                    if (dName) badges.push(`<div class="mini-overlap b-dec">大${dName.substring(0,1)}</div>`);
-                    badges.push(`<div class="mini-overlap b-natal">${nName}</div>`);
+                const nName = getPalaceName(state.lifeBranch, bIndex);
+                const dName = state.selDecade ? getPalaceName(state.decadeLifeBranch, bIndex) : '';
+                const yName = state.selYear ? getPalaceName(state.yearLifeBranch, bIndex) : '';
+                const mName = (state.selYear && state.selMonth) ? getPalaceName(state.monthLifeBranch, bIndex) : '';
+                const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex) : '';
+                const isBodyPalace = (bIndex === state.bodyBranch);
+
+                // 疊宮標籤：統一格式
+                const badges = [];
+                if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName.substring(0,1)}</div>`);
+                if (mName) badges.push(`<div class="mini-overlap b-month">月${mName.substring(0,1)}</div>`);
+                if (yName) badges.push(`<div class="mini-overlap b-year">流${yName.substring(0,1)}</div>`);
+                if (dName) badges.push(`<div class="mini-overlap b-dec">大${dName.substring(0,1)}</div>`);
+                badges.push(`<div class="mini-overlap b-natal">${nName}</div>`);
+                
+                let overlapsHtml = badges.join('');
+
+                // 身宮水平置中緊貼字體
+                let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 mx-auto whitespace-nowrap" style="width: fit-content; font-size: 11px; letter-spacing: 1px;">身宮</div>` : `<div class="shrink-0 flex-1"></div>`;
+
+                // 主副星：極限放大
+                const renderStar = (name, isMajor) => {
+                    const hN = cell.huaN[name]; const hD = cell.huaD[name];
+                    const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
+                    const charHtml = name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
+                    const starSizeClass = 'text-[15px] sm:text-[18px] md:text-[22px]';
                     
-                    let overlapsHtml = badges.join('');
+                    return `
+                        <div class="flex flex-col items-center shrink-0">
+                            <div class="flex flex-col items-center font-black ${isMajor ? 'text-red-700' : 'text-gray-800'} ${starSizeClass}">
+                                ${charHtml}
+                            </div>
+                            <div class="flex flex-col gap-0 w-full px-[1px] mt-[4px] sm:mt-[6px]">
+                                ${hN ? `<span class="hua-badge hua-natal">${hN}</span>` : ''}
+                                ${hD ? `<span class="hua-badge hua-decade">${hD}</span>` : ''}
+                                ${hY ? `<span class="hua-badge hua-year">${hY}</span>` : ''}
+                                ${hM ? `<span class="hua-badge hua-month">${hM}</span>` : ''}
+                                ${hDay ? `<span class="hua-badge hua-day">${hDay}</span>` : ''}
+                            </div>
+                        </div>`;
+                };
 
-                    // ★ 身宮水平置中緊貼字體
-                    let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 mx-auto whitespace-nowrap" style="width: fit-content; font-size: 11px; letter-spacing: 1px;">身宮</div>` : `<div class="shrink-0 flex-1"></div>`;
-
-                    // 主副星：極限放大
-                    const renderStar = (name, isMajor) => {
-                        const hN = cell.huaN[name]; const hD = cell.huaD[name];
-                        const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
-                        const charHtml = name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                        const starSizeClass = 'text-[15px] sm:text-[18px] md:text-[22px]';
-                        
-                        return `
-                            <div class="flex flex-col items-center shrink-0">
-                                <div class="flex flex-col items-center font-black ${isMajor ? 'text-red-700' : 'text-gray-800'} ${starSizeClass}">
-                                    ${charHtml}
-                                </div>
-                                <div class="flex flex-col gap-0 w-full px-[1px] mt-[4px] sm:mt-[6px]">
-                                    ${hN ? `<span class="hua-badge hua-natal">${hN}</span>` : ''}
-                                    ${hD ? `<span class="hua-badge hua-decade">${hD}</span>` : ''}
-                                    ${hY ? `<span class="hua-badge hua-year">${hY}</span>` : ''}
-                                    ${hM ? `<span class="hua-badge hua-month">${hM}</span>` : ''}
-                                    ${hDay ? `<span class="hua-badge hua-day">${hDay}</span>` : ''}
-                                </div>
-                            </div>`;
-                    };
-
-                    // 過客星曜：改在 Flexbox 中與天干並排在 Top Row
-                    let transitHtml = '';
-                    if (cell.transit && cell.transit.length > 0) {
-                        transitHtml = `<div class="flex flex-row-reverse items-start justify-start gap-[1px] sm:gap-[2px] z-10">`;
-                        
-                        const luanXi = cell.transit.filter(t => t.name.includes('鸞') || t.name.includes('喜'));
-                        const luYangTuo = cell.transit.filter(t => !(t.name.includes('鸞') || t.name.includes('喜')));
-                        
-                        if (luYangTuo.length > 0) {
-                            transitHtml += `<div class="flex flex-col gap-[1px] sm:gap-[2px]">`;
-                            luYangTuo.forEach(t => {
-                                const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                                transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
-                            });
-                            transitHtml += `</div>`;
-                        }
-
-                        if (luanXi.length > 0) {
-                            transitHtml += `<div class="flex flex-col gap-[1px] sm:gap-[2px]">`;
-                            luanXi.forEach(t => {
-                                const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                                transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
-                            });
-                            transitHtml += `</div>`;
-                        }
-
+                // 過客星曜：改在 Flexbox 中與天干並排在 Top Row
+                let transitHtml = '';
+                if (cell.transit && cell.transit.length > 0) {
+                    transitHtml = `<div class="flex flex-row-reverse items-start justify-start gap-[1px] sm:gap-[2px] z-10">`;
+                    
+                    const luanXi = cell.transit.filter(t => t.name.includes('鸞') || t.name.includes('喜'));
+                    const luYangTuo = cell.transit.filter(t => !(t.name.includes('鸞') || t.name.includes('喜')));
+                    
+                    if (luYangTuo.length > 0) {
+                        transitHtml += `<div class="flex flex-col gap-[1px] sm:gap-[2px]">`;
+                        luYangTuo.forEach(t => {
+                            const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
+                            transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
+                        });
                         transitHtml += `</div>`;
                     }
 
-                    // 邊框顏色邏輯
-                    let borderClass = 'border-[#9ca3af] text-gray-600 bg-gray-50';
-                    if (conf.element === 'wood') borderClass = 'border-wood';
-                    else if (conf.element === 'fire') borderClass = 'border-fire';
-                    else if (conf.element === 'earth') borderClass = 'border-earth';
-                    else if (conf.element === 'metal') borderClass = 'border-metal';
-                    else if (conf.element === 'water') borderClass = 'border-water';
-
-                    const div = document.createElement('div');
-                    div.id = `palace-${key}`;
-                    div.className = `palace-cell overflow-hidden ${conf.bg}`;
-                    div.style.gridArea = conf.area;
-                    div.onclick = () => selectPalace(key);
-
-                    // 導入 Flex 容器宮位佈局
-                    div.innerHTML = `
-                        <div class="palace-content flex flex-col justify-between h-full w-full origin-top-left p-1 box-border">
-                            
-                            <!-- Top Row: 天干地支 (左) + 過客星曜 (右) -->
-                            <div class="flex justify-between items-start w-full">
-                                <div class="text-[10px] sm:text-[12px] font-bold z-10 border rounded px-[2px] ${borderClass}">
-                                    ${state.stemsMap[bIndex]}${branchNames[bIndex]}
-                                </div>
-                                ${transitHtml}
-                            </div>
-                            
-                            <!-- Middle Row: 星曜 (左對齊，不換列) -->
-                            <div class="flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap w-full flex-1 pt-1 sm:pt-2 overflow-visible">
-                                ${cell.major.map(s => renderStar(s, true)).join('')}
-                                ${cell.minor.map(s => renderStar(s, false)).join('')}
-                            </div>
-
-                            <!-- Bottom Row: 歲數 (左) + 身宮 (中) + 疊宮及本命 (右) -->
-                            <div class="flex justify-between items-end w-full pb-0.5">
-                                <div class="text-[9px] sm:text-[11px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 whitespace-nowrap">
-                                    ${cell.ageStart}-${cell.ageEnd}
-                                </div>
-                                ${bodyPalaceHtml}
-                                <div class="flex flex-col items-end gap-[1px] text-right shrink-0 z-10">
-                                    ${overlapsHtml}
-                                    <div class="text-[12px] sm:text-[15px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 mt-[1px] whitespace-nowrap">
-                                        ${nName}
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    `;
-                    grid.appendChild(div);
-                }
-
-                // 中宮 (強制綁定 gridArea: 2 / 2 / 4 / 4)
-                if(idx === 3) {
-                    const center = document.createElement('div');
-                    center.className = "m-[2px] sm:m-[4px] bg-white/80 backdrop-blur-sm border border-[#9ca3af] shadow-md flex flex-col justify-center items-center relative z-10 pointer-events-none rounded";
-                    // ★ 強制指定中宮位置
-                    center.style.gridArea = "2 / 2 / 4 / 4";
-                    
-                    if (!state.lunar) {
-                        center.innerHTML = `
-                            <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
-                                <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-lg sm:text-2xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-16 sm:w-24 mb-1 sm:mb-4 pointer-events-auto" oninput="updateName()">
-                                <p class="text-[10px] sm:text-sm font-bold text-gray-400 tracking-widest mt-1">請選擇生辰並排盤</p>
-                            </div>
-                        `;
-                    } else {
-                        const hourSelect = document.getElementById('birth-hour');
-                        const hourText = hourSelect.options[hourSelect.selectedIndex].text.split('(')[0];
-                        const yyGenderStr = `${state.yinYang}${state.gender === 'M' ? '男' : '女'}`;
-                        
-                        center.innerHTML = `
-                            <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-2">
-                                <p class="text-[10px] sm:text-sm font-black text-gray-600 mb-0.5 sm:mb-1 border-b border-gray-300 pb-0.5 w-full text-center tracking-widest">${yyGenderStr}命</p>
-
-                                <input type="text" id="user-name-input" value="${state.userName}" placeholder="姓名" class="text-base sm:text-2xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-16 sm:w-24 mb-1 sm:mb-2 pointer-events-auto" oninput="updateName()">
-                                
-                                <div class="flex flex-col gap-0.5 text-[9px] sm:text-[13px] font-bold text-gray-700 w-full text-center">
-                                    <p class="leading-tight">陽曆:<br>${state.solarDate} ${hourText}</p>
-                                    <p class="leading-tight text-amber-800">農曆:<br>${state.lunar.getYearInGanZhi()}年${state.lunar.getMonthInChinese()}月${state.lunar.getDayInChinese()}</p>
-                                </div>
-                            </div>
-                        `;
+                    if (luanXi.length > 0) {
+                        transitHtml += `<div class="flex flex-col gap-[1px] sm:gap-[2px]">`;
+                        luanXi.forEach(t => {
+                            const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
+                            transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
+                        });
+                        transitHtml += `</div>`;
                     }
-                    grid.appendChild(center);
+
+                    transitHtml += `</div>`;
                 }
+
+                // 邊框顏色邏輯
+                let borderClass = 'border-[#9ca3af] text-gray-600 bg-gray-50';
+                if (conf.element === 'wood') borderClass = 'border-wood';
+                else if (conf.element === 'fire') borderClass = 'border-fire';
+                else if (conf.element === 'earth') borderClass = 'border-earth';
+                else if (conf.element === 'metal') borderClass = 'border-metal';
+                else if (conf.element === 'water') borderClass = 'border-water';
+
+                const div = document.createElement('div');
+                div.id = `palace-${key}`;
+                div.className = `palace-cell overflow-hidden ${conf.bg}`;
+                div.style.gridArea = conf.area;
+                div.onclick = () => selectPalace(key);
+
+                // 導入 Flex 容器宮位佈局
+                div.innerHTML = `
+                    <div class="palace-content flex flex-col justify-between h-full w-full origin-top-left p-1 box-border">
+                        
+                        <!-- Top Row: 天干地支 (左) + 過客星曜 (右) -->
+                        <div class="flex justify-between items-start w-full">
+                            <div class="text-[10px] sm:text-[12px] font-bold z-10 border rounded px-[2px] ${borderClass}">
+                                ${state.stemsMap[bIndex]}${branchNames[bIndex]}
+                            </div>
+                            ${transitHtml}
+                        </div>
+                        
+                        <!-- Middle Row: 星曜 (左對齊，不換列) -->
+                        <div class="flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap w-full flex-1 pt-1 sm:pt-2 overflow-visible">
+                            ${cell.major.map(s => renderStar(s, true)).join('')}
+                            ${cell.minor.map(s => renderStar(s, false)).join('')}
+                        </div>
+
+                        <!-- Bottom Row: 歲數 (左) + 身宮 (中) + 疊宮及本命 (右) -->
+                        <div class="flex justify-between items-end w-full pb-0.5">
+                            <div class="text-[9px] sm:text-[11px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 whitespace-nowrap">
+                                ${cell.ageStart}-${cell.ageEnd}
+                            </div>
+                            ${bodyPalaceHtml}
+                            <div class="flex flex-col items-end gap-[1px] text-right shrink-0 z-10">
+                                ${overlapsHtml}
+                                <div class="text-[12px] sm:text-[15px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 mt-[1px] whitespace-nowrap">
+                                    ${nName}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+                grid.appendChild(div);
             });
+
+            // 第二階段：獨立渲染中宮 (強制綁定 gridArea: 2 / 2 / 4 / 4)
+            const center = document.createElement('div');
+            center.className = "m-[2px] sm:m-[4px] bg-white/80 backdrop-blur-sm border border-[#9ca3af] shadow-md flex flex-col justify-center items-center relative z-10 pointer-events-none rounded";
+            center.style.gridArea = "2 / 2 / 4 / 4";
+            
+            if (!state.lunar) {
+                center.innerHTML = `
+                    <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
+                        <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-lg sm:text-2xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-16 sm:w-24 mb-1 sm:mb-4 pointer-events-auto" oninput="updateName()">
+                        <p class="text-[10px] sm:text-sm font-bold text-gray-400 tracking-widest mt-1">請選擇生辰並排盤</p>
+                    </div>
+                `;
+            } else {
+                const hourSelect = document.getElementById('birth-hour');
+                const hourText = hourSelect.options[hourSelect.selectedIndex].text.split('(')[0];
+                const yyGenderStr = `${state.yinYang}${state.gender === 'M' ? '男' : '女'}`;
+                
+                center.innerHTML = `
+                    <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-2">
+                        <p class="text-[10px] sm:text-sm font-black text-gray-600 mb-0.5 sm:mb-1 border-b border-gray-300 pb-0.5 w-full text-center tracking-widest">${yyGenderStr}命</p>
+
+                        <input type="text" id="user-name-input" value="${state.userName}" placeholder="姓名" class="text-base sm:text-2xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-16 sm:w-24 mb-1 sm:mb-2 pointer-events-auto" oninput="updateName()">
+                        
+                        <div class="flex flex-col gap-0.5 text-[9px] sm:text-[13px] font-bold text-gray-700 w-full text-center">
+                            <p class="leading-tight">陽曆:<br>${state.solarDate} ${hourText}</p>
+                            <p class="leading-tight text-amber-800">農曆:<br>${state.lunar.getYearInGanZhi()}年${state.lunar.getMonthInChinese()}月${state.lunar.getDayInChinese()}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            grid.appendChild(center);
 
             if (state.lunar) {
                 // 等待 DOM 渲染完畢後，執行智慧防遮蔽縮放
@@ -1037,14 +1041,7 @@
 
         window.onload = () => {
             initDateSelects();
-            // 預設日期，讓使用者一進來就看到完整的盤面，證明系統完全正常
-            document.getElementById('birth-year').value = "1983";
-            updateDays();
-            document.getElementById('birth-month').value = "1";
-            updateDays();
-            document.getElementById('birth-day').value = "4";
-            document.getElementById('birth-hour').value = "1"; // 丑時
-            initApp(); 
+            renderBoard(); 
         };
     </script>
 </body>
