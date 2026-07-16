@@ -37,12 +37,6 @@
         .bg-water { background-color: #f0f9ff; }
         .bg-earth { background-color: #fffbeb; }
 
-        .border-wood { border-color: #16a34a; background-color: rgba(240, 253, 244, 0.9); color: #15803d; }
-        .border-fire { border-color: #dc2626; background-color: rgba(254, 242, 242, 0.9); color: #b91c1c; }
-        .border-metal { border-color: #4b5563; background-color: rgba(249, 250, 251, 0.9); color: #1f2937; }
-        .border-water { border-color: #2563eb; background-color: rgba(239, 246, 255, 0.9); color: #1d4ed8; }
-        .border-earth { border-color: #d97706; background-color: rgba(254, 243, 199, 0.9); color: #b45309; }
-
         /* 四化標籤 */
         .hua-badge {
             display: inline-block;
@@ -51,10 +45,11 @@
             border-radius: 1px;
             line-height: 1.1;
             text-align: center;
-            font-size: 11px;
-            padding: 1px 3px;
+            font-size: 10px; /* ★ 縮小字體與主星寬度搭配 */
+            padding: 1px 0px; /* 移除左右 padding 以免爆框 */
             margin-top: 1px;
-            width: 100%;
+            width: 100%; /* ★ 強制等同於外層星曜寬度 */
+            box-sizing: border-box;
         }
         .hua-natal { background-color: #b91c1c; } 
         .hua-decade { background-color: #7e22ce; } 
@@ -62,7 +57,7 @@
         .hua-month { background-color: #2563eb; } 
         .hua-day { background-color: #d97706; } 
 
-        /* 過客星曜 直式標籤 - 改為水平排列的容器使用 (固定字體大小為 10px) */
+        /* 過客星曜 直式標籤 - 水平排列容器 */
         .transit-badge {
             display: flex;
             flex-direction: column;
@@ -71,14 +66,14 @@
             border-radius: 2px;
             line-height: 1.1;
             border: 1px solid;
-            font-size: 10px; /* 依照使用者要求鎖定大限舒適大小 */
-            padding: 2px;
+            font-size: 9px; /* ★ 縮小至極致 */
+            padding: 1px;
             text-align: center;
         }
 
-        /* 疊宮標籤 - 垂直堆疊用 (固定字體大小為 11px) */
+        /* 疊宮標籤 - 垂直堆疊用 */
         .mini-overlap {
-            font-size: 11px; /* 依照使用者要求鎖定大限舒適大小 */
+            font-size: 10px; /* ★ 統一與縮小後的星曜字體相同 */
             line-height: 1.2;
             padding: 1px 3px; 
             border: 1px solid;
@@ -172,10 +167,9 @@
                 </div>
             </header>
 
-            <!-- 命盤主體 4x4 正方 Grid (所有格子等大) -->
+            <!-- 命盤主體 4x4 正方 Grid -->
             <div class="relative w-full aspect-square max-w-[800px] mx-auto bg-white shadow-md z-10 border-t border-l border-[#9ca3af]">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
-                <!-- 網格均分為 4x4 正方形 -->
                 <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);">
                     <!-- JS 生成 -->
                 </div>
@@ -689,21 +683,21 @@
                     </div>`;
 
                 // 身宮：水平放置且貼齊字體，置於底部中央
-                let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 whitespace-nowrap" style="font-size: 11px; letter-spacing: 1px;">身宮</div>` : '<div></div>';
+                let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 whitespace-nowrap" style="font-size: 10px; letter-spacing: 1px;">身宮</div>` : '<div></div>';
 
-                // ★ 星曜固定字體大小: 12px (主星), 11px (副星) - 依照使用者回饋最舒適之流年微縮大小
+                // ★ 星曜固定字體大小: 12px (主星), 11px (副星)
                 const renderStar = (name, isMajor) => {
                     const hN = cell.huaN[name]; const hD = cell.huaD[name];
                     const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
                     const charHtml = name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                    const starSizeClass = isMajor ? 'text-[12px]' : 'text-[11px]'; // 已鎖定舒適大小
+                    const starSizeClass = isMajor ? 'text-[12px]' : 'text-[11px]'; 
                     
                     return `
-                        <div class="flex flex-col items-center shrink-0">
+                        <div class="flex flex-col items-center shrink-0 w-min"> <!-- ★ w-min 確保容器與內部字體同寬 -->
                             <div class="flex flex-col items-center font-black ${isMajor ? 'text-red-700' : 'text-gray-800'} ${starSizeClass}">
                                 ${charHtml}
                             </div>
-                            <div class="flex flex-col gap-0 w-full px-[1px] mt-[4px] sm:mt-[6px]">
+                            <div class="flex flex-col gap-0 w-full mt-[4px] sm:mt-[6px]">
                                 ${hN ? `<span class="hua-badge hua-natal">${hN}</span>` : ''}
                                 ${hD ? `<span class="hua-badge hua-decade">${hD}</span>` : ''}
                                 ${hY ? `<span class="hua-badge hua-year">${hY}</span>` : ''}
@@ -724,13 +718,6 @@
                     transitHtml += `</div>`;
                 }
 
-                let borderClass = 'border-[#9ca3af] text-gray-600 bg-gray-50';
-                if (conf.element === 'wood') borderClass = 'border-wood';
-                else if (conf.element === 'fire') borderClass = 'border-fire';
-                else if (conf.element === 'earth') borderClass = 'border-earth';
-                else if (conf.element === 'metal') borderClass = 'border-metal';
-                else if (conf.element === 'water') borderClass = 'border-water';
-
                 const div = document.createElement('div');
                 div.id = `palace-${key}`;
                 div.className = `palace-cell overflow-hidden ${conf.bg}`;
@@ -742,14 +729,14 @@
                     <div class="palace-content flex flex-col justify-between h-full w-full origin-top-left p-1 box-border">
                         <!-- 第一排：天干地支與右上水平排列過客星曜 -->
                         <div class="flex justify-between items-start w-full gap-1">
-                            <div class="text-[10px] sm:text-[12px] font-bold z-10 border rounded px-[2px] ${borderClass} shrink-0">
+                            <div class="text-[10px] font-bold z-10 shrink-0 text-gray-700"> <!-- ★ 拔除框線，字體縮小至 10px -->
                                 ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                             </div>
                             ${transitHtml}
                         </div>
                         
-                        <!-- 第二排：主輔星曜群 -->
-                        <div class="flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap w-full flex-1 pt-0.5 sm:pt-1 overflow-visible">
+                        <!-- 第二排：主輔星曜群 (靠左對齊，縮小間距) -->
+                        <div class="flex justify-start gap-[1px] flex-nowrap w-full flex-1 pt-0.5 sm:pt-1 overflow-visible">
                             ${cell.major.map(s => renderStar(s, true)).join('')}
                             ${cell.minor.map(s => renderStar(s, false)).join('')}
                         </div>
@@ -757,17 +744,17 @@
                         <!-- 第三排：大限歲數、身宮、本命與疊宮 -->
                         <div class="flex justify-between items-end w-full pb-0.5 gap-1 relative">
                             <!-- 歲數 -->
-                            <div class="text-[9px] sm:text-[11px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 whitespace-nowrap">
+                            <div class="text-[9px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 whitespace-nowrap">
                                 ${cell.ageStart}-${cell.ageEnd}
                             </div>
                             
                             <!-- 身宮置中底 -->
                             ${bodyPalaceHtml}
                             
-                            <!-- 右下角本命與疊宮 (垂直排列) ★ 本命與疊宮皆統一為 text-[11px] -->
+                            <!-- 右下角本命與疊宮 (垂直排列) ★ 本命與疊宮皆統一為 text-[10px] -->
                             <div class="flex flex-col items-end text-right shrink-0 z-10 max-w-[65%]">
                                 ${overlapsHtml}
-                                <div class="text-[11px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap mt-[1px]">
+                                <div class="text-[10px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap mt-[1px]">
                                     ${nName}
                                 </div>
                             </div>
@@ -939,7 +926,7 @@
 
         window.onload = () => {
             initDateSelects();
-            renderBoard(); // 初始渲染空白盤
+            renderBoard(); 
         };
     </script>
 </body>
