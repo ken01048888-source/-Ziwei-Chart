@@ -90,7 +90,7 @@
 
         /* 疊宮與本命宮統一標籤 */
         .mini-overlap {
-            font-size: 12px; 
+            font-size: 11px; 
             line-height: 1.2;
             padding: 1px 2px; 
             border: 1px solid;
@@ -102,14 +102,14 @@
             width: fit-content; 
             letter-spacing: 1px;
         }
-        @media (min-width: 640px) { .mini-overlap { font-size: 14px; padding: 1px 3px; } }
+        @media (min-width: 640px) { .mini-overlap { font-size: 13px; padding: 1px 3px; } }
         .b-day { color: #d97706; border-color: #fcd34d; background-color: #fffbeb; }
         .b-month { color: #2563eb; border-color: #bfdbfe; background-color: #eff6ff; }
         .b-year { color: #0d9488; border-color: #99f6e4; background-color: #f0fdfa; }
         .b-dec { color: #7e22ce; border-color: #e9d5ff; background-color: #faf5ff; }
         .b-natal { color: #991b1b; border-color: #fca5a5; background-color: rgba(255,255,255,0.85); }
 
-        /* 身宮呼吸燈效果 */
+        /* 身宮呼吸燈效果 (水平放置，框緊貼字體) */
         @keyframes pulseGlow {
             0%, 100% {
                 box-shadow: 0 0 2px rgba(37, 99, 235, 0.4);
@@ -161,12 +161,14 @@
                             <label class="text-[11px] sm:text-xs font-bold text-gray-600">姓名</label>
                             <input type="text" id="input-name" value="" placeholder="請輸入" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 w-16 sm:w-24 border-b border-gray-300 focus:border-amber-600" oninput="updateName()">
                         </div>
+                        <!-- 男女性別按鈕移至姓名後方 -->
                         <div class="flex bg-gray-100 rounded p-0.5 border border-gray-200">
                             <button id="btn-male" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded shadow bg-blue-700 text-white" onclick="setGender('M')">男</button>
                             <button id="btn-female" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800" onclick="setGender('F')">女</button>
                         </div>
                     </div>
                     
+                    <!-- 原性別處改放：本命解析按鈕 -->
                     <button onclick="showInterpretation()" class="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[10px] sm:text-xs font-bold px-3 py-1 sm:py-1.5 rounded shadow-md transition-all flex items-center gap-1">
                         <i class="fa-solid fa-book-open"></i> <span>本命盤解析</span>
                     </button>
@@ -207,9 +209,10 @@
                 </div>
             </header>
 
-            <!-- 命盤主體 4x4 正方 Grid -->
+            <!-- 命盤主體 4x4 正方 Grid (極大化四周，壓縮中宮留白) -->
             <div class="relative w-full aspect-square max-w-[800px] mx-auto bg-white shadow-md z-10 border-t border-l border-[#9ca3af]">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
+                <!-- 網格均分為 4x4，12宮長寬一致 -->
                 <div id="board-grid" class="w-full h-full absolute inset-0 grid grid-cols-4 grid-rows-4">
                     <!-- JS 生成 -->
                 </div>
@@ -478,17 +481,6 @@
             applyHua(stems[yearStemIdx], 'huaN');
         }
 
-        function applyHua(stem, targetObjStr) {
-            if(!stem) return;
-            const [lu, quan, ke, ji] = huaTable[stem];
-            state.board.forEach(cell => {
-                if(cell.major.includes(lu) || cell.minor.includes(lu)) cell[targetObjStr][lu] = '祿';
-                if(cell.major.includes(quan) || cell.minor.includes(quan)) cell[targetObjStr][quan] = '權';
-                if(cell.major.includes(ke) || cell.minor.includes(ke)) cell[targetObjStr][ke] = '科';
-                if(cell.major.includes(ji) || cell.minor.includes(ji)) cell[targetObjStr][ji] = '忌';
-            });
-        }
-
         function calcTransitStars(monthStem, dayStem) {
             state.board.forEach(c => c.transit = []);
             
@@ -664,13 +656,13 @@
             return palaces[diff];
         }
 
-        // 動態智慧縮放引擎 (整體防切、防重疊)
+        // 精細化自動縮放引擎 (鎖定格子尺寸測量，避免過度縮小)
         function autoScalePalaceText() {
             document.querySelectorAll('.palace-cell').forEach(cell => {
                 const content = cell.querySelector('.palace-content');
                 if (!content) return;
                 
-                // 1. 歸零並鎖定與 cell 相同的尺寸來測量真實溢出，避免 max-content 造成過度撐大
+                // 1. 歸零並鎖定外框尺寸來測量真實溢出
                 content.style.transform = 'none';
                 content.style.width = cell.clientWidth + 'px';
                 content.style.height = cell.clientHeight + 'px';
@@ -687,11 +679,11 @@
                 if (scrollW > safeW && safeW > 0) scale = Math.min(scale, safeW / scrollW);
                 if (scrollH > safeH && safeH > 0) scale = Math.min(scale, safeH / scrollH);
 
-                // 4. 精細套用比例
+                // 4. 套用精細比例
                 if (scale < 1) {
                     const preciseScale = Math.floor(scale * 1000) / 1000;
                     content.style.transform = `scale(${preciseScale})`;
-                    // 反向放大容器內部，讓 justify-between 依然能頂到視覺邊界
+                    // 反向放大內部容器，讓 Flex 依然能填滿格子
                     content.style.width = `${(cell.clientWidth / preciseScale)}px`;
                     content.style.height = `${(cell.clientHeight / preciseScale)}px`;
                 }
@@ -706,7 +698,7 @@
             }, 100);
         });
 
-        // 神級排版：12宮採用 Flexbox 包裝，配合 autoScale 達成絕對防切
+        // 核心渲染：Flexbox 彈性包裹 + 中宮綁定 + 身宮水平
         function renderBoard() {
             const grid = document.getElementById('board-grid');
             grid.innerHTML = ''; 
@@ -739,7 +731,7 @@
                     
                     let overlapsHtml = badges.join('');
 
-                    // 身宮水平居中，緊貼字體
+                    // ★ 身宮水平置中緊貼字體
                     let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 mx-auto whitespace-nowrap" style="width: fit-content; font-size: 11px; letter-spacing: 1px;">身宮</div>` : `<div class="shrink-0 flex-1"></div>`;
 
                     // 主副星：極限放大
@@ -826,14 +818,14 @@
                             </div>
 
                             <!-- Bottom Row: 歲數 (左) + 身宮 (中) + 疊宮及本命 (右) -->
-                            <div class="flex justify-between items-end w-full">
-                                <div class="text-[9px] sm:text-[11px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 mb-0.5 whitespace-nowrap">
+                            <div class="flex justify-between items-end w-full pb-0.5">
+                                <div class="text-[9px] sm:text-[11px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 whitespace-nowrap">
                                     ${cell.ageStart}-${cell.ageEnd}
                                 </div>
                                 ${bodyPalaceHtml}
                                 <div class="flex flex-col items-end gap-[1px] text-right shrink-0 z-10">
                                     ${overlapsHtml}
-                                    <div class="text-sm sm:text-base font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 mt-[1px] whitespace-nowrap">
+                                    <div class="text-[12px] sm:text-[15px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 mt-[1px] whitespace-nowrap">
                                         ${nName}
                                     </div>
                                 </div>
@@ -844,7 +836,7 @@
                     grid.appendChild(div);
                 }
 
-                // 中宮 (強制綁定 gridArea: 2/2/4/4)
+                // 中宮 (強制綁定 gridArea: 2 / 2 / 4 / 4)
                 if(idx === 3) {
                     const center = document.createElement('div');
                     center.className = "m-[2px] sm:m-[4px] bg-white/80 backdrop-blur-sm border border-[#9ca3af] shadow-md flex flex-col justify-center items-center relative z-10 pointer-events-none rounded";
