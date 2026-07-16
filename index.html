@@ -62,7 +62,7 @@
         .hua-month { background-color: #2563eb; } 
         .hua-day { background-color: #d97706; } 
 
-        /* 過客星曜 直式標籤 - 改為水平排列的容器使用 (固定字體大小) */
+        /* 過客星曜 直式標籤 - 改為水平排列的容器使用 (固定字體大小為 10px) */
         .transit-badge {
             display: flex;
             flex-direction: column;
@@ -71,14 +71,14 @@
             border-radius: 2px;
             line-height: 1.1;
             border: 1px solid;
-            font-size: 10px; /* 固定為 10px */
+            font-size: 10px; /* 依照使用者要求鎖定大限舒適大小 */
             padding: 2px;
             text-align: center;
         }
 
-        /* 疊宮標籤 - 垂直堆疊用 (固定字體大小) */
+        /* 疊宮標籤 - 垂直堆疊用 (固定字體大小為 11px) */
         .mini-overlap {
-            font-size: 11px; /* 固定為 11px */
+            font-size: 11px; /* 依照使用者要求鎖定大限舒適大小 */
             line-height: 1.2;
             padding: 1px 3px; 
             border: 1px solid;
@@ -181,6 +181,7 @@
                 </div>
             </div>
 
+            <!-- 下方時間軸控制面板 -->
             <footer class="bg-white border border-gray-300 rounded shadow-sm max-w-[800px] mx-auto w-full z-20 relative flex flex-col overflow-hidden mt-1 sm:mt-0">
                 <div class="bg-gray-100 text-[10px] sm:text-sm text-gray-600 font-bold px-2 py-0.5 flex justify-between border-b border-gray-300">
                     <span><i class="fa-solid fa-list-ul mr-1"></i> 運線切換板</span>
@@ -200,6 +201,7 @@
 
     </div>
 
+    <!-- 訊息提示框 -->
     <div id="msg-box" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
         <div class="bg-white rounded-lg p-5 shadow-xl flex flex-col items-center gap-4 min-w-[250px] transform transition-transform scale-95">
             <div class="text-red-600 text-3xl"><i class="fa-solid fa-circle-exclamation"></i></div>
@@ -689,12 +691,12 @@
                 // 身宮：水平放置且貼齊字體，置於底部中央
                 let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 whitespace-nowrap" style="font-size: 11px; letter-spacing: 1px;">身宮</div>` : '<div></div>';
 
-                // 星曜固定字體大小: 13px (主星), 12px (副星)
+                // ★ 星曜固定字體大小: 12px (主星), 11px (副星) - 依照使用者回饋最舒適之流年微縮大小
                 const renderStar = (name, isMajor) => {
                     const hN = cell.huaN[name]; const hD = cell.huaD[name];
                     const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
                     const charHtml = name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                    const starSizeClass = isMajor ? 'text-[13px]' : 'text-[12px]';
+                    const starSizeClass = isMajor ? 'text-[12px]' : 'text-[11px]'; // 已鎖定舒適大小
                     
                     return `
                         <div class="flex flex-col items-center shrink-0">
@@ -762,7 +764,7 @@
                             <!-- 身宮置中底 -->
                             ${bodyPalaceHtml}
                             
-                            <!-- 右下角本命與疊宮 (垂直排列) -->
+                            <!-- 右下角本命與疊宮 (垂直排列) ★ 本命與疊宮皆統一為 text-[11px] -->
                             <div class="flex flex-col items-end text-right shrink-0 z-10 max-w-[65%]">
                                 ${overlapsHtml}
                                 <div class="text-[11px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap mt-[1px]">
