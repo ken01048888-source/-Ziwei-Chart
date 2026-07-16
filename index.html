@@ -20,7 +20,6 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 直行書寫，並強制絕對不換行截斷字體 */
         .text-vertical {
             writing-mode: vertical-rl;
             text-orientation: upright;
@@ -52,7 +51,7 @@
         .border-water { border-color: #2563eb; background-color: rgba(239, 246, 255, 0.9); color: #1d4ed8; }
         .border-earth { border-color: #d97706; background-color: rgba(254, 243, 199, 0.9); color: #b45309; }
 
-        /* 四化標籤 */
+        /* 四化標籤 (極致壓縮版) */
         .hua-badge {
             display: inline-block;
             font-weight: 900;
@@ -81,24 +80,22 @@
             border-radius: 2px;
             line-height: 1.1;
             border: 1px solid;
-            font-size: 10px; 
+            font-size: 9px; /* 手機版縮小字體以防爆高 */
             padding: 1px;
             text-align: center;
         }
         @media (min-width: 640px) { .transit-badge { font-size: 13px; padding: 2px; } }
 
-        /* 疊宮與本命宮統一標籤 */
+        /* 疊宮標籤 (大小一致，並排顯示) */
         .mini-overlap {
-            font-size: 11px; 
+            font-size: 9px; /* 手機版大幅縮小，並排時更省空間 */
             line-height: 1.2;
             padding: 1px 2px; 
             border: 1px solid;
             border-radius: 2px;
-            margin-top: 1px;
             font-weight: 900;
             white-space: nowrap;
             text-align: center;
-            width: fit-content; 
             letter-spacing: 1px;
         }
         @media (min-width: 640px) { .mini-overlap { font-size: 13px; padding: 1px 3px; } }
@@ -106,9 +103,8 @@
         .b-month { color: #2563eb; border-color: #bfdbfe; background-color: #eff6ff; }
         .b-year { color: #0d9488; border-color: #99f6e4; background-color: #f0fdfa; }
         .b-dec { color: #7e22ce; border-color: #e9d5ff; background-color: #faf5ff; }
-        .b-natal { color: #991b1b; border-color: #fca5a5; background-color: rgba(255,255,255,0.85); }
 
-        /* 身宮呼吸燈效果 (水平放置，框緊貼字體) */
+        /* 身宮呼吸燈效果 */
         @keyframes pulseGlow {
             0%, 100% {
                 box-shadow: 0 0 2px rgba(37, 99, 235, 0.4);
@@ -153,7 +149,7 @@
             
             <!-- 頂部控制列 -->
             <header class="bg-white border border-gray-300 rounded p-1.5 sm:p-2 shadow-sm flex flex-col gap-1.5 sm:gap-2 z-30 relative">
-                <!-- 第一排：姓名與性別 + 本命解析置頂 -->
+                <!-- 第一排：姓名與性別 -->
                 <div class="flex flex-wrap items-center justify-between gap-1.5 w-full">
                     <div class="flex items-center gap-2">
                         <span class="text-xs sm:text-sm font-black tracking-widest text-gray-800 shrink-0 hidden sm:block">紫微排盤</span>
@@ -207,11 +203,11 @@
                 </div>
             </header>
 
-            <!-- 命盤主體 4x4 正方 Grid -->
+            <!-- 命盤主體 4x4 正方 Grid (極致邊框空間利用) -->
             <div class="relative w-full aspect-square max-w-[800px] mx-auto bg-white shadow-md z-10 border-t border-l border-[#9ca3af]">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
-                <!-- 網格均分為 4x4，12宮長寬完全一致 -->
-                <div id="board-grid" class="w-full h-full absolute inset-0 grid grid-cols-4 grid-rows-4">
+                <!-- 網格黃金比例: 周圍宮位大，中間壓縮至 2x2 -->
+                <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: 1.15fr 1fr 1fr 1.15fr; grid-template-rows: 1.15fr 1fr 1fr 1.15fr;">
                     <!-- JS 生成 -->
                 </div>
             </div>
@@ -686,38 +682,29 @@
             return palaces[diff];
         }
 
-        // 精細化同步自動縮放引擎：用 Flex 容器作為一體計算
         function autoScalePalaceText() {
             document.querySelectorAll('.palace-cell').forEach(cell => {
                 const content = cell.querySelector('.palace-content');
                 if (!content) return;
                 
-                // 1. 歸零為100%原始比例，確保獲取最真實的佈局狀態
                 content.style.transform = 'none';
                 content.style.width = '100%';
                 content.style.height = '100%';
 
-                // 強制瀏覽器重新計算佈局 (Force Reflow)
                 void content.offsetWidth;
 
-                // 2. 取得實際內容撐開後需要的最大長寬
                 const scrollW = content.scrollWidth;
                 const scrollH = content.scrollHeight;
-
-                // 3. 取得目前格子實際能給予的安全範圍
-                let scale = 1;
                 const safeW = cell.clientWidth;
                 const safeH = cell.clientHeight;
 
-                // 4. 計算精細比例，僅在「真正溢出」時才縮小
-                if (scrollW > safeW && safeW > 0) scale = Math.min(scale, safeW / scrollW);
-                if (scrollH > safeH && safeH > 0) scale = Math.min(scale, safeH / scrollH);
+                let scale = 1;
+                if (scrollW > safeW && safeW > 0) scale = Math.min(scale, (safeW - 1) / scrollW);
+                if (scrollH > safeH && safeH > 0) scale = Math.min(scale, (safeH - 1) / scrollH);
 
-                // 5. 套用精細比例
                 if (scale < 1) {
                     const preciseScale = Math.floor(scale * 1000) / 1000;
                     content.style.transform = `scale(${preciseScale})`;
-                    // 反向放大內部容器，讓 Flexbox 依舊能撐滿原始格子的可視範圍
                     content.style.width = `${100 / preciseScale}%`;
                     content.style.height = `${100 / preciseScale}%`;
                 }
@@ -732,12 +719,11 @@
             }, 100);
         });
 
-        // 核心渲染：分離 12 宮與中宮的生成邏輯
         function renderBoard() {
             const grid = document.getElementById('board-grid');
             grid.innerHTML = ''; 
 
-            // 第一階段：單純渲染 12 個外圍宮位
+            // 1. 渲染外圍 12 宮
             uiOrder.forEach((key) => {
                 const bIndex = branches.indexOf(key);
                 const cell = state.board[bIndex];
@@ -748,7 +734,7 @@
                     div.className = `palace-cell overflow-hidden ${conf.bg}`;
                     div.style.gridArea = conf.area;
                     grid.appendChild(div);
-                    return; // 空白盤面直接跳過內容渲染
+                    return; 
                 }
 
                 const nName = getPalaceName(state.lifeBranch, bIndex);
@@ -758,20 +744,21 @@
                 const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex) : '';
                 const isBodyPalace = (bIndex === state.bodyBranch);
 
-                // 疊宮標籤：統一格式
+                // 疊宮標籤：去除多餘本命重複名字，保留乾淨排版
                 const badges = [];
                 if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName.substring(0,1)}</div>`);
                 if (mName) badges.push(`<div class="mini-overlap b-month">月${mName.substring(0,1)}</div>`);
                 if (yName) badges.push(`<div class="mini-overlap b-year">流${yName.substring(0,1)}</div>`);
                 if (dName) badges.push(`<div class="mini-overlap b-dec">大${dName.substring(0,1)}</div>`);
-                badges.push(`<div class="mini-overlap b-natal">${nName}</div>`);
                 
-                let overlapsHtml = badges.join('');
+                // 改為橫向自動折行(flex-wrap)，防爆高
+                let overlapsHtml = `
+                    <div class="flex flex-wrap justify-end gap-[1px] sm:gap-[2px] mb-[1px]">
+                        ${badges.join('')}
+                    </div>`;
 
-                // 身宮水平置中緊貼字體
-                let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 mx-auto whitespace-nowrap" style="width: fit-content; font-size: 11px; letter-spacing: 1px;">身宮</div>` : `<div class="shrink-0 flex-1"></div>`;
+                let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 whitespace-nowrap absolute left-1/2 bottom-[2px] -translate-x-1/2" style="font-size: 11px; letter-spacing: 1px;">身宮</div>` : '';
 
-                // 主副星：極限放大
                 const renderStar = (name, isMajor) => {
                     const hN = cell.huaN[name]; const hD = cell.huaD[name];
                     const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
@@ -793,7 +780,6 @@
                         </div>`;
                 };
 
-                // 過客星曜：改在 Flexbox 中與天干並排在 Top Row
                 let transitHtml = '';
                 if (cell.transit && cell.transit.length > 0) {
                     transitHtml = `<div class="flex flex-row-reverse items-start justify-start gap-[1px] sm:gap-[2px] z-10">`;
@@ -822,7 +808,6 @@
                     transitHtml += `</div>`;
                 }
 
-                // 邊框顏色邏輯
                 let borderClass = 'border-[#9ca3af] text-gray-600 bg-gray-50';
                 if (conf.element === 'wood') borderClass = 'border-wood';
                 else if (conf.element === 'fire') borderClass = 'border-fire';
@@ -836,33 +821,31 @@
                 div.style.gridArea = conf.area;
                 div.onclick = () => selectPalace(key);
 
-                // 導入 Flex 容器宮位佈局
                 div.innerHTML = `
                     <div class="palace-content flex flex-col justify-between h-full w-full origin-top-left p-1 box-border">
                         
-                        <!-- Top Row: 天干地支 (左) + 過客星曜 (右) -->
-                        <div class="flex justify-between items-start w-full">
-                            <div class="text-[10px] sm:text-[12px] font-bold z-10 border rounded px-[2px] ${borderClass}">
+                        <div class="flex justify-between items-start w-full gap-1">
+                            <div class="text-[10px] sm:text-[12px] font-bold z-10 border rounded px-[2px] ${borderClass} shrink-0">
                                 ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                             </div>
                             ${transitHtml}
                         </div>
                         
-                        <!-- Middle Row: 星曜 (左對齊，不換列) -->
-                        <div class="flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap w-full flex-1 pt-1 sm:pt-2 overflow-visible">
+                        <div class="flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap w-full flex-1 pt-0.5 sm:pt-1 overflow-visible">
                             ${cell.major.map(s => renderStar(s, true)).join('')}
                             ${cell.minor.map(s => renderStar(s, false)).join('')}
                         </div>
 
-                        <!-- Bottom Row: 歲數 (左) + 身宮 (中) + 疊宮及本命 (右) -->
-                        <div class="flex justify-between items-end w-full pb-0.5">
+                        <div class="flex justify-between items-end w-full pb-0.5 gap-1 relative">
                             <div class="text-[9px] sm:text-[11px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 whitespace-nowrap">
                                 ${cell.ageStart}-${cell.ageEnd}
                             </div>
+                            
                             ${bodyPalaceHtml}
-                            <div class="flex flex-col items-end gap-[1px] text-right shrink-0 z-10">
+                            
+                            <div class="flex flex-col items-end text-right shrink-0 z-10 max-w-[65%]">
                                 ${overlapsHtml}
-                                <div class="text-[12px] sm:text-[15px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 mt-[1px] whitespace-nowrap">
+                                <div class="text-[12px] sm:text-[15px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap">
                                     ${nName}
                                 </div>
                             </div>
@@ -873,7 +856,7 @@
                 grid.appendChild(div);
             });
 
-            // 第二階段：獨立渲染中宮 (強制綁定 gridArea: 2 / 2 / 4 / 4)
+            // 2. 獨立渲染中宮 (絕對置中)
             const center = document.createElement('div');
             center.className = "m-[2px] sm:m-[4px] bg-white/80 backdrop-blur-sm border border-[#9ca3af] shadow-md flex flex-col justify-center items-center relative z-10 pointer-events-none rounded";
             center.style.gridArea = "2 / 2 / 4 / 4";
@@ -906,10 +889,7 @@
             grid.appendChild(center);
 
             if (state.lunar) {
-                // 等待 DOM 渲染完畢後，執行智慧防遮蔽縮放
-                setTimeout(() => {
-                    requestAnimationFrame(autoScalePalaceText);
-                }, 50);
+                setTimeout(() => { requestAnimationFrame(autoScalePalaceText); }, 50);
             }
             if(activePalace && state.lunar) selectPalace(activePalace, true); 
         }
@@ -1041,7 +1021,7 @@
 
         window.onload = () => {
             initDateSelects();
-            renderBoard(); 
+            renderBoard(); // 初始無時辰，渲染空盤
         };
     </script>
 </body>
