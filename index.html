@@ -20,14 +20,6 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .text-vertical {
-            writing-mode: vertical-rl;
-            text-orientation: upright;
-            letter-spacing: 0;
-            white-space: nowrap; 
-            word-break: keep-all;
-        }
-
         /* 網格座標與底色 */
         .palace-cell {
             position: relative;
@@ -51,7 +43,7 @@
         .border-water { border-color: #2563eb; background-color: rgba(239, 246, 255, 0.9); color: #1d4ed8; }
         .border-earth { border-color: #d97706; background-color: rgba(254, 243, 199, 0.9); color: #b45309; }
 
-        /* 四化標籤 (極致壓縮版) */
+        /* 四化標籤 */
         .hua-badge {
             display: inline-block;
             font-weight: 900;
@@ -71,7 +63,7 @@
         .hua-month { background-color: #2563eb; } 
         .hua-day { background-color: #d97706; } 
 
-        /* 過客星曜 直式標籤 */
+        /* 過客星曜 直式標籤 - 改為水平排列的容器使用 */
         .transit-badge {
             display: flex;
             flex-direction: column;
@@ -80,15 +72,15 @@
             border-radius: 2px;
             line-height: 1.1;
             border: 1px solid;
-            font-size: 9px; /* 手機版縮小字體以防爆高 */
+            font-size: 9px;
             padding: 1px;
             text-align: center;
         }
         @media (min-width: 640px) { .transit-badge { font-size: 13px; padding: 2px; } }
 
-        /* 疊宮標籤 (大小一致，並排顯示) */
+        /* 疊宮標籤 - 垂直堆疊用 */
         .mini-overlap {
-            font-size: 9px; /* 手機版大幅縮小，並排時更省空間 */
+            font-size: 9px;
             line-height: 1.2;
             padding: 1px 2px; 
             border: 1px solid;
@@ -97,6 +89,7 @@
             white-space: nowrap;
             text-align: center;
             letter-spacing: 1px;
+            width: fit-content;
         }
         @media (min-width: 640px) { .mini-overlap { font-size: 13px; padding: 1px 3px; } }
         .b-day { color: #d97706; border-color: #fcd34d; background-color: #fffbeb; }
@@ -106,33 +99,18 @@
 
         /* 身宮呼吸燈效果 */
         @keyframes pulseGlow {
-            0%, 100% {
-                box-shadow: 0 0 2px rgba(37, 99, 235, 0.4);
-                border-color: rgba(37, 99, 235, 0.5);
-                background-color: rgba(239, 246, 255, 0.9);
-            }
-            50% {
-                box-shadow: 0 0 8px rgba(37, 99, 235, 0.8);
-                border-color: rgba(37, 99, 235, 1);
-                background-color: rgba(239, 246, 255, 1);
-            }
+            0%, 100% { box-shadow: 0 0 2px rgba(37, 99, 235, 0.4); border-color: rgba(37, 99, 235, 0.5); background-color: rgba(239, 246, 255, 0.9); }
+            50% { box-shadow: 0 0 8px rgba(37, 99, 235, 0.8); border-color: rgba(37, 99, 235, 1); background-color: rgba(239, 246, 255, 1); }
         }
         .pulse-body {
             animation: pulseGlow 2.5s infinite ease-in-out;
             border: 1.5px solid rgba(37, 99, 235, 0.6);
             box-sizing: border-box;
+            width: fit-content;
         }
 
-        .btn-timeline {
-            background-color: #f9fafb;
-            color: #4b5563;
-            transition: all 0.1s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
+        /* 運線按鈕狀態 */
+        .btn-timeline { background-color: #f9fafb; color: #4b5563; transition: all 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         .btn-timeline:hover { background-color: #e5e7eb; }
         .btn-active-decade { background-color: #7e22ce !important; color: white !important; font-weight: bold; }
         .btn-active-year { background-color: #0d9488 !important; color: white !important; font-weight: bold; }
@@ -149,7 +127,6 @@
             
             <!-- 頂部控制列 -->
             <header class="bg-white border border-gray-300 rounded p-1.5 sm:p-2 shadow-sm flex flex-col gap-1.5 sm:gap-2 z-30 relative">
-                <!-- 第一排：姓名與性別 -->
                 <div class="flex flex-wrap items-center justify-between gap-1.5 w-full">
                     <div class="flex items-center gap-2">
                         <span class="text-xs sm:text-sm font-black tracking-widest text-gray-800 shrink-0 hidden sm:block">紫微排盤</span>
@@ -168,7 +145,6 @@
                     </button>
                 </div>
                 
-                <!-- 第二排：生辰選擇 -->
                 <div class="flex gap-1 sm:gap-2 w-full flex-wrap items-center">
                     <div class="flex items-center gap-0.5 sm:gap-1 bg-gray-50 border border-gray-300 rounded px-1 sm:px-2 py-0.5 sm:py-1 focus-within:border-amber-500 shrink-0">
                         <span class="text-gray-700 font-bold text-[10px] sm:text-xs mr-0.5">西元</span>
@@ -203,16 +179,15 @@
                 </div>
             </header>
 
-            <!-- 命盤主體 4x4 正方 Grid (極致邊框空間利用) -->
+            <!-- 命盤主體 4x4 正方 Grid (所有格子等大) -->
             <div class="relative w-full aspect-square max-w-[800px] mx-auto bg-white shadow-md z-10 border-t border-l border-[#9ca3af]">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
-                <!-- 網格黃金比例: 周圍宮位大，中間壓縮至 2x2 -->
-                <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: 1.15fr 1fr 1fr 1.15fr; grid-template-rows: 1.15fr 1fr 1fr 1.15fr;">
+                <!-- 網格均分為 4x4 正方形 -->
+                <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);">
                     <!-- JS 生成 -->
                 </div>
             </div>
 
-            <!-- 下方時間軸 -->
             <footer class="bg-white border border-gray-300 rounded shadow-sm max-w-[800px] mx-auto w-full z-20 relative flex flex-col overflow-hidden mt-1 sm:mt-0">
                 <div class="bg-gray-100 text-[10px] sm:text-sm text-gray-600 font-bold px-2 py-0.5 flex justify-between border-b border-gray-300">
                     <span><i class="fa-solid fa-list-ul mr-1"></i> 運線切換板</span>
@@ -232,7 +207,6 @@
 
     </div>
 
-    <!-- 自訂防呆錯誤訊息對話框 -->
     <div id="msg-box" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
         <div class="bg-white rounded-lg p-5 shadow-xl flex flex-col items-center gap-4 min-w-[250px] transform transition-transform scale-95">
             <div class="text-red-600 text-3xl"><i class="fa-solid fa-circle-exclamation"></i></div>
@@ -364,7 +338,6 @@
             const d = document.getElementById('birth-day').value;
             const hStr = document.getElementById('birth-hour').value;
 
-            // 防呆處理
             if (!y || !m || !d || hStr === "") {
                 showMsg("請選擇完整的生辰（年、月、日、時）才能進行排盤喔！");
                 return;
@@ -513,20 +486,20 @@
             if(state.selDecade) {
                 const dStemIdx = stems.indexOf(state.selDecade.stem);
                 const dLuB = luCunMap[dStemIdx];
-                state.board[dLuB].transit.push({name: '大祿', color: 'text-purple-700 bg-purple-50 border-purple-200'});
-                state.board[(dLuB + 1) % 12].transit.push({name: '大羊', color: 'text-purple-700 bg-purple-50 border-purple-200'});
-                state.board[(dLuB - 1 + 12) % 12].transit.push({name: '大陀', color: 'text-purple-700 bg-purple-50 border-purple-200'});
+                state.board[dLuB].transit.push({name: '限祿', color: 'text-purple-700 bg-purple-50 border-purple-200'});
+                state.board[(dLuB + 1) % 12].transit.push({name: '限羊', color: 'text-purple-700 bg-purple-50 border-purple-200'});
+                state.board[(dLuB - 1 + 12) % 12].transit.push({name: '限陀', color: 'text-purple-700 bg-purple-50 border-purple-200'});
             }
             if(state.selYear) {
                 const yStemIdx = stems.indexOf(state.selYear.stem);
                 const yLuB = luCunMap[yStemIdx];
-                state.board[yLuB].transit.push({name: '流祿', color: 'text-teal-700 bg-teal-50 border-teal-200'});
-                state.board[(yLuB + 1) % 12].transit.push({name: '流羊', color: 'text-teal-700 bg-teal-50 border-teal-200'});
-                state.board[(yLuB - 1 + 12) % 12].transit.push({name: '流陀', color: 'text-teal-700 bg-teal-50 border-teal-200'});
+                state.board[yLuB].transit.push({name: '年祿', color: 'text-teal-700 bg-teal-50 border-teal-200'});
+                state.board[(yLuB + 1) % 12].transit.push({name: '年羊', color: 'text-teal-700 bg-teal-50 border-teal-200'});
+                state.board[(yLuB - 1 + 12) % 12].transit.push({name: '年陀', color: 'text-teal-700 bg-teal-50 border-teal-200'});
 
                 const yHongB = (3 - state.selYear.branch + 12) % 12;
-                state.board[yHongB].transit.push({name: '流鸞', color: 'text-teal-700 bg-teal-50 border-teal-200'});
-                state.board[(yHongB + 6) % 12].transit.push({name: '流喜', color: 'text-teal-700 bg-teal-50 border-teal-200'});
+                state.board[yHongB].transit.push({name: '年鸞', color: 'text-teal-700 bg-teal-50 border-teal-200'});
+                state.board[(yHongB + 6) % 12].transit.push({name: '年喜', color: 'text-teal-700 bg-teal-50 border-teal-200'});
             }
             if(monthStem) {
                 const mStemIdx = stems.indexOf(monthStem);
@@ -682,29 +655,37 @@
             return palaces[diff];
         }
 
+        // 精細化自動縮放引擎
         function autoScalePalaceText() {
             document.querySelectorAll('.palace-cell').forEach(cell => {
                 const content = cell.querySelector('.palace-content');
                 if (!content) return;
                 
+                // 1. 強制重置比例，準備測量原始大小
                 content.style.transform = 'none';
                 content.style.width = '100%';
                 content.style.height = '100%';
+                content.style.transformOrigin = 'top left';
 
-                void content.offsetWidth;
+                // 2. 強制瀏覽器重繪 (Reflow)
+                void content.offsetWidth; 
 
+                // 3. 測量真正溢出的尺寸
                 const scrollW = content.scrollWidth;
                 const scrollH = content.scrollHeight;
                 const safeW = cell.clientWidth;
                 const safeH = cell.clientHeight;
 
                 let scale = 1;
-                if (scrollW > safeW && safeW > 0) scale = Math.min(scale, (safeW - 1) / scrollW);
-                if (scrollH > safeH && safeH > 0) scale = Math.min(scale, (safeH - 1) / scrollH);
+                // 只有當內容確實大於格子時，才等比例縮小
+                if (scrollW > safeW && safeW > 0) scale = Math.min(scale, safeW / scrollW);
+                if (scrollH > safeH && safeH > 0) scale = Math.min(scale, safeH / scrollH);
 
+                // 4. 精確到小數點後三位進行微縮
                 if (scale < 1) {
                     const preciseScale = Math.floor(scale * 1000) / 1000;
                     content.style.transform = `scale(${preciseScale})`;
+                    // 同步反向放大容器寬高，確保縮放後仍填滿整個格子
                     content.style.width = `${100 / preciseScale}%`;
                     content.style.height = `${100 / preciseScale}%`;
                 }
@@ -744,20 +725,21 @@
                 const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex) : '';
                 const isBodyPalace = (bIndex === state.bodyBranch);
 
-                // 疊宮標籤：去除多餘本命重複名字，保留乾淨排版
+                // 疊宮標籤：垂直堆疊 (由下往上)
                 const badges = [];
                 if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName.substring(0,1)}</div>`);
                 if (mName) badges.push(`<div class="mini-overlap b-month">月${mName.substring(0,1)}</div>`);
                 if (yName) badges.push(`<div class="mini-overlap b-year">流${yName.substring(0,1)}</div>`);
                 if (dName) badges.push(`<div class="mini-overlap b-dec">大${dName.substring(0,1)}</div>`);
                 
-                // 改為橫向自動折行(flex-wrap)，防爆高
+                // 垂直堆疊
                 let overlapsHtml = `
-                    <div class="flex flex-wrap justify-end gap-[1px] sm:gap-[2px] mb-[1px]">
+                    <div class="flex flex-col items-end justify-end gap-[1px] sm:gap-[2px] mb-[1px]">
                         ${badges.join('')}
                     </div>`;
 
-                let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 whitespace-nowrap absolute left-1/2 bottom-[2px] -translate-x-1/2" style="font-size: 11px; letter-spacing: 1px;">身宮</div>` : '';
+                // 身宮：水平放置且貼齊字體，置於底部中央
+                let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 whitespace-nowrap" style="font-size: 11px; letter-spacing: 1px;">身宮</div>` : '<div></div>';
 
                 const renderStar = (name, isMajor) => {
                     const hN = cell.huaN[name]; const hD = cell.huaD[name];
@@ -780,31 +762,14 @@
                         </div>`;
                 };
 
+                // 過客星曜：右上角「水平」排列，不換行
                 let transitHtml = '';
                 if (cell.transit && cell.transit.length > 0) {
-                    transitHtml = `<div class="flex flex-row-reverse items-start justify-start gap-[1px] sm:gap-[2px] z-10">`;
-                    
-                    const luanXi = cell.transit.filter(t => t.name.includes('鸞') || t.name.includes('喜'));
-                    const luYangTuo = cell.transit.filter(t => !(t.name.includes('鸞') || t.name.includes('喜')));
-                    
-                    if (luYangTuo.length > 0) {
-                        transitHtml += `<div class="flex flex-col gap-[1px] sm:gap-[2px]">`;
-                        luYangTuo.forEach(t => {
-                            const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                            transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
-                        });
-                        transitHtml += `</div>`;
-                    }
-
-                    if (luanXi.length > 0) {
-                        transitHtml += `<div class="flex flex-col gap-[1px] sm:gap-[2px]">`;
-                        luanXi.forEach(t => {
-                            const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                            transitHtml += `<div class="transit-badge ${t.color}">${charHtml}</div>`;
-                        });
-                        transitHtml += `</div>`;
-                    }
-
+                    transitHtml = `<div class="flex flex-row items-start justify-end gap-[1px] sm:gap-[2px] z-10 flex-nowrap overflow-visible">`;
+                    cell.transit.forEach(t => {
+                        const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
+                        transitHtml += `<div class="transit-badge shrink-0 ${t.color}">${charHtml}</div>`;
+                    });
                     transitHtml += `</div>`;
                 }
 
@@ -821,9 +786,10 @@
                 div.style.gridArea = conf.area;
                 div.onclick = () => selectPalace(key);
 
+                // 完全基於 Flexbox 的宮位內容佈局
                 div.innerHTML = `
                     <div class="palace-content flex flex-col justify-between h-full w-full origin-top-left p-1 box-border">
-                        
+                        <!-- 第一排：天干地支與右上水平排列過客星曜 -->
                         <div class="flex justify-between items-start w-full gap-1">
                             <div class="text-[10px] sm:text-[12px] font-bold z-10 border rounded px-[2px] ${borderClass} shrink-0">
                                 ${state.stemsMap[bIndex]}${branchNames[bIndex]}
@@ -831,32 +797,36 @@
                             ${transitHtml}
                         </div>
                         
+                        <!-- 第二排：主輔星曜群 -->
                         <div class="flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap w-full flex-1 pt-0.5 sm:pt-1 overflow-visible">
                             ${cell.major.map(s => renderStar(s, true)).join('')}
                             ${cell.minor.map(s => renderStar(s, false)).join('')}
                         </div>
 
+                        <!-- 第三排：大限歲數、身宮、本命與疊宮 -->
                         <div class="flex justify-between items-end w-full pb-0.5 gap-1 relative">
+                            <!-- 歲數 -->
                             <div class="text-[9px] sm:text-[11px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 whitespace-nowrap">
                                 ${cell.ageStart}-${cell.ageEnd}
                             </div>
                             
+                            <!-- 身宮置中底 -->
                             ${bodyPalaceHtml}
                             
+                            <!-- 右下角本命與疊宮 (垂直排列) -->
                             <div class="flex flex-col items-end text-right shrink-0 z-10 max-w-[65%]">
                                 ${overlapsHtml}
-                                <div class="text-[12px] sm:text-[15px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap">
+                                <div class="text-[12px] sm:text-[15px] font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 whitespace-nowrap mt-[1px]">
                                     ${nName}
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 `;
                 grid.appendChild(div);
             });
 
-            // 2. 獨立渲染中宮 (絕對置中)
+            // 2. 獨立渲染中宮 (綁定在中央 2x2)
             const center = document.createElement('div');
             center.className = "m-[2px] sm:m-[4px] bg-white/80 backdrop-blur-sm border border-[#9ca3af] shadow-md flex flex-col justify-center items-center relative z-10 pointer-events-none rounded";
             center.style.gridArea = "2 / 2 / 4 / 4";
@@ -864,8 +834,8 @@
             if (!state.lunar) {
                 center.innerHTML = `
                     <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
-                        <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-lg sm:text-2xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-16 sm:w-24 mb-1 sm:mb-4 pointer-events-auto" oninput="updateName()">
-                        <p class="text-[10px] sm:text-sm font-bold text-gray-400 tracking-widest mt-1">請選擇生辰並排盤</p>
+                        <i class="fa-solid fa-yin-yang text-4xl text-gray-300 mb-2"></i>
+                        <p class="text-[10px] sm:text-sm font-bold text-gray-400 tracking-widest mt-1">請輸入生辰並進行排盤</p>
                     </div>
                 `;
             } else {
@@ -888,6 +858,7 @@
             }
             grid.appendChild(center);
 
+            // 確保 DOM 生成後再執行精細縮放計算
             if (state.lunar) {
                 setTimeout(() => { requestAnimationFrame(autoScalePalaceText); }, 50);
             }
@@ -1021,7 +992,7 @@
 
         window.onload = () => {
             initDateSelects();
-            renderBoard(); // 初始無時辰，渲染空盤
+            renderBoard(); // 初始渲染空白盤 (預設空白)
         };
     </script>
 </body>
