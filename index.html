@@ -670,36 +670,30 @@
                 const content = cell.querySelector('.palace-content');
                 if (!content) return;
                 
-                // 1. Reset scale and dimensions to measure natural size
+                // 1. 歸零並鎖定與 cell 相同的尺寸來測量真實溢出，避免 max-content 造成過度撐大
                 content.style.transform = 'none';
-                content.style.width = 'max-content';
-                content.style.height = 'max-content';
+                content.style.width = cell.clientWidth + 'px';
+                content.style.height = cell.clientHeight + 'px';
 
-                const cellW = cell.clientWidth;
-                const cellH = cell.clientHeight;
-                
-                // Read natural sizes (with some padding allowance)
-                const targetW = content.scrollWidth;
-                const targetH = content.scrollHeight;
+                // 2. 取得實際內容需要的最大長寬
+                const scrollW = content.scrollWidth;
+                const scrollH = content.scrollHeight;
 
-                // 2. Calculate necessary scale
+                // 3. 計算精細比例，保留 1px 緩衝
                 let scale = 1;
-                // Leave a little margin (4px)
-                const safeW = cellW - 4;
-                const safeH = cellH - 4;
+                const safeW = cell.clientWidth - 1;
+                const safeH = cell.clientHeight - 1;
 
-                if (targetW > safeW && safeW > 0) scale = Math.min(scale, safeW / targetW);
-                if (targetH > safeH && safeH > 0) scale = Math.min(scale, safeH / targetH);
+                if (scrollW > safeW && safeW > 0) scale = Math.min(scale, safeW / scrollW);
+                if (scrollH > safeH && safeH > 0) scale = Math.min(scale, safeH / scrollH);
 
-                // 3. Apply scale
+                // 4. 精細套用比例
                 if (scale < 1) {
-                    content.style.transform = `scale(${scale})`;
-                    // To make the flex container still stretch to the bottom/right of the visual cell:
-                    content.style.width = `${(cellW / scale)}px`;
-                    content.style.height = `${(cellH / scale)}px`;
-                } else {
-                    content.style.width = '100%';
-                    content.style.height = '100%';
+                    const preciseScale = Math.floor(scale * 1000) / 1000;
+                    content.style.transform = `scale(${preciseScale})`;
+                    // 反向放大容器內部，讓 justify-between 依然能頂到視覺邊界
+                    content.style.width = `${(cell.clientWidth / preciseScale)}px`;
+                    content.style.height = `${(cell.clientHeight / preciseScale)}px`;
                 }
             });
         }
@@ -746,7 +740,7 @@
                     let overlapsHtml = badges.join('');
 
                     // 身宮水平居中，緊貼字體
-                    let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 mx-auto" style="white-space: nowrap; width: fit-content; font-size: 11px; letter-spacing: 1px;">身宮</div>` : `<div class="shrink-0 flex-1"></div>`;
+                    let bodyPalaceHtml = isBodyPalace ? `<div class="pulse-body font-black text-blue-700 z-10 leading-none bg-white/80 rounded px-1 py-0.5 text-center shrink-0 mx-auto whitespace-nowrap" style="width: fit-content; font-size: 11px; letter-spacing: 1px;">身宮</div>` : `<div class="shrink-0 flex-1"></div>`;
 
                     // 主副星：極限放大
                     const renderStar = (name, isMajor) => {
@@ -833,13 +827,13 @@
 
                             <!-- Bottom Row: 歲數 (左) + 身宮 (中) + 疊宮及本命 (右) -->
                             <div class="flex justify-between items-end w-full">
-                                <div class="text-[9px] sm:text-[11px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 mb-0.5">
+                                <div class="text-[9px] sm:text-[11px] text-gray-500 font-bold bg-white/60 rounded px-[1px] shrink-0 mb-0.5 whitespace-nowrap">
                                     ${cell.ageStart}-${cell.ageEnd}
                                 </div>
                                 ${bodyPalaceHtml}
                                 <div class="flex flex-col items-end gap-[1px] text-right shrink-0 z-10">
                                     ${overlapsHtml}
-                                    <div class="text-sm sm:text-base font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 mt-[1px]">
+                                    <div class="text-sm sm:text-base font-black text-red-800 tracking-widest pl-1 border-l-2 border-red-300 mt-[1px] whitespace-nowrap">
                                         ${nName}
                                     </div>
                                 </div>
