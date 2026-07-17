@@ -2,44 +2,44 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>紫微斗數排盤 - 原始還原版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>紫微斗數排盤 - 穩定還原版</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background-color: #f3f4f6; font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif; }
+    /* 確保手機操作順暢 */
+    body { -webkit-user-select: none; user-select: none; overscroll-behavior: none; background-color: #f3f4f6; font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif; }
     
+    /* 12宮格極大化正方形 */
     .grid-board {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: repeat(4, 1fr);
-      gap: 2px;
+      gap: 1px;
       background-color: #9ca3af;
-      border: 2px solid #9ca3af;
+      border: 1px solid #9ca3af;
       aspect-ratio: 1 / 1;
       width: 100%;
-      max-width: 800px;
+      max-width: 600px;
       margin: 0 auto;
     }
     
+    /* 單一宮位設定 */
     .palace {
       background-color: #ffffff;
       position: relative;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     
-    .palace-content {
+    /* 內部縮放容器 (解決畫面空白的核心) */
+    .scale-container {
       width: 100%;
       height: 100%;
-      padding: 6px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      position: relative;
+      transform-origin: center center;
       transition: transform 0.2s ease;
     }
     
+    /* 中宮 */
     .center-palace {
       grid-area: 2 / 2 / 4 / 4;
       background-color: #f8fafc;
@@ -47,27 +47,27 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      position: relative;
     }
   </style>
 </head>
-<body class="p-4 flex flex-col h-screen">
-  
-  <!-- 頂部控制列 -->
-  <div class="flex justify-between items-center mb-4 max-w-[800px] mx-auto w-full">
-    <h1 class="text-xl font-bold text-gray-800">紫微斗數</h1>
-    <button class="bg-gray-800 text-white px-4 py-2 rounded shadow hover:bg-gray-700">排盤</button>
+<body class="p-2 flex flex-col h-screen">
+
+  <!-- 頂部標題 -->
+  <div class="flex justify-between items-center mb-2 max-w-[600px] mx-auto w-full">
+    <h1 class="text-lg font-bold text-gray-800">紫微斗數</h1>
+    <button class="bg-gray-800 text-white px-3 py-1 rounded text-sm shadow">排盤</button>
   </div>
 
   <!-- 命盤區 -->
-  <div id="board" class="grid-board shadow-xl"></div>
+  <div id="board" class="grid-board shadow-lg"></div>
 
-  <!-- 底部控制區 -->
-  <div class="mt-6 flex justify-center gap-3 max-w-[800px] mx-auto w-full">
-    <button class="bg-purple-100 text-purple-800 px-5 py-2 rounded-lg font-bold border border-purple-300 shadow hover:bg-purple-200" onclick="simulateScale()">大限</button>
-    <button class="bg-green-100 text-green-800 px-5 py-2 rounded-lg font-bold border border-green-300 shadow hover:bg-green-200" onclick="simulateScale()">流年</button>
-    <button class="bg-blue-100 text-blue-800 px-5 py-2 rounded-lg font-bold border border-blue-300 shadow hover:bg-blue-200" onclick="simulateScale()">流月</button>
-    <button class="bg-orange-100 text-orange-800 px-5 py-2 rounded-lg font-bold border border-orange-300 shadow hover:bg-orange-200" onclick="simulateScale()">流日</button>
+  <!-- 底部運限按鈕 -->
+  <div class="mt-4 grid grid-cols-4 gap-2 max-w-[600px] mx-auto w-full text-center">
+    <button class="bg-purple-100 text-purple-800 py-2 rounded text-sm font-bold border border-purple-300" onclick="triggerScale()">大限</button>
+    <button class="bg-green-100 text-green-800 py-2 rounded text-sm font-bold border border-green-300" onclick="triggerScale()">流年</button>
+    <button class="bg-blue-100 text-blue-800 py-2 rounded text-sm font-bold border border-blue-300" onclick="triggerScale()">流月</button>
+    <button class="bg-orange-100 text-orange-800 py-2 rounded text-sm font-bold border border-orange-300" onclick="triggerScale()">流日</button>
   </div>
 
   <script>
@@ -86,36 +86,38 @@
       palace.style.gridArea = gridAreas[i];
       
       palace.innerHTML = `
-        <div class="palace-content">
-          <!-- 上排：宮干地支與過客星曜 -->
-          <div class="flex justify-between items-start">
-            <div class="bg-gray-200 border border-gray-400 px-1 text-xs text-gray-700 font-bold rounded">甲子</div>
-            <div class="flex gap-1">
-              <div class="text-xs text-red-600 font-bold">祿</div>
-              <div class="text-xs text-gray-600 font-bold">羊</div>
+        <div class="scale-container p-1">
+          <!-- 左上：宮干地支 -->
+          <div class="absolute top-1 left-1 text-[10px] text-gray-500 font-medium">甲子</div>
+          
+          <!-- 右上：過客星曜 (水平排列) -->
+          <div class="absolute top-1 right-1 flex gap-[2px] items-start">
+            <div class="text-[9px] text-red-600 font-bold shrink-0">祿</div>
+            <div class="text-[9px] text-gray-500 shrink-0">羊</div>
+          </div>
+
+          <!-- 中左：主副星與四化 -->
+          <div class="absolute top-5 left-1 flex flex-col items-start gap-[2px]">
+            <div class="flex items-center gap-[1px]">
+              <span class="text-[12px] font-bold text-red-700">紫微</span>
+              <span class="text-[8px] bg-blue-600 text-white px-[2px] rounded text-center">權</span>
+            </div>
+            <div class="flex items-center gap-[1px]">
+              <span class="text-[11px] text-gray-700">文昌</span>
+              <span class="text-[8px] bg-gray-500 text-white px-[2px] rounded text-center">忌</span>
             </div>
           </div>
 
-          <!-- 中排：主副星與四化 -->
-          <div class="flex flex-col items-center justify-center flex-grow py-1 gap-1">
-            <div class="flex items-center gap-1">
-              <span class="text-base font-bold text-red-700">紫微</span>
-              <span class="text-[10px] bg-blue-600 text-white px-1 py-0.5 rounded">權</span>
-            </div>
-            <div class="flex items-center gap-1">
-              <span class="text-sm font-bold text-gray-700">文昌</span>
-              <span class="text-[10px] bg-gray-500 text-white px-1 py-0.5 rounded">忌</span>
-            </div>
+          <!-- 右下：疊宮與本命宮 (垂直堆疊，保留色彩框線) -->
+          <div class="absolute bottom-1 right-1 flex flex-col items-end gap-[2px]">
+            <span class="text-[10px] text-purple-700 border border-purple-300 bg-purple-50 px-[2px] rounded leading-tight shrink-0">大限命宮</span>
+            <span class="text-[10px] text-green-700 border border-green-300 bg-green-50 px-[2px] rounded leading-tight shrink-0">流年夫妻</span>
+            <span class="text-[11px] font-bold text-red-600 leading-tight mt-[1px] shrink-0">命宮</span>
           </div>
 
-          <!-- 下排：歲數與疊宮本命 -->
-          <div class="flex justify-between items-end">
-            <div class="text-xs text-gray-500 font-bold">4-13</div>
-            <div class="flex flex-col items-end gap-1">
-              <span class="text-xs text-purple-700 border border-purple-400 bg-purple-50 px-1 rounded">大限命宮</span>
-              <span class="text-xs text-green-700 border border-green-400 bg-green-50 px-1 rounded">流年夫妻</span>
-              <span class="text-sm font-bold text-red-600">命宮</span>
-            </div>
+          <!-- 左下：歲數 -->
+          <div class="absolute bottom-1 left-1 text-[9px] text-gray-400 font-bold">
+            4-13
           </div>
         </div>
       `;
@@ -126,40 +128,34 @@
     const center = document.createElement('div');
     center.className = 'center-palace';
     center.innerHTML = `
-      <div class="text-lg text-gray-500 mb-2 font-bold">等待輸入生辰排盤</div>
-      <p class="text-sm text-gray-400">目前為空白盤面</p>
+      <div class="text-sm text-gray-400 mb-2 font-bold">請輸入生辰排盤</div>
     `;
     board.appendChild(center);
 
-    // 原始版自動縮放引擎
-    window.simulateScale = function() {
-      const contents = document.querySelectorAll('.palace-content');
-      contents.forEach(content => {
-        // 1. 強制歸零回 100% 測量真實尺寸
-        content.style.transform = 'scale(1)';
+    // 穩定版自動縮放引擎
+    window.triggerScale = function() {
+      const containers = document.querySelectorAll('.scale-container');
+      containers.forEach(container => {
+        // 先重置回 100%
+        container.style.transform = 'scale(1)';
         
-        // 2. 測量與計算縮放
-        setTimeout(() => {
-          const parent = content.parentElement;
-          const parentRect = parent.getBoundingClientRect();
-          const contentHeight = content.scrollHeight;
-          const contentWidth = content.scrollWidth;
+        // 給瀏覽器一點時間計算真實尺寸後再縮放
+        requestAnimationFrame(() => {
+          const parent = container.parentElement;
+          // 設定虛擬的內容邊界 (依賴內部 absolute 元素的最外圍位置)
+          const contentHeight = 120; // 預設最大容許高度估值
+          const contentWidth = parent.clientWidth;
           
-          const heightRatio = parentRect.height / contentHeight;
-          const widthRatio = parentRect.width / contentWidth;
-          
-          // 若有阻擋或超出，則進行等比例微幅縮放
-          if (heightRatio < 1 || widthRatio < 1) {
-            const scale = Math.min(heightRatio, widthRatio) * 0.95;
-            content.style.transform = \`scale(\${scale})\`;
-            content.style.transformOrigin = 'center center';
+          if (parent.clientHeight < contentHeight) {
+            const scale = Math.max(0.8, parent.clientHeight / contentHeight);
+            container.style.transform = \`scale(\${scale})\`;
           }
-        }, 10);
+        });
       });
     }
     
-    // 初始載入時執行一次防擋檢測
-    setTimeout(simulateScale, 100);
+    // 初始載入時觸發一次
+    setTimeout(triggerScale, 100);
   </script>
 </body>
 </html>
