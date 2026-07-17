@@ -659,7 +659,7 @@
                     const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex) : '';
                     const isBodyPalace = (bIndex === state.bodyBranch);
 
-                    // ★ 疊宮標籤：順序反轉，改用 flex-row-reverse 讓它們從右下角往左上彈性擴展
+                    // ★ 疊宮標籤：垂直排列，由下往上堆疊
                     const badges = [];
                     badges.push(`<div class="mini-overlap b-natal">${nName}</div>`);
                     if (dName) badges.push(`<div class="mini-overlap b-dec">大${dName.substring(0,1)}</div>`);
@@ -668,7 +668,7 @@
                     if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName.substring(0,1)}</div>`);
                     
                     let overlapsHtml = `
-                        <div class="absolute bottom-[2px] right-[2px] left-[15px] flex flex-row-reverse flex-wrap-reverse justify-start items-end gap-[1px] z-20 pointer-events-none">
+                        <div class="absolute bottom-[2px] right-[2px] flex flex-col-reverse items-end gap-[1px] z-20 pointer-events-none">
                             ${badges.join('')}
                         </div>`;
 
@@ -697,10 +697,10 @@
                             </div>`;
                     };
 
-                    // ★ 過客星曜：改為單一容器 flex-wrap，滿了自動往左排，不再死板切成兩行
+                    // ★ 過客星曜：移至右上角成垂直書寫，由右至左排列
                     let transitHtml = '';
                     if (cell.transit && cell.transit.length > 0) {
-                        transitHtml = `<div class="absolute right-[2px] top-[12%] w-[35%] bottom-[25px] flex flex-row-reverse flex-wrap items-start justify-start gap-[1px] sm:gap-[2px] z-10 pointer-events-none overflow-hidden">`;
+                        transitHtml = `<div class="absolute right-[2px] top-[2px] max-w-[70%] flex flex-row-reverse flex-wrap items-start justify-start gap-[1px] sm:gap-[2px] z-10 pointer-events-none overflow-hidden">`;
                         cell.transit.forEach(t => {
                             const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
                             transitHtml += `<div class="transit-badge ${t.color} shrink-0">${charHtml}</div>`;
