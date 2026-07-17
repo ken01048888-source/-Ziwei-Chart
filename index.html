@@ -41,13 +41,6 @@
       padding: 8px;
       position: relative;
     }
-    
-    /* 運線星曜垂直書寫 (由右至左) */
-    .vertical-rl {
-      writing-mode: vertical-rl;
-      text-orientation: upright;
-      letter-spacing: 1px;
-    }
   </style>
 </head>
 <body class="p-2 flex flex-col h-screen">
@@ -55,12 +48,9 @@
   <!-- 頂部控制列 -->
   <div class="flex justify-between items-center mb-2 max-w-[600px] mx-auto w-full">
     <h1 class="text-lg font-bold text-gray-800">紫微斗數</h1>
-    <button id="btn-analyze" class="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium shadow">
-      人格特質
-    </button>
   </div>
 
-  <!-- 命盤區 (預設為空，動態渲染) -->
+  <!-- 命盤區 -->
   <div id="board" class="grid-board shadow-lg"></div>
 
   <!-- 底部控制區 (運限盤按鈕 - 保留原始排版與顏色設計) -->
@@ -88,39 +78,36 @@
       palace.style.gridArea = gridAreas[i];
       
       palace.innerHTML = `
-        <!-- 左上：宮干 (極小字體) -->
-        <div class="absolute top-0.5 left-1 text-[9px] text-gray-500 font-medium">甲子</div>
+        <!-- 左上：宮干 (無框線，維持清晰大小) -->
+        <div class="absolute top-1 left-1 text-[10px] text-gray-500 font-medium">甲子</div>
         
-        <!-- 右上：運線祿羊陀鸞喜 (垂直書寫，由右至左) -->
-        <div class="absolute top-0.5 right-0.5 flex flex-row-reverse gap-[2px] items-start">
-          <div class="text-[8px] text-red-600 leading-none vertical-rl font-bold">祿存</div>
-          <div class="text-[8px] text-gray-500 leading-none vertical-rl">擎羊</div>
+        <!-- 右上：運線祿羊陀鸞喜 (水平排列，不換行) -->
+        <div class="absolute top-1 right-1 flex gap-[2px] items-start">
+          <div class="text-[8px] text-red-600 font-bold shrink-0">祿</div>
+          <div class="text-[8px] text-gray-500 shrink-0">羊</div>
         </div>
 
-        <!-- 中左：主輔星與四化 (絕對靠左對齊，四化寬度貼齊星曜) -->
-        <div class="absolute top-4 left-0.5 flex flex-col items-start gap-[1px]">
+        <!-- 中左：主輔星與四化 (絕對靠左對齊，四化含框寬度貼齊星曜) -->
+        <div class="absolute top-5 left-1 flex flex-col items-start gap-[2px]">
           <div class="flex items-center gap-[1px]">
-            <span class="text-[10px] font-bold text-red-700">紫微</span>
-            <span class="text-[7px] bg-blue-600 text-white px-[1px] rounded w-full text-center">權</span>
+            <span class="text-[12px] font-bold text-red-700">紫微</span>
+            <span class="text-[8px] bg-blue-600 text-white px-[1px] rounded w-full text-center">權</span>
           </div>
           <div class="flex items-center gap-[1px]">
-            <span class="text-[10px] font-bold text-red-700">天相</span>
-          </div>
-          <div class="flex items-center gap-[1px] mt-[1px]">
-            <span class="text-[9px] text-gray-700">文昌</span>
-            <span class="text-[7px] bg-gray-500 text-white px-[1px] rounded w-full text-center">忌</span>
+            <span class="text-[11px] text-gray-700">文昌</span>
+            <span class="text-[8px] bg-gray-500 text-white px-[1px] rounded w-full text-center">忌</span>
           </div>
         </div>
 
-        <!-- 右下：疊宮與本命宮 (垂直堆疊，字體極致微縮) -->
-        <div class="absolute bottom-0.5 right-0.5 flex flex-col items-end gap-[1px]">
-          <span class="text-[7px] text-purple-700 border border-purple-300 px-[2px] rounded leading-none shrink-0">大限命宮</span>
-          <span class="text-[7px] text-green-700 border border-green-300 px-[2px] rounded leading-none shrink-0">流年夫妻</span>
-          <span class="text-[8px] font-bold text-red-600 leading-none mt-[1px] shrink-0">命宮</span>
+        <!-- 右下：疊宮與本命宮 (垂直堆疊，保留色彩框線) -->
+        <div class="absolute bottom-1 right-1 flex flex-col items-end gap-[1px]">
+          <span class="text-[10px] text-purple-700 border border-purple-300 px-[2px] rounded leading-tight shrink-0">大限命宮</span>
+          <span class="text-[10px] text-green-700 border border-green-300 px-[2px] rounded leading-tight shrink-0">流年夫妻</span>
+          <span class="text-[10px] font-bold text-red-600 leading-tight mt-[1px] shrink-0">命宮</span>
         </div>
 
         <!-- 左下：歲數 -->
-        <div class="absolute bottom-0.5 left-1 text-[8px] text-gray-400">
+        <div class="absolute bottom-1 left-1 text-[9px] text-gray-400">
           4-13
         </div>
       `;
@@ -131,8 +118,7 @@
     const center = document.createElement('div');
     center.className = 'center-palace';
     center.innerHTML = `
-      <div class="text-xs text-gray-400 mb-2">尚未輸入生辰</div>
-      <button class="bg-gray-800 text-white px-4 py-1.5 rounded text-sm shadow">排盤</button>
+      <div class="text-sm text-gray-400 mb-2">請輸入生辰排盤</div>
     `;
     board.appendChild(center);
   </script>
