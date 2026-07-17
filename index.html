@@ -146,17 +146,20 @@
                         </div>
                     </div>
                     
-                    <!-- 個人特質按鈕移至右上角 -->
-                    <button onclick="showInterpretation()" class="ml-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[11px] sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded shadow-md transition-all flex items-center gap-1 shrink-0">
-                        <i class="fa-regular fa-address-card"></i> <span class="hidden sm:inline">個人特質</span>
-                    </button>
+                    <!-- 個人特質按鈕與版次標籤移至右上角 -->
+                    <div class="ml-auto flex flex-col items-end shrink-0">
+                        <button onclick="showInterpretation()" class="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[11px] sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded shadow-md transition-all flex items-center gap-1">
+                            <i class="fa-regular fa-address-card"></i> <span class="hidden sm:inline">個人特質</span>
+                        </button>
+                        <span class="text-[9px] sm:text-[10px] text-gray-400 font-bold tracking-wider mt-[2px]">Rev.01</span>
+                    </div>
                 </div>
                 
                 <!-- 第二列：出生時間與排盤按鈕 -->
                 <div class="flex gap-1 sm:gap-2 w-full flex-wrap items-center">
                     <div class="flex items-center gap-0.5 sm:gap-1 bg-gray-50 border border-gray-300 rounded px-1 sm:px-2 py-0.5 sm:py-1 focus-within:border-amber-500 shrink-0">
                         <span class="text-gray-700 font-bold text-[10px] sm:text-xs mr-0.5">西元</span>
-                        <select id="birth-year" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer" onchange="updateDays()"></select>
+                        <select id="birth-year" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer w-[50px] sm:w-[60px]" onchange="updateDays()"></select>
                         <span class="text-gray-500 text-[10px] sm:text-xs">年</span>
                         
                         <select id="birth-month" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer" onchange="updateDays()"></select>
@@ -190,7 +193,7 @@
             <!-- 命盤主體 4x4 Grid -->
             <div class="relative w-full aspect-[2/3] sm:aspect-[4/5] lg:aspect-square max-w-[800px] mx-auto bg-white shadow-md z-10">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
-                <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: 1.15fr 1fr 1fr 1.15fr; grid-template-rows: 1.15fr 1fr 1fr 1.15fr;">
+                <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr));">
                 </div>
             </div>
 
@@ -560,7 +563,14 @@
                 const isSel = state.selYear && state.selYear.year === y.year;
                 const btn = document.createElement('div');
                 btn.className = `btn-timeline py-[2px] sm:py-[4px] ${isSel ? 'btn-active-year' : ''}`;
-                btn.innerHTML = `<span class="text-[9px] sm:text-[12px] font-bold leading-none mb-[2px]">${y.stem}${branchNames[y.branch]}</span><span class="text-[8px] sm:text-[10px] text-gray-500 leading-none">${y.age}歲</span>`;
+                btn.innerHTML = `
+                    <span class="text-[8px] sm:text-[10px] opacity-75 leading-none mb-[2px]">${y.year}年</span>
+                    <div class="flex flex-col items-center text-[10px] sm:text-[12px] font-bold leading-none mb-[2px] gap-[1px]">
+                        <span>${y.stem}</span>
+                        <span>${branchNames[y.branch]}</span>
+                    </div>
+                    <span class="text-[8px] sm:text-[10px] text-gray-500 opacity-90 leading-none">${y.age}歲</span>
+                `;
                 btn.onclick = () => { state.selYear = isSel ? null : y; updateTimeState(); };
                 divYear.appendChild(btn);
             });
@@ -726,8 +736,8 @@
                             ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                         </div>
                         
-                        <!-- 核心星曜區：加入 flex-wrap 允許換行，並限制寬度避免蓋到流年星 -->
-                        <div class="absolute top-4 sm:top-6 left-[2px] w-[62%] bottom-[20px] flex justify-start gap-[1px] sm:gap-[2px] flex-wrap content-start z-10 overflow-hidden">
+                        <!-- 核心星曜區：強制不換列 (flex-nowrap)，並限制寬度避免蓋到流年星，且整體往下位移 -->
+                        <div class="absolute top-[28px] sm:top-[34px] left-[2px] w-[62%] bottom-[20px] flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap content-start z-10 overflow-hidden">
                             ${cell.major.map(s => renderStar(s, true)).join('')}
                             ${cell.minor.map(s => renderStar(s, false)).join('')}
                         </div>
@@ -917,5 +927,16 @@
             renderBoard(); 
         };
     </script>
+
+    <!-- 
+    ========================================================
+    程式碼版次紀錄 (Version History)
+    ========================================================
+    [Rev.01] - 目前版本
+    - 星曜維持不換列 (flex-nowrap)
+    - 縮短出生年按鈕長度，使其剛剛好 (w-[50px] sm:w-[60px])
+    - 個人特質下方新增版次標籤，並開始以 HTML 註解記錄版次內容
+    ========================================================
+    -->
 </body>
 </html>
