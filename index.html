@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>紫微排盤</title>
-    
+    <!-- PWA / Mobile Web App Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="紫微排盤">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#f7f6f2">
-
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/7e22ce/ffffff?text=紫微">
+    
+    <title>紫微排盤</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,7 +28,7 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 網格座標與底色 - 啟用容器查詢 (container-type) */
+        /* 網格座標與底色 - 啟用容器查詢 (container-type) 來實現完美的字體自動縮放 */
         .palace-cell {
             position: relative;
             cursor: pointer;
@@ -45,7 +46,7 @@
         .bg-water { background-color: #f0f9ff; }
         .bg-earth { background-color: #fffbeb; }
 
-        /* 四化標籤 (更縮小) */
+        /* 四化標籤 (Fluid 縮放) */
         .hua-badge {
             display: inline-block;
             font-weight: 900;
@@ -53,18 +54,18 @@
             border-radius: 1px;
             line-height: 1.1;
             text-align: center;
-            font-size: clamp(7px, 5cqw, 10px);
+            font-size: clamp(8px, 6cqw, 11px);
             padding: 1px;
             width: 100%;
         }
-        @media (min-width: 640px) { .hua-badge { padding: 1px 2px; } }
+        @media (min-width: 640px) { .hua-badge { padding: 1px 3px; } }
         .hua-natal { background-color: #b91c1c; } 
         .hua-decade { background-color: #7e22ce; } 
         .hua-year { background-color: #0d9488; } 
         .hua-month { background-color: #2563eb; } 
         .hua-day { background-color: #d97706; } 
 
-        /* 過客星曜 直式標籤 (更縮小) */
+        /* 過客星曜 直式標籤 (Fluid 縮放，字體調小) */
         .transit-badge {
             display: flex;
             flex-direction: column;
@@ -73,14 +74,15 @@
             border-radius: 2px;
             line-height: 1.1;
             border: 1px solid;
-            font-size: clamp(8px, 6.5cqw, 11px); 
+            font-size: clamp(8px, 7cqw, 11px); 
             padding: 1px;
             text-align: center;
         }
+        @media (min-width: 640px) { .transit-badge { padding: 2px; } }
 
-        /* 疊宮與本命宮統一標籤 (稍微縮小) */
+        /* 疊宮與本命宮統一標籤 (Fluid 縮放) */
         .mini-overlap {
-            font-size: clamp(9px, 7.5cqw, 13px); 
+            font-size: clamp(9px, 8cqw, 14px); 
             line-height: 1.2;
             padding: 1px 2px; 
             border: 1px solid;
@@ -92,11 +94,12 @@
             width: fit-content; 
             letter-spacing: 1px;
         }
+        @media (min-width: 640px) { .mini-overlap { padding: 1px 3px; } }
         .b-day { color: #d97706; border-color: #fcd34d; background-color: #fffbeb; }
         .b-month { color: #2563eb; border-color: #bfdbfe; background-color: #eff6ff; }
         .b-year { color: #0d9488; border-color: #99f6e4; background-color: #f0fdfa; }
-        .b-syear { color: #db2777; border-color: #fbcfe8; background-color: #fdf2f8; } /* 小限 (粉紅) */
         .b-dec { color: #7e22ce; border-color: #e9d5ff; background-color: #faf5ff; }
+        .b-small { color: #db2777; border-color: #fbcfe8; background-color: #fdf2f8; } /* 小限 */
         .b-natal { color: #991b1b; border-color: #fca5a5; background-color: rgba(255,255,255,0.85); }
 
         /* 緊湊型時間軸表格 */
@@ -111,17 +114,11 @@
             cursor: pointer;
         }
         .btn-timeline:hover { background-color: #e5e7eb; }
-        
-        /* 修改點選後的顏色與字體顏色，統一強制為白色 */
-        .btn-active-decade { background-color: #7e22ce !important; }
-        .btn-active-year { background-color: #0d9488 !important; }
-        .btn-active-month { background-color: #2563eb !important; }
-        .btn-active-day { background-color: #b45309 !important; }
-        
-        .btn-active-decade *, .btn-active-year *, .btn-active-month *, .btn-active-day * {
-            color: white !important;
-            opacity: 1 !important;
-        }
+        /* 點選啟動時變為白色字體以防看不清 */
+        .btn-active-decade { background-color: #7e22ce !important; color: white !important; font-weight: bold; }
+        .btn-active-year { background-color: #0d9488 !important; color: white !important; font-weight: bold; }
+        .btn-active-month { background-color: #2563eb !important; color: white !important; font-weight: bold; }
+        .btn-active-day { background-color: #b45309 !important; color: white !important; font-weight: bold; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col pt-1 pb-4">
@@ -139,19 +136,13 @@
                         <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                             <label class="text-[11px] sm:text-xs font-bold text-gray-600">姓名</label>
                             <input type="text" id="input-name" value="" placeholder="請輸入" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 w-16 sm:w-24 border-b border-gray-300 focus:border-amber-600" oninput="updateName()">
-                            <div class="w-[1px] h-4 bg-gray-300 mx-1"></div>
-                            <div class="flex bg-gray-100 rounded p-0.5 border border-gray-200">
-                                <button id="btn-male" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded shadow bg-blue-700 text-white" onclick="setGender('M')">男</button>
-                                <button id="btn-female" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800" onclick="setGender('F')">女</button>
+                            
+                            <!-- 性別按鈕移至姓名旁 -->
+                            <div class="flex bg-gray-200 rounded p-0.5 ml-2">
+                                <button id="btn-male" class="px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded shadow bg-blue-700 text-white" onclick="setGender('M')">男</button>
+                                <button id="btn-female" class="px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded text-gray-500 hover:text-gray-800" onclick="setGender('F')">女</button>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="ml-auto flex flex-col items-end shrink-0">
-                        <button onclick="showInterpretation()" class="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[11px] sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded shadow-md transition-all flex items-center gap-1">
-                            <i class="fa-regular fa-address-card"></i> <span class="hidden sm:inline">個人特質</span>
-                        </button>
-                        <span class="text-[9px] sm:text-[10px] text-gray-400 font-bold tracking-wider mt-[2px]">Rev.03</span>
                     </div>
                 </div>
                 
@@ -185,11 +176,17 @@
                         <option value="23">晚子時(23-00)</option>
                     </select>
                     
-                    <button onclick="initApp()" class="bg-gray-800 text-white text-[11px] sm:text-sm font-bold px-4 py-1 sm:py-1.5 rounded shrink-0 hover:bg-black shadow transition-colors ml-auto md:ml-0">排盤</button>
+                    <button onclick="initApp()" class="bg-gray-800 text-white text-[11px] sm:text-sm font-bold px-3 py-1 sm:py-1.5 rounded shrink-0 hover:bg-black shadow transition-colors">排盤</button>
+                    
+                    <!-- 個人特質按鈕移置右上角，並標示版次 -->
+                    <button onclick="showInterpretation()" class="ml-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[11px] sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded shadow-md transition-all flex flex-col items-center justify-center gap-0">
+                        <div class="flex items-center gap-1"><i class="fa-regular fa-address-card"></i> <span class="hidden sm:inline">個人特質</span></div>
+                        <span class="text-[8px] font-normal opacity-75">Rev.04</span>
+                    </button>
                 </div>
             </header>
 
-            <!-- 命盤主體 4x4 Grid (等比例) -->
+            <!-- 命盤主體 4x4 Grid (等比例 1fr 1fr 1fr 1fr) -->
             <div class="relative w-full aspect-[2/3] sm:aspect-[4/5] lg:aspect-square max-w-[800px] mx-auto bg-white shadow-md z-10">
                 <svg id="lines-layer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 50;"></svg>
                 <div id="board-grid" class="w-full h-full absolute inset-0" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr 1fr;">
@@ -213,7 +210,6 @@
         <aside id="interpretation-panel" class="w-full lg:w-[35%] bg-white border border-gray-300 rounded-lg p-3 sm:p-5 shadow-md flex flex-col hidden h-fit mt-1 lg:mt-0 sticky top-2 z-40">
             <div id="interpretation-content"></div>
         </aside>
-
     </div>
 
     <script>
@@ -265,7 +261,7 @@
         const branches = ['zi', 'chou', 'yin', 'mao', 'chen', 'si', 'wu', 'wei', 'shen', 'you', 'xu', 'hai'];
         const branchNames = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
         const stems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-        // 交友正名為僕役
+        // 交友宮更名為僕役宮
         const palaces = ["命宮", "兄弟", "夫妻", "子女", "財帛", "疾厄", "遷移", "僕役", "官祿", "田宅", "福德", "父母"];
         
         const gridConfig = {
@@ -299,7 +295,7 @@
             solarDate: '', hourIndex: 0,
             decades: [], years: [], months: [], days: [],
             selDecade: null, selYear: null, selMonth: null, selDay: null,
-            decadeLifeBranch: 0, yearLifeBranch: 0, sYearLifeBranch: 0, monthLifeBranch: 0, dayLifeBranch: 0,
+            decadeLifeBranch: 0, yearLifeBranch: 0, monthLifeBranch: 0, dayLifeBranch: 0, smallLimitBranch: null,
             board: Array(12).fill().map(() => ({ major: [], minor: [], transit: [], huaN: {}, huaD: {}, huaY: {}, huaM: {}, huaDay: {}, ageStart: 0, ageEnd: 0 }))
         };
 
@@ -313,8 +309,8 @@
 
         function setGender(g) {
             state.gender = g;
-            document.getElementById('btn-male').className = g === 'M' ? "px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded shadow bg-blue-700 text-white" : "px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800";
-            document.getElementById('btn-female').className = g === 'F' ? "px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded shadow bg-pink-700 text-white" : "px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800";
+            document.getElementById('btn-male').className = g === 'M' ? "px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded shadow bg-blue-700 text-white" : "px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded text-gray-500 hover:text-gray-800";
+            document.getElementById('btn-female').className = g === 'F' ? "px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded shadow bg-pink-700 text-white" : "px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded text-gray-500 hover:text-gray-800";
             if(state.lunar) initApp();
         }
 
@@ -341,11 +337,25 @@
 
             state.solarDate = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
             const inputHourVal = parseInt(hStr);
+
+            let calcYear = parseInt(y);
+            let calcMonth = parseInt(m);
+            let calcDay = parseInt(d);
+
+            // [Rev.04] 修正：紫微斗數中，晚子時 (23:00-00:00) 視為「隔天」的開始，因此陽曆日期必須加1天
+            if (inputHourVal === 23) {
+                let dObj = new Date(calcYear, calcMonth - 1, calcDay);
+                dObj.setDate(dObj.getDate() + 1);
+                calcYear = dObj.getFullYear();
+                calcMonth = dObj.getMonth() + 1;
+                calcDay = dObj.getDate();
+            }
+
             state.hourIndex = (inputHourVal === 23) ? 0 : inputHourVal;
             
-            // 修復跨日子時：晚子時(23)算作隔天，在 lunar.js 中可透過時辰直接決定
-            let solarHourForLunar = (inputHourVal === 23) ? 23 : (inputHourVal === 0 ? 0 : inputHourVal * 2);
-            let solar = Solar.fromYmdHms(parseInt(y), parseInt(m), parseInt(d), solarHourForLunar, 30, 0); 
+            // 無論早晚子時，送入 lunar 引擎的時辰都統一設為 0 (00:30)，以獲取正確的當日農曆日期與干支
+            let solarHourForLunar = (inputHourVal === 23 || inputHourVal === 0) ? 0 : inputHourVal * 2;
+            const solar = Solar.fromYmdHms(calcYear, calcMonth, calcDay, solarHourForLunar, 30, 0); 
             state.lunar = solar.getLunar();
             
             const yearStemIdx = state.lunar.getYearGanIndex();
@@ -374,7 +384,6 @@
                 cell.huaN = {}; cell.huaD = {}; cell.huaY = {}; cell.huaM = {}; cell.huaDay = {};
             });
 
-            // 大限起點：陽男陰女順，陰男陽女逆
             const isForward = (state.yinYang === '陽' && state.gender === 'M') || (state.yinYang === '陰' && state.gender === 'F');
             let age = state.elementJu;
             for(let i=0; i<12; i++) {
@@ -509,17 +518,6 @@
             }
         }
 
-        // 找小限起點：生肖地支找三合的四馬地，男順女逆
-        function getSmallLimitBranch(birthZhiIdx) {
-            const sanHeMap = {
-                0: 2, 4: 2, 8: 2, // 申子辰 -> 寅
-                2: 5, 6: 5, 10: 5, // 寅午戌 -> 巳
-                5: 8, 9: 8, 1: 8, // 巳酉丑 -> 申
-                8: 11, 11: 11, 3: 11 // 亥卯未 -> 亥
-            };
-            return sanHeMap[birthZhiIdx] !== undefined ? sanHeMap[birthZhiIdx] : 2; // default 寅
-        }
-
         function buildTimelineData() {
             const currentAge = new Date().getFullYear() - state.lunar.getSolar().getYear() + 1;
             const isForward = (state.yinYang === '陽' && state.gender === 'M') || (state.yinYang === '陰' && state.gender === 'F');
@@ -548,35 +546,36 @@
             }
             if(state.selYear && !state.years.find(y => y.year === state.selYear.year)) state.selYear = null;
 
-            // 準備月份與日份資料 (附帶干支)
+            // 構建流月資料 (預先推算當年的月天干)
+            state.months = [];
             if (state.selYear) {
-                state.months = [];
-                const wuHuMap = [2, 4, 6, 8, 0];
                 const yStemIdx = stems.indexOf(state.selYear.stem);
+                const wuHuMap = [2, 4, 6, 8, 0];
                 const startStemM = wuHuMap[yStemIdx % 5];
-                
+                const monthNamesCN = ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','冬月','臘月'];
                 for(let i=1; i<=12; i++) {
-                    const mStem = stems[(startStemM + i - 1) % 10];
-                    const mBranch = branchNames[(i + 1) % 12]; // 寅月起
-                    state.months.push({ month: i, stem: mStem, branch: mBranch });
+                    const mStemIdx = (startStemM + i - 1) % 10;
+                    const mBranchIdx = (2 + i - 1) % 12; // 寅月起算
+                    state.months.push({
+                        month: i, name: monthNamesCN[i-1], 
+                        stem: stems[mStemIdx], branch: branchNames[mBranchIdx]
+                    });
                 }
-
-                if (state.selMonth) {
-                    state.days = [];
-                    const tempLunarStart = Lunar.fromYmd(state.selYear.year, state.selMonth, 1);
-                    const daysInMonth = tempLunarStart.getMonth() === state.selMonth ? tempLunarStart.getDay() : 30; // 簡化處理
-                    
-                    let dayGanIdx = stems.indexOf(tempLunarStart.getDayGan());
-                    let dayZhiIdx = branches.indexOf(LunarUtil.ZHI[tempLunarStart.getDayZhiExact()]); // 近似
-                    
-                    for(let i=1; i<=30; i++) {
-                        // 透過 Lunar 算出真實的每一天干支
-                        try {
-                            const dLunar = Lunar.fromYmd(state.selYear.year, state.selMonth, i);
-                            state.days.push({ day: i, stem: dLunar.getDayGan(), branch: dLunar.getDayZhi() });
-                        } catch(e) {
-                             state.days.push({ day: i, stem: '', branch: '' });
-                        }
+            }
+            
+            // 構建流日資料 (依賴所選的年份與月份)
+            state.days = [];
+            if (state.selYear && state.selMonth) {
+                const dayNamesCN = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十', '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十', '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+                for(let i=1; i<=30; i++) {
+                    let dStem = '', dBranch = '';
+                    try {
+                        const tempLunar = Lunar.fromYmd(state.selYear.year, state.selMonth, i);
+                        dStem = tempLunar.getDayGan();
+                        dBranch = tempLunar.getDayZhi();
+                        state.days.push({ day: i, name: dayNamesCN[i-1], stem: dStem, branch: dBranch });
+                    } catch(e) {
+                        // 當月可能沒有29或30日
                     }
                 }
             }
@@ -588,16 +587,14 @@
             const divMonth = document.getElementById('timeline-months');
             const divDay = document.getElementById('timeline-days');
             
-            divDecade.innerHTML = ''; divYear.innerHTML = '';
-            divMonth.innerHTML = ''; divDay.innerHTML = '';
-
+            divDecade.innerHTML = ''; divYear.innerHTML = ''; divMonth.innerHTML = ''; divDay.innerHTML = '';
             if(!state.lunar) return;
 
-            state.decades.forEach((d) => {
+            state.decades.forEach(d => {
                 const isSel = state.selDecade && state.selDecade.branch === d.branch;
                 const btn = document.createElement('div');
                 btn.className = `btn-timeline py-[1.5px] sm:py-[3px] ${isSel ? 'btn-active-decade' : ''}`;
-                btn.innerHTML = `<span class="text-[9px] sm:text-[11px] font-black leading-none mb-[1px] opacity-80">${d.name}</span><span class="text-[10px] sm:text-[13px] font-bold leading-none">${d.stem}${branchNames[d.branch]}</span><span class="text-[8px] sm:text-[10px] mt-[1px] opacity-75">${d.start}-${d.end}</span>`;
+                btn.innerHTML = `<span class="text-[9px] sm:text-[11px] font-black leading-none mb-[1px] ${isSel ? 'text-white' : 'text-purple-700 opacity-80'}">${d.name}</span><span class="text-[10px] sm:text-[13px] font-bold leading-none">${d.stem}${branchNames[d.branch]}</span><span class="text-[8px] sm:text-[10px] mt-[1px] ${isSel ? 'text-white opacity-80' : 'text-gray-500'}">${d.start}-${d.end}</span>`;
                 btn.onclick = () => { state.selDecade = isSel ? null : d; updateTimeState(); };
                 divDecade.appendChild(btn);
             });
@@ -606,40 +603,29 @@
                 const isSel = state.selYear && state.selYear.year === y.year;
                 const btn = document.createElement('div');
                 btn.className = `btn-timeline py-[2px] sm:py-[4px] ${isSel ? 'btn-active-year' : ''}`;
-                btn.innerHTML = `
-                    <span class="text-[8px] sm:text-[10px] opacity-75 leading-none mb-[2px]">${y.year}年</span>
-                    <span class="text-[9px] sm:text-[12px] font-bold leading-none mb-[2px]">${y.stem}${branchNames[y.branch]}</span>
-                    <span class="text-[8px] sm:text-[10px] opacity-75 leading-none">${y.age}歲</span>
-                `;
+                // [Rev.03] 年份按鈕內部改為垂直置中排列
+                btn.innerHTML = `<span class="text-[8px] sm:text-[9px] font-bold leading-none mb-[1px] opacity-80">${y.year}年</span><span class="text-[10px] sm:text-[13px] font-bold leading-none mb-[1px]">${y.stem}${branchNames[y.branch]}</span><span class="text-[8px] sm:text-[10px] ${isSel ? 'text-white opacity-80' : 'text-gray-500'} leading-none">${y.age}歲</span>`;
                 btn.onclick = () => { state.selYear = isSel ? null : y; updateTimeState(); };
                 divYear.appendChild(btn);
             });
 
-            if (state.selYear && state.months.length > 0) {
-                const monthNamesCN = ['正月','二月','三月','四月','五月','六月','七月','八月','九月','十月','冬月','臘月'];
+            if(state.selYear) {
                 state.months.forEach(m => {
                     const isSel = state.selMonth === m.month;
                     const btn = document.createElement('div');
-                    btn.className = `btn-timeline py-[2.5px] sm:py-[5px] ${isSel ? 'btn-active-month' : ''}`;
-                    btn.innerHTML = `
-                        <span class="text-[9px] sm:text-[12px] font-bold leading-none mb-[2px]">${monthNamesCN[m.month-1]}</span>
-                        <span class="text-[8px] sm:text-[10px] opacity-75 leading-none">${m.stem}${m.branch}</span>
-                    `;
+                    btn.className = `btn-timeline py-[2.5px] sm:py-[5px] flex flex-col gap-[1px] ${isSel ? 'btn-active-month' : ''}`;
+                    btn.innerHTML = `<span class="text-[8px] sm:text-[11px] font-bold leading-none">${m.name}</span><span class="text-[7px] sm:text-[9px] font-normal opacity-80 leading-none">${m.stem}${m.branch}</span>`;
                     btn.onclick = () => { state.selMonth = isSel ? null : m.month; updateTimeState(); };
                     divMonth.appendChild(btn);
                 });
             }
 
-            if (state.selYear && state.selMonth && state.days.length > 0) {
-                const dayNamesCN = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十', '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十', '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+            if(state.selYear && state.selMonth) {
                 state.days.forEach(d => { 
                     const isSel = state.selDay === d.day;
                     const btn = document.createElement('div');
-                    btn.className = `btn-timeline py-[2.5px] sm:py-[5px] ${isSel ? 'btn-active-day' : ''}`;
-                    btn.innerHTML = `
-                        <span class="text-[8px] sm:text-[10px] font-bold leading-none mb-[2px]">${dayNamesCN[d.day-1]}</span>
-                        <span class="text-[7px] sm:text-[9px] opacity-75 leading-none">${d.stem}${d.branch}</span>
-                    `;
+                    btn.className = `btn-timeline py-[2.5px] sm:py-[5px] flex flex-col gap-[1px] ${isSel ? 'btn-active-day' : ''}`;
+                    btn.innerHTML = `<span class="text-[8px] sm:text-[10px] font-bold leading-none">${d.name}</span><span class="text-[7px] sm:text-[8px] font-normal opacity-80 leading-none">${d.stem}${d.branch}</span>`;
                     btn.onclick = () => { state.selDay = isSel ? null : d.day; updateTimeState(); };
                     divDay.appendChild(btn);
                 });
@@ -653,9 +639,9 @@
             
             state.decadeLifeBranch = null;
             state.yearLifeBranch = null;
-            state.sYearLifeBranch = null; 
             state.monthLifeBranch = null;
             state.dayLifeBranch = null;
+            state.smallLimitBranch = null;
 
             if (state.selDecade) {
                 state.decadeLifeBranch = state.selDecade.branch;
@@ -665,13 +651,18 @@
             if (state.selYear) {
                 state.yearLifeBranch = state.selYear.branch;
                 applyHua(state.selYear.stem, 'huaY');
+
+                // [Rev.03] 增加小限計算邏輯：依照生肖找三合與四馬地，男順女逆
+                const yearBranchIdx = state.lunar.getYearZhiIndex();
+                let smallLimitStartBase = 0;
+                if ([2, 6, 10].includes(yearBranchIdx)) smallLimitStartBase = 4; // 寅午戌 -> 辰 (4)
+                else if ([8, 0, 4].includes(yearBranchIdx)) smallLimitStartBase = 10; // 申子辰 -> 戌 (10)
+                else if ([5, 9, 1].includes(yearBranchIdx)) smallLimitStartBase = 7; // 巳酉丑 -> 未 (7)
+                else if ([11, 3, 7].includes(yearBranchIdx)) smallLimitStartBase = 1; // 亥卯未 -> 丑 (1)
                 
-                // 計算小限
-                const birthZhiIdx = state.lunar.getYearZhiIndex();
-                const sLimitStart = getSmallLimitBranch(birthZhiIdx);
-                const isSmallForward = state.gender === 'M'; // 男順女逆
-                const ageDiff = (state.selYear.age - 1) % 12;
-                state.sYearLifeBranch = (sLimitStart + (isSmallForward ? ageDiff : -ageDiff) + 12) % 12;
+                const age = state.selYear.age;
+                // 男順女逆計算
+                state.smallLimitBranch = (smallLimitStartBase + (state.gender === 'M' ? age - 1 : -(age - 1)) + 120) % 12;
             }
 
             let monthStem = null;
@@ -680,23 +671,18 @@
                 const birthHour = state.hourIndex;
                 const douJun = (state.yearLifeBranch - (birthMonth - 1) + birthHour + 12) % 12;
                 state.monthLifeBranch = (douJun + (state.selMonth - 1)) % 12;
-
-                const yStemIdx = stems.indexOf(state.selYear.stem);
-                const wuHuMap = [2, 4, 6, 8, 0];
-                const startStemM = wuHuMap[yStemIdx % 5];
-                const mStemIdx = (startStemM + state.selMonth - 1) % 10;
-                monthStem = stems[mStemIdx];
+                monthStem = state.months.find(m => m.month === state.selMonth).stem;
                 applyHua(monthStem, 'huaM');
             }
 
             let dayStem = null;
             if (state.selYear && state.selMonth && state.selDay) {
                 state.dayLifeBranch = (state.monthLifeBranch + state.selDay - 1) % 12;
-                try {
-                    const tempLunar = Lunar.fromYmd(state.selYear.year, state.selMonth, state.selDay);
-                    dayStem = tempLunar.getDayGan();
+                const targetDay = state.days.find(d => d.day === state.selDay);
+                if(targetDay) {
+                    dayStem = targetDay.stem;
                     applyHua(dayStem, 'huaDay');
-                } catch(e) {}
+                }
             }
             
             calcTransitStars(monthStem, dayStem);
@@ -729,17 +715,17 @@
                     const nName = getPalaceName(state.lifeBranch, bIndex);
                     const dName = state.selDecade ? getPalaceName(state.decadeLifeBranch, bIndex) : '';
                     const yName = state.selYear ? getPalaceName(state.yearLifeBranch, bIndex) : '';
-                    const syName = state.selYear ? getPalaceName(state.sYearLifeBranch, bIndex) : '';
                     const mName = (state.selYear && state.selMonth) ? getPalaceName(state.monthLifeBranch, bIndex) : '';
                     const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex) : '';
+                    const smallName = (state.selYear && state.smallLimitBranch !== null) ? getPalaceName(state.smallLimitBranch, bIndex) : '';
                     const isBodyPalace = (bIndex === state.bodyBranch);
 
-                    // ★ 疊宮標籤：加入小限
+                    // ★ 疊宮標籤：順序反轉 (flex-col-reverse)，垂直由下往上推疊
                     const badges = [];
                     badges.push(`<div class="mini-overlap b-natal">${nName}</div>`);
                     if (dName) badges.push(`<div class="mini-overlap b-dec">大${dName.substring(0,1)}</div>`);
+                    if (smallName) badges.push(`<div class="mini-overlap b-small">小${smallName.substring(0,1)}</div>`); // 小限標籤
                     if (yName) badges.push(`<div class="mini-overlap b-year">流${yName.substring(0,1)}</div>`);
-                    if (syName) badges.push(`<div class="mini-overlap b-syear">小${syName.substring(0,1)}</div>`);
                     if (mName) badges.push(`<div class="mini-overlap b-month">月${mName.substring(0,1)}</div>`);
                     if (dayName) badges.push(`<div class="mini-overlap b-day">日${dayName.substring(0,1)}</div>`);
                     
@@ -748,14 +734,15 @@
                             ${badges.join('')}
                         </div>`;
 
+                    // ★ 身宮獨立置中
                     let bodyPalaceHtml = isBodyPalace ? `<div class="absolute bottom-[2px] left-1/2 -translate-x-1/2 text-[clamp(12px,11cqw,20px)] font-black text-blue-700 tracking-widest z-10 leading-none bg-white/70 rounded px-[2px] pb-[1px]">身宮</div>` : '';
 
-                    // ★ 主輔星渲染 (字體進一步縮小以適應多字)
+                    // ★ 主輔星渲染 (採用 clamp 響應式字體)
                     const renderStar = (name, isMajor) => {
                         const hN = cell.huaN[name]; const hD = cell.huaD[name];
                         const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
                         const charHtml = name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
-                        const starSizeClass = 'text-[clamp(11px,8.5cqw,17px)]'; 
+                        const starSizeClass = 'text-[clamp(11px,9cqw,17px)]'; // [Rev.03] 再縮小一點主輔星字體
                         
                         return `
                             <div class="flex flex-col items-center shrink-0">
@@ -772,10 +759,10 @@
                             </div>`;
                     };
 
-                    // ★ 過客星曜：改在右上角，單列直書，由右至左
+                    // ★ 過客星曜：改到右上角 top-[2px]，水平由右至左排列，文字本身直立
                     let transitHtml = '';
                     if (cell.transit && cell.transit.length > 0) {
-                        transitHtml = `<div class="absolute right-[2px] top-[2px] max-w-[60%] flex flex-row-reverse flex-wrap items-start justify-start gap-[1px] sm:gap-[2px] z-10 pointer-events-none overflow-hidden">`;
+                        transitHtml = `<div class="absolute right-[2px] top-[2px] w-[90%] flex flex-row-reverse flex-nowrap items-start justify-start gap-[1px] sm:gap-[2px] z-10 pointer-events-none overflow-hidden">`;
                         cell.transit.forEach(t => {
                             const charHtml = t.name.split('').map(c => `<span class="leading-none">${c}</span>`).join('');
                             transitHtml += `<div class="transit-badge ${t.color} shrink-0">${charHtml}</div>`;
@@ -791,27 +778,27 @@
 
                     div.innerHTML = `
                         <!-- 左上：天干地支 -->
-                        <div class="absolute top-0.5 sm:top-1 left-0.5 sm:left-1 text-[clamp(9px,8cqw,13px)] font-bold text-gray-500 z-10">
+                        <div class="absolute top-0.5 sm:top-1 left-0.5 sm:left-1 text-[clamp(10px,9cqw,14px)] font-bold text-gray-500 z-10">
                             ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                         </div>
                         
-                        <!-- 核心星曜區：往下位移 (top-6 sm:top-7)，強制不換列 flex-nowrap -->
-                        <div class="absolute top-[26px] sm:top-[30px] left-[2px] w-[65%] bottom-[20px] flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap content-start z-10 overflow-hidden">
+                        <!-- 核心星曜區：垂直往下移至 top-[28px]，維持 flex-nowrap 不換列 -->
+                        <div class="absolute top-[22px] sm:top-[28px] left-[2px] w-[75%] bottom-[20px] flex justify-start gap-[1px] sm:gap-[2px] flex-nowrap content-start z-10 overflow-hidden">
                             ${cell.major.map(s => renderStar(s, true)).join('')}
                             ${cell.minor.map(s => renderStar(s, false)).join('')}
                         </div>
 
-                        <!-- 過客星曜 -->
+                        <!-- 過客星曜：右上角水平展開 -->
                         ${transitHtml}
 
-                        <!-- 疊宮標籤：由下往上推疊 -->
+                        <!-- 疊宮標籤：右下角垂直堆疊 -->
                         ${overlapsHtml}
                         
                         <!-- 底部正中央：身宮 -->
                         ${bodyPalaceHtml}
 
                         <!-- 最左下角：大限年齡 -->
-                        <div class="absolute bottom-0.5 left-0.5 text-[clamp(8px,7cqw,12px)] text-gray-500 font-bold z-10 bg-white/50 rounded px-[1px]">
+                        <div class="absolute bottom-0.5 left-0.5 text-[clamp(9px,8cqw,13px)] text-gray-500 font-bold z-10 bg-white/50 rounded px-[1px]">
                             ${cell.ageStart}-${cell.ageEnd}
                         </div>
                     `;
@@ -827,7 +814,6 @@
                     if (!state.lunar) {
                         center.innerHTML = `
                             <div class="z-20 w-full flex flex-col items-center justify-center h-full bg-transparent px-1 sm:px-4">
-                                <input type="text" id="user-name-input" value="${state.userName}" placeholder="輸入姓名" class="text-lg sm:text-2xl font-black text-center text-gray-900 bg-transparent border-b border-gray-400 focus:outline-none focus:border-amber-600 w-16 sm:w-24 mb-1 sm:mb-4 pointer-events-auto" oninput="updateName()">
                                 <p class="text-[10px] sm:text-sm font-bold text-gray-400 tracking-widest mt-1">請選擇生辰並排盤</p>
                             </div>
                         `;
@@ -919,25 +905,23 @@
                 let hasShattering = stars.some(s => ['七殺','破軍','貪狼'].includes(s));
                 let hasLeader = stars.some(s => ['紫微','天府','太陽'].includes(s));
                 let hasSoft = stars.some(s => ['天同','太陰','天相'].includes(s));
-                let hasRules = stars.some(s => ['天相', '武曲', '巨門', '天梁'].includes(s));
                 
-                if (hasShattering) analysis.push("💥 **開創與堅持 (殺破狼)**：您具備極強的行動力與夢想追求。在職場與生活中，您不甘於現狀，願意為了心中的夢想去大破大立(破軍)、對追求事物有極大的堅持(七殺)，以及對世間事物充滿探索的慾望(貪狼)。運勢好時發展極快，但也容易因過度堅持而面臨起伏。");
-                if (hasLeader) analysis.push("👑 **主導與面子 (紫/府/陽)**：您天生自帶威嚴，相當重視面子與裡子。在群體中往往希望扮演主導角色(太陽)，具備優秀的管理天賦與大局觀，並且懂得務實地精算資源與化煞為用(天府)。");
-                if (hasSoft) analysis.push("🕊️ **協調與感性 (同/陰/機)**：您重視生活品質與情感交流(太陰)。在追求事業之餘，行事風格較為細膩圓融，擅長思考與邏輯推演(天機)，並帶有一點隨遇而安的赤子之心(天同)。");
-                if (hasRules) analysis.push("⚖️ **規則與庇蔭 (相/梁/巨)**：您內心自有一套人際互動的準則(天相)。在處理事務時，您具備深度的思考能力(巨門)，同時也帶有成熟、願意庇蔭照顧他人的長者風範(天梁)。");
+                // [Rev.03] 深度解說：根據初階班筆記重新詮釋星曜意義
+                if (hasShattering) analysis.push("💥 **開創與突破 (殺破狼)**：您對人生目標有著獨特的「堅持」。這股力量會讓您為了追求夢想、慾望或務實利益，敢於大破大立。人生變動較大，是因為您不甘於妥協現狀。");
+                if (hasLeader) analysis.push("👑 **領導與統禦 (主導星系)**：您的內心極度重視面子、尊嚴與事情的主導權。您希望事情能照著您的規劃走（太陽的規範或天府的盤算），也因此容易在團體中展現出較強勢的領導風範。");
+                if (hasSoft) analysis.push("🕊️ **庇蔭與協調 (柔和星系)**：您的特質中帶有細膩與照顧人的天性（如太陰、天同、天梁）。您相對重視人際關係的和諧與精神層面的福份，但也可能因為想太多而產生情緒的糾結。");
 
                 let extras = [];
                 Object.values(hua).forEach(h => {
-                    if (h === '祿') extras.push(`⭐ **福澤與機遇 (化祿)**：您的命局中帶有自然多出來的資源與機遇。在遇到困難時，常能化險為夷，或得到周遭人脈的善意回饋，代表一種『春耕』與『收穫』的能量。`);
-                    if (h === '權') extras.push(`⭐ **掌控與企圖 (化權)**：您對事業或目標的掌控慾望較強。行事果決，能夠展現出高度的執行力與不容置疑的威嚴，有『雙』或加重掌握的涵義。`);
-                    if (h === '科') extras.push(`⭐ **名聲與修養 (化科)**：您相當重視自己的名譽與外在形象。行事斯文有條理，生命中常能遇到賞識您的貴人，容易有彰顯、曝光的機會。`);
-                    if (h === '忌') extras.push(`⭐ **執念與空缺 (化忌)**：您內心深處對某些事物有著強烈的渴望或覺得『不夠』的空缺感。這會讓您執著追求，但若能將這份焦慮轉化為動力，並理解『祿隨忌走』的道理，將是您補足人生缺口的關鍵。`);
+                    if (h === '祿') extras.push(`⭐ **獲取與機遇 (化祿)**：您的生命中常有「多出來的好處」。它不僅是資源的吸引，更是您填補內心空缺的重要工具。`);
+                    if (h === '權') extras.push(`⭐ **掌控與企圖 (化權)**：您對事業或目標的掌控慾望極強。行事果決，希望一切能在自己的規則與掌握之中。`);
+                    if (h === '科') extras.push(`⭐ **名聲與表現 (化科)**：您相當重視外在名譽與社會價值的展現。行事斯文有條理，容易被他人看見。`);
+                    if (h === '忌') extras.push(`⭐ **執念與空缺 (化忌)**：您的內心深處有一股「永遠覺得不夠」的執念。這份焦慮讓您備嘗辛苦，但「祿隨忌走」，只要懂得轉化，這正是您成功的強大動力。`);
                 });
                 
-                if (minors.includes('祿存')) extras.push(`💰 **穩健積累 (祿存)**：您具備極佳的儲蓄特質與風險意識，擅長穩紮穩打地累積有形資源，能乘旺同宮的主星優勢。`);
-                if (minors.includes('文昌') || minors.includes('文曲')) extras.push(`📖 **思慮與才華 (昌/曲)**：您具備優秀的思慮能力與才華。文昌偏向理性的主流規範，文曲則偏向感性的非主流巧思，能為您的事業與生活帶來不同面向的智力支持。`);
-                if (minors.includes('擎羊') || minors.includes('陀羅')) extras.push(`⚡ **堅持與糾結 (羊/陀)**：您的性格中帶有固執或糾結的一面。擎羊讓您在決策時異常堅持；陀羅則可能讓您在選擇前猶豫不決、原地打轉。但也正因為這股力量，賦予了您在逆境中不妥協的毅力。`);
-                if (minors.includes('火星') || minors.includes('鈴星')) extras.push(`🔥 **爆發與算計 (火/鈴)**：您具備突然的爆發力(火星)或深沉的謀略算計(鈴星)。這股力量能讓您迅速推進事物，但也需要注意情緒控制，避免衝動行事。`);
+                if (minors.includes('祿存')) extras.push(`💰 **穩健積累 (祿存)**：您具備極佳的盤算特質，能將無形的機遇轉化為實際的資源積累。`);
+                if (minors.includes('天魁') || minors.includes('天鉞')) extras.push(`🤝 **貴人提攜 (魁鉞)**：您的氣場容易吸引長輩或有原則的貴人，在關鍵時刻給予檯面上或私底下的幫助。`);
+                if (minors.includes('擎羊') || minors.includes('陀羅')) extras.push(`⚡ **剛烈與糾結 (羊/陀)**：您的性格中帶有強烈的固執（羊）或難以抉擇的糾結（陀）。這是把雙面刃，帶來了挫折，也賦予了極強的韌性。`);
 
                 return { core: analysis.join('<br><br>'), extras: extras.join('<br><br>') };
             };
@@ -952,7 +936,7 @@
                 </div>
                 
                 <p class="text-[12px] sm:text-[13px] text-gray-700 leading-relaxed mb-4">
-                    <span class="font-bold text-indigo-700" id="interp-name-display">${interpNameDisplay}</span> 您好！在紫微斗數中，您的「命宮（基本個性）」、「財帛宮（理財態度）」與「官祿宮（生活追求）」共同構成了您的**核心氣場（三方四正）**。本解析融合星曜化氣與宮位體系，為您呈現獨特的人生特質：
+                    <span class="font-bold text-indigo-700" id="interp-name-display">${interpNameDisplay}</span> 您好！在紫微斗數中，您的「命宮（基本個性）」、「財帛宮（價值交換）」與「官祿宮（人生追求）」共同構成了您的**核心三方氣場**。以下是依據最新斗數邏輯所作的分析：
                 </p>
 
                 <div class="flex flex-col gap-3 sm:gap-4 overflow-y-auto pr-1 hide-scrollbar" style="max-height: 65vh;">
@@ -960,22 +944,22 @@
                     <div>
                         <h4 class="text-xs sm:text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-star text-amber-500 w-5"></i>主導性格與行為模式</h4>
                         <div class="text-[12px] sm:text-[13px] text-gray-700 bg-indigo-50/50 p-3 rounded-r-lg border-l-4 border-indigo-500 shadow-sm leading-relaxed text-justify">
-                            <strong class="text-indigo-800 block mb-1">核心主星：${allStars.length ? allStars.join('、') : '隨機應變 (空宮格局，表裡如一)'}</strong>
-                            ${allStars.length ? result.core : '您的核心宮位較為空靈，這意味著您像海綿一樣，適應力與可塑性極強，往往能隨著環境與面對的人事物，展現出靈活多變的特質。這也代表您能夠更純粹地反映出對宮(遷移宮)所展現的樣貌。'}
+                            <strong class="text-indigo-800 block mb-1">核心星曜：${allStars.length ? allStars.join('、') : '表裡如一 (空宮格局)'}</strong>
+                            ${allStars.length ? result.core : '您的核心宮位較為空靈，這意味著您擁有極強的可塑性。當空宮借對宮星曜時，往往代表您外在的表現與內心的渴望是「表裡如一」的。'}
                         </div>
                     </div>
 
                     <div>
-                        <h4 class="text-xs sm:text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-bolt text-amber-500 w-5"></i>潛在能量與四化關鍵</h4>
+                        <h4 class="text-xs sm:text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-bolt text-amber-500 w-5"></i>潛在能量與關鍵特質</h4>
                         <div class="text-[12px] sm:text-[13px] text-gray-700 bg-amber-50/50 p-3 rounded-r-lg border-l-4 border-amber-500 shadow-sm leading-relaxed text-justify">
-                            ${result.extras ? result.extras : '您的核心氣場相對平穩，無過度極端的執念或情緒干擾。您傾向於以和為貴，並能以冷靜理性的態度面對生活中的挑戰。'}
+                            ${result.extras ? result.extras : '您的核心氣場相對平穩，較少受到極端執念干擾，這賦予了您在各種環境中都能處之泰然的優勢。'}
                         </div>
                     </div>
 
                     <div class="mt-1">
-                        <h4 class="text-xs sm:text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-lightbulb text-indigo-500 w-5"></i>大耕老師學派-發展建議</h4>
+                        <h4 class="text-xs sm:text-sm font-bold text-gray-800 mb-1 flex items-center"><i class="fa-solid fa-lightbulb text-indigo-500 w-5"></i>綜合發展建議</h4>
                         <p class="text-[12px] sm:text-[13px] text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-200 text-justify">
-                            紫微斗數的重點在於「推論與理解背後的原因」，而非死背。您的格局沒有絕對的好壞，所有的星曜與煞忌都是您自身價值觀的投射。瞭解自己的執著所在(陀羅、化忌)，並善用您的天賦優勢(祿存、吉星)，不在不對的運限硬碰硬，才是命理學「延命(讓生命更好)」的真諦。
+                            命盤上的跡象沒有絕對的好與壞，端看您如何運用。面對化忌的空缺，應思考如何將「祿」導向正確的宮位來填補；面對煞星的衝動，則應學習在關鍵時刻踩下煞車。理解自己的氣場特質，才能在運限起伏中做出最佳的選擇。
                         </p>
                     </div>
                 </div>
@@ -994,25 +978,30 @@
     ========================================================
     程式碼版次紀錄 (Version History)
     ========================================================
-    [Rev.03] - 2026-07-17
-    - 依據大耕老師課程筆記深度優化
-    - 修復晚子時(23-00)跨日干支計算邏輯
-    - 星曜字體進一步縮小，避免多字重疊
-    - 宮位「交友」正名為「僕役」
-    - 大幅改寫「個人特質」解讀，融入殺破狼、四化原理等課程精華
-    - 下方時間軸點選後字體強制轉白
-    - 流年按鈕農曆干支改為水平排列
-    - 流月、流日按鈕補上準確的農曆天干地支
-    - 疊宮系統增加「小限 (小O)」標籤 (男順女逆、依生肖三合局起四馬地)
+    [Rev.04] - 最新版
+    - 修正晚子時排盤邏輯：紫微斗數中晚子時 (23:00~00:00) 歸屬「隔日」，
+      當選擇晚子時時，系統自動將陽曆推進一天，徹底解決
+      星曜與命宮產生落差的問題。
 
-    [Rev.02] - 2026-07-17
-    - 新增 Web App Meta 標籤，支援手機「加入主畫面」全螢幕運行模式
-    - 更新 UI 版次顯示為 Rev.02
+    [Rev.03] - 依據第50屆初階班筆記大改版
+    - 導入「小限」計算與疊宮顯示。
+    - 運限時辰切換按鈕加入動態文字變白功能，提升對比。
+    - 流年按鈕改水平排列。
+    - 流月、流日加入完整農曆天干地支推算與顯示。
+    - 星曜字體 `clamp` 數值再縮小，優化極端狀態防爆版。
+    - 「交友宮」正式更名為「僕役宮」。
+    - 深度整合初階筆記重寫「個人特質」解說。
 
-    [Rev.01] - 初始基準版
-    - 星曜維持不換列 (flex-nowrap)
-    - 縮短出生年按鈕長度，使其剛剛好 (w-[50px] sm:w-[60px])
-    - 個人特質下方新增版次標籤，並開始以 HTML 註解記錄版次內容
+    [Rev.02] - PWA & UI 優化
+    - 加入 Apple/Android Meta Tags 支援加入桌面全螢幕 APP。
+    - 星曜改回不換列，精準控制出生年份選單寬度。
+    - 性別按鈕緊靠姓名輸入框。
+    - 「個人特質」按鈕移至右上角。
+
+    [Rev.01] - 響應式字體與排版革命
+    - 全面導入 CSS Container Queries (`cqw`) 解決手機字體裁切。
+    - 疊宮改為垂直由下往上堆疊。
+    - 運線過客星曜移至右上角，直立水平排列。
     ========================================================
     -->
 </body>
