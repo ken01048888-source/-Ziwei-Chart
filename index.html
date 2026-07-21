@@ -130,20 +130,25 @@
                 <div class="flex flex-wrap items-center justify-between gap-1.5 w-full">
                     <div class="flex items-center gap-2">
                         <span class="text-xs sm:text-sm font-black tracking-widest text-gray-800 shrink-0 hidden sm:block">命盤</span>
-                        
-                        <!-- 姓名與性別群組 -->
-                        <div class="flex items-center gap-0 bg-gray-50 border border-gray-200 rounded overflow-hidden">
-                            <label class="text-[11px] sm:text-xs font-bold text-gray-600 px-1.5 sm:px-2 bg-gray-200 py-0.5 sm:py-1">姓名</label>
-                            <input type="text" id="input-name" value="" placeholder="請輸入" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 w-16 sm:w-20 px-1 border-r border-gray-300 focus:bg-white" oninput="updateName()">
-                            <button id="btn-male" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold bg-blue-700 text-white" onclick="setGender('M')">男</button>
-                            <button id="btn-female" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold bg-gray-200 text-gray-500 hover:text-gray-800" onclick="setGender('F')">女</button>
+                        <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+                            <label class="text-[11px] sm:text-xs font-bold text-gray-600">姓名</label>
+                            <input type="text" id="input-name" value="" placeholder="請輸入" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 w-16 sm:w-24 border-b border-gray-300 focus:border-amber-600" oninput="updateName()">
                         </div>
                     </div>
-
-                    <!-- 唯一的個人特質按鈕 -->
-                    <button onclick="showInterpretation()" class="ml-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[11px] sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded shadow-md transition-all flex items-center gap-1">
-                        <i class="fa-regular fa-address-card"></i> <span class="hidden sm:inline">個人特質</span>
-                    </button>
+                    <div class="flex bg-gray-100 rounded p-0.5 border border-gray-200">
+                        <button id="btn-male" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded shadow bg-blue-700 text-white" onclick="setGender('M')">男</button>
+                        <button id="btn-female" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800" onclick="setGender('F')">女</button>
+                    </div>
+                    
+                    <!-- 新增：儲存與名冊按鈕 -->
+                    <div class="flex gap-1 ml-auto sm:ml-2">
+                        <button onclick="saveProfile()" class="text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[11px] sm:text-xs font-bold px-2 py-1 rounded transition-colors" title="將當前命盤存入名冊">
+                            <i class="fa-solid fa-floppy-disk"></i> <span class="hidden md:inline">儲存</span>
+                        </button>
+                        <button onclick="toggleProfileModal(true)" class="text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-[11px] sm:text-xs font-bold px-2 py-1 rounded transition-colors" title="開啟命例名冊">
+                            <i class="fa-solid fa-address-book"></i> <span class="hidden md:inline">名冊</span>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="flex gap-1 sm:gap-2 w-full flex-wrap items-center">
@@ -208,6 +213,52 @@
             <div id="interpretation-content"></div>
         </aside>
 
+    </div>
+
+    <!-- 新增：命例名冊彈出視窗 (Modal) -->
+    <div id="profile-modal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-2 sm:p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transform scale-95 transition-transform duration-300" id="profile-modal-content">
+            <div class="px-4 py-3 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <h3 class="text-base sm:text-lg font-black text-gray-800"><i class="fa-solid fa-address-book text-teal-600 mr-2"></i>命例名冊</h3>
+                <button onclick="toggleProfileModal(false)" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            
+            <!-- 分類頁籤 -->
+            <div class="px-4 pt-3 flex gap-2 overflow-x-auto hide-scrollbar border-b border-gray-200" id="profile-categories">
+                <!-- 頁籤會由 JS 動態生成 -->
+            </div>
+
+            <!-- 名單列表 -->
+            <div class="p-2 sm:p-4 overflow-y-auto flex-1 bg-gray-50" id="profile-list">
+                <!-- 名單會由 JS 動態生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增：儲存對話框 (Modal) -->
+    <div id="save-modal" class="fixed inset-0 bg-black/60 z-[110] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm flex flex-col overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <h3 class="text-base font-black text-gray-800"><i class="fa-solid fa-floppy-disk text-amber-600 mr-2"></i>儲存命盤</h3>
+            </div>
+            <div class="p-4 flex flex-col gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">選擇分類標籤</label>
+                    <div class="flex flex-wrap gap-2 mb-2" id="save-category-tags">
+                        <button class="cat-tag px-3 py-1 rounded-full text-xs font-bold border border-gray-300 bg-gray-100 text-gray-600" onclick="selectCategory('本人')">本人</button>
+                        <button class="cat-tag px-3 py-1 rounded-full text-xs font-bold border border-gray-300 bg-gray-100 text-gray-600" onclick="selectCategory('家人')">家人</button>
+                        <button class="cat-tag px-3 py-1 rounded-full text-xs font-bold border border-gray-300 bg-gray-100 text-gray-600" onclick="selectCategory('朋友')">朋友</button>
+                        <button class="cat-tag px-3 py-1 rounded-full text-xs font-bold border border-gray-300 bg-gray-100 text-gray-600" onclick="selectCategory('客戶')">客戶</button>
+                        <button class="cat-tag px-3 py-1 rounded-full text-xs font-bold border border-gray-300 bg-gray-100 text-gray-600" onclick="selectCategory('名人')">名人</button>
+                    </div>
+                    <input type="text" id="save-category-input" placeholder="或輸入自訂分類..." class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm outline-none focus:border-amber-500">
+                </div>
+            </div>
+            <div class="px-4 py-3 border-t border-gray-200 flex justify-end gap-2 bg-gray-50">
+                <button onclick="closeSaveModal()" class="px-4 py-1.5 rounded text-sm font-bold text-gray-600 bg-gray-200 hover:bg-gray-300">取消</button>
+                <button onclick="confirmSaveProfile()" class="px-4 py-1.5 rounded text-sm font-bold text-white bg-amber-600 hover:bg-amber-700">確定儲存</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -295,6 +346,169 @@
             decadeLifeBranch: null, yearLifeBranch: null, smallLifeBranch: null, monthLifeBranch: null, dayLifeBranch: null,
             board: Array(12).fill().map(() => ({ major: [], minor: [], transit: [], huaN: {}, huaD: {}, huaY: {}, huaM: {}, huaDay: {}, ageStart: 0, ageEnd: 0 }))
         };
+
+        // 新增：名冊管理系統
+        let profilesData = [];
+        let currentFilterCategory = '全部';
+        let tempSaveCategory = '朋友';
+
+        function loadProfilesFromStorage() {
+            try {
+                const data = localStorage.getItem('ziwei_profiles');
+                if (data) profilesData = JSON.parse(data);
+            } catch (e) { console.error("無法讀取本地名冊", e); }
+        }
+
+        function saveProfilesToStorage() {
+            localStorage.setItem('ziwei_profiles', JSON.stringify(profilesData));
+        }
+
+        function toggleProfileModal(show) {
+            const modal = document.getElementById('profile-modal');
+            const content = document.getElementById('profile-modal-content');
+            if (show) {
+                loadProfilesFromStorage();
+                renderProfileModal();
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+            } else {
+                modal.classList.add('opacity-0'); content.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        function renderProfileModal() {
+            const catContainer = document.getElementById('profile-categories');
+            const listContainer = document.getElementById('profile-list');
+            
+            // 整理所有不重複的分類
+            let categories = ['全部'];
+            profilesData.forEach(p => { if (!categories.includes(p.category)) categories.push(p.category); });
+
+            // 繪製分類頁籤
+            catContainer.innerHTML = categories.map(cat => `
+                <button onclick="currentFilterCategory='${cat}'; renderProfileModal()" 
+                    class="whitespace-nowrap px-3 py-1.5 text-sm font-bold border-b-2 transition-colors ${currentFilterCategory === cat ? 'border-teal-600 text-teal-700' : 'border-transparent text-gray-500 hover:text-gray-800'}">
+                    ${cat}
+                </button>
+            `).join('');
+
+            // 過濾並繪製名單列表
+            const filtered = currentFilterCategory === '全部' ? profilesData : profilesData.filter(p => p.category === currentFilterCategory);
+            
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-10 text-gray-400 text-sm font-bold"><i class="fa-regular fa-folder-open text-3xl mb-2 block"></i>尚無命盤資料</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">` + filtered.map(p => `
+                <div class="bg-white border border-gray-200 rounded p-3 flex justify-between items-center shadow-sm hover:border-teal-300 transition-colors">
+                    <div class="cursor-pointer flex-1" onclick="loadProfileIntoApp('${p.id}')">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-base font-black text-gray-800">${p.name || '未命名'}</span>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${p.gender==='M' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${p.gender==='M'?'男':'女'}</span>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 border border-gray-200">${p.category}</span>
+                        </div>
+                        <div class="text-[11px] text-gray-500 font-bold">
+                            ${p.year}年${p.month}月${p.day}日 ${document.querySelector(`#birth-hour option[value="${p.hour}"]`)?.text.split('(')[0] || ''}
+                        </div>
+                    </div>
+                    <button onclick="deleteProfile('${p.id}')" class="text-gray-300 hover:text-red-500 px-2 py-1 transition-colors" title="刪除"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `).join('') + `</div>`;
+        }
+
+        function saveProfile() {
+            const y = document.getElementById('birth-year').value;
+            const m = document.getElementById('birth-month').value;
+            const d = document.getElementById('birth-day').value;
+            const h = document.getElementById('birth-hour').value;
+            if (!y || !m || !d || h === "") {
+                alert("請先填寫完整的生辰資料後再儲存！"); // 這裡唯一使用 alert 做最基本的輸入提醒
+                return;
+            }
+            
+            // 顯示儲存對話框
+            const modal = document.getElementById('save-modal');
+            modal.classList.remove('hidden');
+            selectCategory('朋友'); // 預設
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeSaveModal() {
+            const modal = document.getElementById('save-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function selectCategory(cat) {
+            tempSaveCategory = cat;
+            document.getElementById('save-category-input').value = cat;
+            document.querySelectorAll('.cat-tag').forEach(el => {
+                if (el.innerText === cat) {
+                    el.classList.replace('bg-gray-100', 'bg-amber-100');
+                    el.classList.replace('text-gray-600', 'text-amber-700');
+                    el.classList.replace('border-gray-300', 'border-amber-300');
+                } else {
+                    el.classList.replace('bg-amber-100', 'bg-gray-100');
+                    el.classList.replace('text-amber-700', 'text-gray-600');
+                    el.classList.replace('border-amber-300', 'border-gray-300');
+                }
+            });
+        }
+
+        function confirmSaveProfile() {
+            const name = document.getElementById('input-name').value;
+            const gender = state.gender;
+            const y = document.getElementById('birth-year').value;
+            const m = document.getElementById('birth-month').value;
+            const d = document.getElementById('birth-day').value;
+            const h = document.getElementById('birth-hour').value;
+            const cat = document.getElementById('save-category-input').value.trim() || '未分類';
+
+            loadProfilesFromStorage();
+            
+            const newProfile = {
+                id: Date.now().toString(),
+                name: name, gender: gender, category: cat,
+                year: y, month: m, day: d, hour: h
+            };
+
+            // 檢查是否已有完全相同的盤，若有則更新
+            const existingIdx = profilesData.findIndex(p => p.name === name && p.year === y && p.month === m && p.day === d && p.hour === h);
+            if(existingIdx >= 0) profilesData[existingIdx] = newProfile;
+            else profilesData.push(newProfile);
+
+            saveProfilesToStorage();
+            closeSaveModal();
+        }
+
+        function loadProfileIntoApp(id) {
+            const profile = profilesData.find(p => p.id === id);
+            if (!profile) return;
+
+            document.getElementById('input-name').value = profile.name;
+            setGender(profile.gender);
+            document.getElementById('birth-year').value = profile.year;
+            updateDays();
+            document.getElementById('birth-month').value = profile.month;
+            updateDays();
+            document.getElementById('birth-day').value = profile.day;
+            document.getElementById('birth-hour').value = profile.hour;
+
+            updateName();
+            toggleProfileModal(false);
+            initApp(); // 自動排盤
+        }
+
+        function deleteProfile(id) {
+            // 使用內建 confirm 確認刪除
+            if (confirm('確定要刪除這筆命例嗎？')) {
+                profilesData = profilesData.filter(p => p.id !== id);
+                saveProfilesToStorage();
+                renderProfileModal();
+            }
+        }
 
         // 全域活動宮位 (點擊亮燈/連線使用)
         let activePalace = null;
@@ -997,18 +1211,19 @@
          * ==========================================
          * 程式碼版次紀錄 (Version History)
          * ==========================================
-         * [Rev.01] 基準版本：加入版次追蹤機制，修正字體自動縮放 (CSS Container Queries)、星曜不換列。
-         * [Rev.02] PWA 支援：加入 meta apple-mobile-web-app-capable，讓網頁可加入桌面當作全螢幕 App 執行。
-         * [Rev.03] 深度解說與正名：交友宮改為僕役宮、加入小限標籤、流月/流日干支、修正個人特質解析內容。
-         * [Rev.04] 時辰修正：修復晚子時 (23:00~00:00) 農曆不換日的錯誤。
-         * [Rev.05] 五行局與排版：中宮顯示五行局數，性別按鈕移至姓名旁，個人特質移至右上角。
-         * [Rev.06] 大限演算法：嚴格採用實歲推算大限起運年，小限維持虛歲推移。
-         * [Rev.07] UI 聚焦：生辰下拉選單置中，運線命宮自動以黃底紅框高亮顯示，並連線三方四正。
-         * [Rev.08] UI 優化與修復：修復流月流日消失問題，調整生辰與姓名格子大小避免截斷。
+         * [Rev.01] 基準版本：加入版次追蹤機制。
+         * [Rev.02] PWA 支援：加入 meta apple-mobile-web-app-capable。
+         * [Rev.03] 深度解說與正名：交友宮改為僕役宮、加入小限標籤、流月/流日干支、修正晚子時農曆換日邏輯。
+         * [Rev.04] 時辰修正：徹底修復晚子時 (23:00~00:00) 農曆不換日的錯誤。
+         * [Rev.05] 五行局與排版：中宮顯示五行局數，性別按鈕移至姓名旁。
+         * [Rev.06] 大限演算法：嚴格採用實歲推算大限起運年，修復提早一年起運的問題。
+         * [Rev.07] UI 聚焦：運線命宮自動黃底紅框高亮連線。
+         * [Rev.08] 修復流月流日消失問題。
          * [Rev.09] 疊宮順序修正：右下角疊宮完全依照「本命->大限->小限->流年->流月->流日」由下往上堆疊。
-         * [Rev.10] 流月流日修復：補回被覆蓋掉的流月與流日干支計算邏輯。
-         * [Rev.11] 互動優化：星曜字體進一步縮小並允許自動換行；排盤按鈕與時辰綁定；宮位點選互動。
-         * [Rev.12] 重大修復：徹底修復 isActive 未定義導致的宮位空白 Bug。還原星曜字體大小至 Rev.04。點擊宮位支援 Toggle OFF 消除亮燈。
+         * [Rev.10] 補回被覆蓋的流月與流日干支推算邏輯。
+         * [Rev.11] 互動優化：星曜自動換列；點擊宮位支援 Toggle OFF 消除亮燈；排盤按鈕綁定時辰。
+         * [Rev.12] 星曜字體還原為 Rev.04 尺寸，徹底修復空白宮位崩潰問題。
+         * [Rev.13] 命例名冊系統：新增 LocalStorage 儲存、讀取、分類（家人/朋友/客戶）管理功能。
          */
     </script>
 </body>
