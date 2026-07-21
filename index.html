@@ -127,46 +127,57 @@
             
             <!-- 頂部控制列 -->
             <header class="bg-white border border-gray-300 rounded p-1.5 sm:p-2 shadow-sm flex flex-col gap-1.5 sm:gap-2 z-30 relative">
+                <!-- 第一排：姓名、特質、性別、名冊儲存 -->
                 <div class="flex flex-wrap items-center justify-between gap-1.5 w-full">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1.5 sm:gap-2">
                         <span class="text-xs sm:text-sm font-black tracking-widest text-gray-800 shrink-0 hidden sm:block">命盤</span>
-                        <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
-                            <label class="text-[11px] sm:text-xs font-bold text-gray-600">姓名</label>
-                            <input type="text" id="input-name" value="" placeholder="請輸入" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 w-16 sm:w-24 border-b border-gray-300 focus:border-amber-600" oninput="updateName()">
+                        
+                        <!-- 姓名輸入 -->
+                        <div class="flex items-center gap-1 bg-gray-50 border border-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
+                            <label class="text-[11px] sm:text-xs font-bold text-gray-600 whitespace-nowrap">姓名</label>
+                            <input type="text" id="input-name" value="" placeholder="請輸入" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 w-16 sm:w-20 border-b border-gray-300 focus:border-amber-600" oninput="updateName()">
                         </div>
-                    </div>
-                    <div class="flex bg-gray-100 rounded p-0.5 border border-gray-200">
-                        <button id="btn-male" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded shadow bg-blue-700 text-white" onclick="setGender('M')">男</button>
-                        <button id="btn-female" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800" onclick="setGender('F')">女</button>
+                        
+                        <!-- 個人特質按鈕 (緊接姓名後方) -->
+                        <button onclick="showInterpretation()" class="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[11px] sm:text-xs font-bold px-2 py-1 rounded shadow-sm transition-all flex items-center gap-1 shrink-0" title="個人特質解析">
+                            <i class="fa-regular fa-address-card"></i> <span class="hidden sm:inline">個人特質</span>
+                        </button>
                     </div>
                     
-                    <!-- 新增：儲存與名冊按鈕 -->
-                    <div class="flex gap-1 ml-auto sm:ml-2">
-                        <button onclick="saveProfile()" class="text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[11px] sm:text-xs font-bold px-2 py-1 rounded transition-colors" title="將當前命盤存入名冊">
-                            <i class="fa-solid fa-floppy-disk"></i> <span class="hidden md:inline">儲存</span>
-                        </button>
-                        <button onclick="toggleProfileModal(true)" class="text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-[11px] sm:text-xs font-bold px-2 py-1 rounded transition-colors" title="開啟命例名冊">
-                            <i class="fa-solid fa-address-book"></i> <span class="hidden md:inline">名冊</span>
-                        </button>
+                    <!-- 右側：性別與名冊儲存 -->
+                    <div class="flex items-center gap-1.5 ml-auto">
+                        <div class="flex bg-gray-100 rounded p-0.5 border border-gray-200 shrink-0">
+                            <button id="btn-male" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded shadow bg-blue-700 text-white" onclick="setGender('M')">男</button>
+                            <button id="btn-female" class="px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold rounded text-gray-500 hover:text-gray-800" onclick="setGender('F')">女</button>
+                        </div>
+                        <div class="flex gap-1 shrink-0">
+                            <button onclick="saveProfile()" class="text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[11px] sm:text-xs font-bold px-2 py-1 rounded transition-colors" title="將當前命盤存入名冊">
+                                <i class="fa-solid fa-floppy-disk"></i> <span class="hidden md:inline">儲存</span>
+                            </button>
+                            <button onclick="toggleProfileModal(true)" class="text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-[11px] sm:text-xs font-bold px-2 py-1 rounded transition-colors" title="開啟命例名冊">
+                                <i class="fa-solid fa-address-book"></i> <span class="hidden md:inline">名冊</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="flex gap-1 sm:gap-2 w-full flex-wrap items-center">
-                    <div class="flex items-center gap-0.5 sm:gap-1 bg-gray-50 border border-gray-300 rounded px-1 sm:px-2 py-0.5 sm:py-1 focus-within:border-amber-500 shrink-0">
-                        <span class="text-gray-700 font-bold text-[10px] sm:text-xs mr-0.5">西元</span>
-                        <select id="birth-year" class="select-center bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer w-[65px] sm:w-[75px]" onchange="updateDays()"></select>
-                        <span class="text-gray-500 text-[10px] sm:text-xs">年</span>
+                <!-- 第二排：生辰輸入 + 排盤按鈕 (緊湊同一排) -->
+                <div class="flex items-center gap-1 sm:gap-2 w-full overflow-x-auto hide-scrollbar pb-0.5">
+                    <!-- 年月日時 群組 -->
+                    <div class="flex items-center gap-0.5 sm:gap-1 bg-gray-50 border border-gray-300 rounded px-1 sm:px-2 py-0.5 sm:py-1 shrink-0">
+                        <span class="text-gray-700 font-bold text-[10px] sm:text-xs mr-0.5 shrink-0 whitespace-nowrap">西元</span>
+                        <select id="birth-year" class="select-center bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer w-[60px] sm:w-[70px] shrink-0" onchange="updateDays()"></select>
+                        <span class="text-gray-500 text-[10px] sm:text-xs shrink-0 whitespace-nowrap">年</span>
                         
-                        <select id="birth-month" class="select-center bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer w-[55px] sm:w-[65px]" onchange="updateDays()"></select>
-                        <span class="text-gray-500 text-[10px] sm:text-xs">月</span>
+                        <select id="birth-month" class="select-center bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer w-[45px] sm:w-[50px] shrink-0" onchange="updateDays()"></select>
+                        <span class="text-gray-500 text-[10px] sm:text-xs shrink-0 whitespace-nowrap">月</span>
                         
-                        <select id="birth-day" class="select-center bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer w-[55px] sm:w-[65px]"></select>
-                        <span class="text-gray-500 text-[10px] sm:text-xs">日</span>
-                    </div>
-
-                    <!-- [Rev.12] 將時辰與排盤按鈕用 flex group 綁在一起，絕對不換行 -->
-                    <div class="flex items-center gap-1 sm:gap-2 shrink-0">
-                        <select id="birth-hour" class="select-center bg-gray-50 border border-gray-300 rounded px-1 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-sm font-bold text-gray-800 outline-none focus:ring-1 focus:ring-amber-500 shrink-0 cursor-pointer w-[110px] sm:w-[130px]">
+                        <select id="birth-day" class="select-center bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer w-[45px] sm:w-[50px] shrink-0"></select>
+                        <span class="text-gray-500 text-[10px] sm:text-xs shrink-0 whitespace-nowrap">日</span>
+                        
+                        <div class="h-3 w-px bg-gray-300 mx-0.5 sm:mx-1 shrink-0"></div>
+                        
+                        <select id="birth-hour" class="select-center bg-transparent outline-none text-[11px] sm:text-sm font-bold text-gray-800 cursor-pointer w-[95px] sm:w-[115px] shrink-0 whitespace-nowrap">
                             <option value="" disabled selected>請選擇時辰</option>
                             <option value="0">早子時(00-01)</option>
                             <option value="1">丑時(01-03)</option>
@@ -182,9 +193,10 @@
                             <option value="11">亥時(21-23)</option>
                             <option value="23">晚子時(23-00)</option>
                         </select>
-                        
-                        <button onclick="initApp()" class="bg-gray-800 text-white text-[11px] sm:text-sm font-bold px-3 py-1 sm:py-1.5 rounded hover:bg-black shadow transition-colors shrink-0">排盤</button>
                     </div>
+                    
+                    <!-- 排盤按鈕 -->
+                    <button onclick="initApp()" class="bg-gray-800 text-white text-[11px] sm:text-sm font-bold px-4 py-1 sm:py-1.5 rounded hover:bg-black shadow transition-colors shrink-0 whitespace-nowrap">排盤</button>
                 </div>
             </header>
 
