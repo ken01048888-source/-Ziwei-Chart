@@ -138,7 +138,7 @@
                             <input type="text" id="input-name" value="" placeholder="請輸入" class="bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 w-16 sm:w-20 border-b border-gray-300 focus:border-amber-600" oninput="updateName()">
                         </div>
                         
-                        <!-- 個人特質按鈕 (緊接姓名後方) -->
+                        <!-- 個人特質按鈕 -->
                         <button onclick="showInterpretation()" class="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-[11px] sm:text-xs font-bold px-2 py-1 rounded shadow-sm transition-all flex items-center gap-1 shrink-0" title="個人特質解析">
                             <i class="fa-regular fa-address-card"></i> <span class="hidden sm:inline">個人特質</span>
                         </button>
@@ -161,9 +161,8 @@
                     </div>
                 </div>
                 
-                <!-- 第二排：生辰輸入 + 排盤按鈕 (緊湊同一排) -->
+                <!-- 第二排：生辰輸入 + 排盤按鈕 -->
                 <div class="flex items-center gap-1 sm:gap-2 w-full overflow-x-auto hide-scrollbar pb-0.5">
-                    <!-- 年月日時 群組 -->
                     <div class="flex items-center gap-0.5 sm:gap-1 bg-gray-50 border border-gray-300 rounded px-1 sm:px-2 py-0.5 sm:py-1 shrink-0">
                         <span class="text-gray-700 font-bold text-[10px] sm:text-xs mr-0.5 shrink-0 whitespace-nowrap">西元</span>
                         <select id="birth-year" class="select-center bg-transparent outline-none text-[12px] sm:text-sm font-bold text-gray-800 cursor-pointer w-[60px] sm:w-[70px] shrink-0" onchange="updateDays()"></select>
@@ -195,7 +194,6 @@
                         </select>
                     </div>
                     
-                    <!-- 排盤按鈕 -->
                     <button onclick="initApp()" class="bg-gray-800 text-white text-[11px] sm:text-sm font-bold px-4 py-1 sm:py-1.5 rounded hover:bg-black shadow transition-colors shrink-0 whitespace-nowrap">排盤</button>
                 </div>
             </header>
@@ -227,7 +225,7 @@
 
     </div>
 
-    <!-- 新增：命例名冊彈出視窗 (Modal) -->
+    <!-- 命例名冊彈出視窗 (Modal) -->
     <div id="profile-modal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-2 sm:p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transform scale-95 transition-transform duration-300" id="profile-modal-content">
             <div class="px-4 py-3 border-b border-gray-200 flex justify-between items-center bg-gray-50">
@@ -235,19 +233,12 @@
                 <button onclick="toggleProfileModal(false)" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-times text-xl"></i></button>
             </div>
             
-            <!-- 分類頁籤 -->
-            <div class="px-4 pt-3 flex gap-2 overflow-x-auto hide-scrollbar border-b border-gray-200" id="profile-categories">
-                <!-- 頁籤會由 JS 動態生成 -->
-            </div>
-
-            <!-- 名單列表 -->
-            <div class="p-2 sm:p-4 overflow-y-auto flex-1 bg-gray-50" id="profile-list">
-                <!-- 名單會由 JS 動態生成 -->
-            </div>
+            <div class="px-4 pt-3 flex gap-2 overflow-x-auto hide-scrollbar border-b border-gray-200" id="profile-categories"></div>
+            <div class="p-2 sm:p-4 overflow-y-auto flex-1 bg-gray-50" id="profile-list"></div>
         </div>
     </div>
 
-    <!-- 新增：儲存對話框 (Modal) -->
+    <!-- 儲存對話框 (Modal) -->
     <div id="save-modal" class="fixed inset-0 bg-black/60 z-[110] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-sm flex flex-col overflow-hidden">
             <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
@@ -273,6 +264,19 @@
         </div>
     </div>
 
+    <!-- 自訂訊息對話框 (Rev.14 新增取代 alert) -->
+    <div id="custom-msg-modal" class="fixed inset-0 bg-black/60 z-[200] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="custom-msg-content">
+            <div class="p-5 flex flex-col items-center text-center gap-3">
+                <div id="custom-msg-icon" class="text-3xl text-amber-500 mb-2"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <h3 id="custom-msg-text" class="text-sm font-bold text-gray-800">訊息</h3>
+            </div>
+            <div class="px-4 py-3 border-t border-gray-200 flex justify-center gap-3 bg-gray-50" id="custom-msg-actions">
+                <!-- 動態注入按鈕 -->
+            </div>
+        </div>
+    </div>
+
     <script>
         function initDateSelects() {
             const yearSelect = document.getElementById('birth-year');
@@ -283,7 +287,9 @@
             yearSelect.innerHTML = '';
             yearSelect.add(new Option('請選擇', '', true, true));
             const currentYear = new Date().getFullYear();
-            for (let y = currentYear - 80; y <= currentYear + 20; y++) {
+            
+            // [Rev.14] 變更：將起始年份改為固定的 1916
+            for (let y = 1916; y <= currentYear + 20; y++) {
                 yearSelect.add(new Option(y, y));
             }
 
@@ -322,7 +328,7 @@
         const branches = ['zi', 'chou', 'yin', 'mao', 'chen', 'si', 'wu', 'wei', 'shen', 'you', 'xu', 'hai'];
         const branchNames = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
         const stems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-        const palaces = ["命宮", "兄弟", "夫妻", "子女", "財帛", "疾厄", "遷移", "僕役", "官祿", "田宅", "福德", "父母"]; // [Rev.03] 正名
+        const palaces = ["命宮", "兄弟", "夫妻", "子女", "財帛", "疾厄", "遷移", "僕役", "官祿", "田宅", "福德", "父母"]; 
         
         const gridConfig = {
             si: { area: '1/1/2/2', bg: 'bg-fire' }, wu: { area: '1/2/2/3', bg: 'bg-fire' }, wei: { area: '1/3/2/4', bg: 'bg-earth' }, shen: { area: '1/4/2/5', bg: 'bg-metal' },
@@ -359,7 +365,6 @@
             board: Array(12).fill().map(() => ({ major: [], minor: [], transit: [], huaN: {}, huaD: {}, huaY: {}, huaM: {}, huaDay: {}, ageStart: 0, ageEnd: 0 }))
         };
 
-        // 新增：名冊管理系統
         let profilesData = [];
         let currentFilterCategory = '全部';
         let tempSaveCategory = '朋友';
@@ -373,6 +378,41 @@
 
         function saveProfilesToStorage() {
             localStorage.setItem('ziwei_profiles', JSON.stringify(profilesData));
+        }
+
+        // [Rev.14] 自訂訊息視窗取代 alert/confirm
+        function showMessage(msg, isConfirm = false, onConfirm = null) {
+            const modal = document.getElementById('custom-msg-modal');
+            const content = document.getElementById('custom-msg-content');
+            document.getElementById('custom-msg-text').innerText = msg;
+            const actions = document.getElementById('custom-msg-actions');
+            
+            if (isConfirm) {
+                actions.innerHTML = `
+                    <button id="msg-cancel" class="px-4 py-1.5 rounded text-sm font-bold text-gray-600 bg-gray-200 hover:bg-gray-300">取消</button>
+                    <button id="msg-ok" class="px-4 py-1.5 rounded text-sm font-bold text-white bg-red-600 hover:bg-red-700">確定刪除</button>
+                `;
+                document.getElementById('msg-cancel').onclick = () => closeMessage();
+                document.getElementById('msg-ok').onclick = () => {
+                    closeMessage();
+                    if (onConfirm) onConfirm();
+                };
+            } else {
+                actions.innerHTML = `
+                    <button id="msg-ok" class="px-4 py-1.5 rounded text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700">我知道了</button>
+                `;
+                document.getElementById('msg-ok').onclick = () => closeMessage();
+            }
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function closeMessage() {
+            const modal = document.getElementById('custom-msg-modal');
+            const content = document.getElementById('custom-msg-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
         function toggleProfileModal(show) {
@@ -393,11 +433,9 @@
             const catContainer = document.getElementById('profile-categories');
             const listContainer = document.getElementById('profile-list');
             
-            // 整理所有不重複的分類
             let categories = ['全部'];
             profilesData.forEach(p => { if (!categories.includes(p.category)) categories.push(p.category); });
 
-            // 繪製分類頁籤
             catContainer.innerHTML = categories.map(cat => `
                 <button onclick="currentFilterCategory='${cat}'; renderProfileModal()" 
                     class="whitespace-nowrap px-3 py-1.5 text-sm font-bold border-b-2 transition-colors ${currentFilterCategory === cat ? 'border-teal-600 text-teal-700' : 'border-transparent text-gray-500 hover:text-gray-800'}">
@@ -405,7 +443,6 @@
                 </button>
             `).join('');
 
-            // 過濾並繪製名單列表
             const filtered = currentFilterCategory === '全部' ? profilesData : profilesData.filter(p => p.category === currentFilterCategory);
             
             if (filtered.length === 0) {
@@ -436,14 +473,13 @@
             const d = document.getElementById('birth-day').value;
             const h = document.getElementById('birth-hour').value;
             if (!y || !m || !d || h === "") {
-                alert("請先填寫完整的生辰資料後再儲存！"); // 這裡唯一使用 alert 做最基本的輸入提醒
+                showMessage("請先填寫完整的生辰資料後再儲存！");
                 return;
             }
             
-            // 顯示儲存對話框
             const modal = document.getElementById('save-modal');
             modal.classList.remove('hidden');
-            selectCategory('朋友'); // 預設
+            selectCategory('朋友'); 
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
         }
 
@@ -486,7 +522,6 @@
                 year: y, month: m, day: d, hour: h
             };
 
-            // 檢查是否已有完全相同的盤，若有則更新
             const existingIdx = profilesData.findIndex(p => p.name === name && p.year === y && p.month === m && p.day === d && p.hour === h);
             if(existingIdx >= 0) profilesData[existingIdx] = newProfile;
             else profilesData.push(newProfile);
@@ -510,19 +545,17 @@
 
             updateName();
             toggleProfileModal(false);
-            initApp(); // 自動排盤
+            initApp(); 
         }
 
         function deleteProfile(id) {
-            // 使用內建 confirm 確認刪除
-            if (confirm('確定要刪除這筆命例嗎？')) {
+            showMessage('確定要刪除這筆命例嗎？', true, () => {
                 profilesData = profilesData.filter(p => p.id !== id);
                 saveProfilesToStorage();
                 renderProfileModal();
-            }
+            });
         }
 
-        // 全域活動宮位 (點擊亮燈/連線使用)
         let activePalace = null;
 
         function updateName() {
@@ -565,7 +598,6 @@
             const inputHourVal = parseInt(hStr);
             state.hourIndex = (inputHourVal === 23) ? 0 : inputHourVal;
 
-            // [Rev.04] 晚子時 (23:00) 換日邏輯修正
             let dateObj = new Date(parseInt(y), parseInt(m)-1, parseInt(d));
             if (inputHourVal === 23) {
                 dateObj.setDate(dateObj.getDate() + 1);
@@ -605,6 +637,7 @@
                 cell.huaN = {}; cell.huaD = {}; cell.huaY = {}; cell.huaM = {}; cell.huaDay = {};
             });
 
+            // 本命年齡區間，依舊是由陽順陰逆走
             const isForward = (state.yinYang === '陽' && state.gender === 'M') || (state.yinYang === '陰' && state.gender === 'F');
             let age = state.elementJu;
             for(let i=0; i<12; i++) {
@@ -746,11 +779,14 @@
             const currentYearLunar = Lunar.fromDate(new Date()).getYear();
             const currentAgeReal = currentYearLunar - birthYearLunar; 
 
+            // 依《紫微斗數全書》安星訣：
+            // Rule 2: 更換每一次大限時，大限命宮走向為：陽男陰女順時針走(+)，陰男陽女逆時針走(-)
             const isForward = (state.yinYang === '陽' && state.gender === 'M') || (state.yinYang === '陰' && state.gender === 'F');
             
             state.decades = [];
             const cnNum = ['一限','二限','三限','四限','五限','六限','七限','八限','九限','十限'];
             for(let i=0; i<10; i++) {
+                // 由本命命宮起算，依照 isForward 決定順時針(+i)或逆時針(-i)
                 const b = (state.lifeBranch + (isForward ? i : -i) + 12) % 12;
                 state.decades.push({
                     name: cnNum[i], branch: b, stem: state.stemsMap[b],
@@ -771,7 +807,6 @@
             }
             if(state.selYear && !state.years.find(y => y.year === state.selYear.year)) state.selYear = null;
 
-            // [Rev.10] 補回流月與流日干支資料計算
             if(state.selYear) {
                 const yStemIdx = stems.indexOf(state.selYear.stem);
                 const wuHuMap = [2, 4, 6, 8, 0];
@@ -787,7 +822,7 @@
 
                 if(state.selMonth) {
                     state.daysData = [];
-                    const daysInMonth = 30; // 簡化展示30天
+                    const daysInMonth = 30; // 簡化展示
                     let startDayStemIdx = 0;
                     try {
                         const tempLunar = Lunar.fromYmd(state.selYear.year, state.selMonth, 1);
@@ -827,7 +862,6 @@
                 const isSel = state.selYear && state.selYear.year === y.year;
                 const btn = document.createElement('div');
                 btn.className = `btn-timeline py-[2px] sm:py-[4px] ${isSel ? 'btn-active-year' : ''}`;
-                // [Rev.03] 修正流年按鈕文字為水平排列，包含年份與歲數置中
                 btn.innerHTML = `<span class="text-[9px] sm:text-[11px] font-bold leading-none mb-[2px]">${y.year}年</span><span class="text-[10px] sm:text-[13px] font-black leading-none mb-[1px]">${y.stem}${branchNames[y.branch]}</span><span class="text-[8px] sm:text-[10px] ${isSel ? 'text-white' : 'text-gray-500'} leading-none">${y.age}歲</span>`;
                 btn.onclick = () => { state.selYear = isSel ? null : y; updateTimeState(); };
                 divYear.appendChild(btn);
@@ -868,7 +902,7 @@
             state.smallLifeBranch = null;
             state.monthLifeBranch = null;
             state.dayLifeBranch = null;
-            let focusBranchForHighlight = null; // 決定點選後要聚焦亮燈的宮位
+            let focusBranchForHighlight = null; 
 
             if (state.selDecade) {
                 state.decadeLifeBranch = state.selDecade.branch;
@@ -877,19 +911,22 @@
             }
 
             if (state.selYear) {
+                // 依《紫微斗數全書》安星訣：
+                // Rule 3: 不論性別男女，流年命宮都是順時針走 (每年遞增1)
                 state.yearLifeBranch = state.selYear.branch;
                 applyHua(state.selYear.stem, 'huaY');
                 focusBranchForHighlight = state.yearLifeBranch;
 
-                // [Rev.09] 小限計算：採虛歲 (nominalAge)
+                // Rule 1: 更換每一次小限時，小限命宮走向為男命順時針走(+)，女命逆時針走(-)
                 const birthYearLunar = state.lunar.getYear();
                 const nominalAge = state.selYear.year - birthYearLunar + 1;
                 const yearBranchIdx = state.lunar.getYearZhiIndex();
                 const smallBaseMap = [10, 7, 4, 1]; // 申子辰->戌(10), 巳酉丑->未(7), 寅午戌->辰(4), 亥卯未->丑(1)
                 const base1 = smallBaseMap[yearBranchIdx % 4];
                 const isMale = (state.gender === 'M');
-                // 男順女逆計算歲數落點
-                state.smallLifeBranch = (base1 + (isMale ? 1 : -1) * (nominalAge - 1) + 120) % 12;
+                
+                // 由小限1歲起點(base1)開始，男順加1，女逆減1 (+1200確保餘數不為負)
+                state.smallLifeBranch = (base1 + (isMale ? 1 : -1) * (nominalAge - 1) + 1200) % 12;
             }
 
             let monthStem = null;
@@ -923,7 +960,6 @@
             renderTimelines();
             renderBoard();
 
-            // [Rev.08] 自動聚焦當前點擊的運線命宮
             if (focusBranchForHighlight !== null) {
                 selectPalace(branches[focusBranchForHighlight], true);
             } else if (activePalace) {
@@ -933,6 +969,8 @@
 
         function getPalaceName(lifeBranch, targetBranch) {
             if (lifeBranch === null || !state.lunar) return '';
+            // 推出運限命宮後，接續推理後續的宮位：
+            // 只要確立了命宮，剩餘的11宮皆固定以「逆時針」推衍 (命,兄,夫,子,財...)
             const diff = (lifeBranch - targetBranch + 12) % 12;
             return palaces[diff];
         }
@@ -960,7 +998,6 @@
                     const dayName = (state.selYear && state.selMonth && state.selDay) ? getPalaceName(state.dayLifeBranch, bIndex) : '';
                     const isBodyPalace = (bIndex === state.bodyBranch);
 
-                    // [Rev.09] 疊宮標籤：順序反轉 (flex-col-reverse) 由下往上堆疊
                     const badges = [];
                     badges.push(`<div class="mini-overlap b-natal">${nName}</div>`);
                     if (dName) badges.push(`<div class="mini-overlap b-dec">大${dName.substring(0,1)}</div>`);
@@ -974,10 +1011,8 @@
                             ${badges.join('')}
                         </div>`;
 
-                    // 身宮獨立置中
                     let bodyPalaceHtml = isBodyPalace ? `<div class="absolute bottom-[2px] left-1/2 -translate-x-1/2 text-[clamp(12px,11cqw,20px)] font-black text-blue-700 tracking-widest z-10 leading-none bg-white/70 rounded px-[2px] pb-[1px]">身宮</div>` : '';
 
-                    // [Rev.12] 主輔星字體還原為 Rev.04 大小 clamp(12px,10cqw,18px)，保留自動換行
                     const renderStar = (name, isMajor) => {
                         const hN = cell.huaN[name]; const hD = cell.huaD[name];
                         const hY = cell.huaY[name]; const hM = cell.huaM[name]; const hDay = cell.huaDay[name];
@@ -999,7 +1034,6 @@
                             </div>`;
                     };
 
-                    // 過客星曜 (流年/流月/流日)：右上角垂直排列，由右至左擴展
                     let transitHtml = '';
                     if (cell.transit && cell.transit.length > 0) {
                         transitHtml = `<div class="absolute right-[2px] top-[2px] w-[50%] bottom-[25px] flex flex-row-reverse flex-wrap items-start justify-start gap-[1px] sm:gap-[2px] z-10 pointer-events-none overflow-hidden">`;
@@ -1010,15 +1044,12 @@
                         transitHtml += `</div>`;
                     }
 
-                    // 判斷是否為當前點選的焦點宮位
                     const isActive = (activePalace === key);
 
                     const div = document.createElement('div');
                     div.id = `palace-${key}`;
-                    // [Rev.12] 修復 className 賦值錯誤問題，並加上高亮色
                     div.className = `palace-cell overflow-hidden ${conf.bg} ${isActive ? 'active-life-cell' : ''}`;
                     div.style.gridArea = conf.area;
-                    // [Rev.12] 點擊觸發 toggle 行為
                     div.onclick = () => selectPalace(key); 
 
                     div.innerHTML = `
@@ -1027,7 +1058,7 @@
                             ${state.stemsMap[bIndex]}${branchNames[bIndex]}
                         </div>
                         
-                        <!-- 核心星曜區：允許 flex-wrap，並加深 top 距離避免撞到天干地支 -->
+                        <!-- 核心星曜區 -->
                         <div class="absolute top-[28px] sm:top-[30px] left-[2px] w-[65%] bottom-[20px] flex justify-start gap-[1px] sm:gap-[2px] flex-wrap content-start z-10 overflow-hidden">
                             ${cell.major.map(s => renderStar(s, true)).join('')}
                             ${cell.minor.map(s => renderStar(s, false)).join('')}
@@ -1045,7 +1076,6 @@
                     grid.appendChild(div);
                 }
 
-                // 中宮
                 if(idx === 3) {
                     const center = document.createElement('div');
                     center.className = "col-span-2 row-span-2 m-[2px] sm:m-[4px] bg-white/80 backdrop-blur-sm border border-[#9ca3af] shadow-md flex flex-col justify-center items-center relative z-10 pointer-events-none rounded";
@@ -1084,7 +1114,6 @@
         function selectPalace(key, isReRender = false) {
             const svg = document.getElementById('lines-layer');
             
-            // [Rev.12] 點擊同一個宮位：取消高亮 (Toggle OFF)
             if (activePalace === key && !isReRender) {
                 document.querySelectorAll('.palace-cell').forEach(el => el.classList.remove('active-life-cell'));
                 activePalace = null; 
@@ -1092,7 +1121,6 @@
                 return;
             }
 
-            // 選中新宮位 (Toggle ON)
             document.querySelectorAll('.palace-cell').forEach(el => el.classList.remove('active-life-cell'));
             activePalace = key;
             const targetEl = document.getElementById(`palace-${key}`);
@@ -1178,8 +1206,9 @@
                     <h3 class="text-base sm:text-lg font-black text-indigo-800 flex items-center gap-2"><i class="fa-regular fa-address-card"></i>個人特質解析</h3>
                     <button onclick="document.getElementById('interpretation-panel').classList.add('hidden')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-times"></i></button>
                 </div>
-                <!-- 標示版號供追蹤 -->
-                <div class="text-right text-[10px] text-gray-400 font-bold -mt-3 mb-2">Build [Rev.12]</div>
+                
+                <!-- 標示版號供追蹤 (Rev.15) -->
+                <div class="text-right text-[10px] text-gray-400 font-bold -mt-3 mb-2">Build [Rev.15]</div>
                 
                 <p class="text-[12px] sm:text-[13px] text-gray-700 leading-relaxed mb-4">
                     <span class="font-bold text-indigo-700" id="interp-name-display">${interpNameDisplay}</span> 您好！在紫微斗數中，您的「命宮（本質）」、「財帛宮（資源獲取）」與「官祿宮（實踐態度）」共同構成了您的**核心氣場（三方四正）**。以下是專屬於您的性格與潛能分析：
@@ -1218,7 +1247,7 @@
             initDateSelects();
             renderBoard(); 
         };
-        
+
         /* 
          * ==========================================
          * 程式碼版次紀錄 (Version History)
@@ -1235,7 +1264,9 @@
          * [Rev.10] 補回被覆蓋的流月與流日干支推算邏輯。
          * [Rev.11] 互動優化：星曜自動換列；點擊宮位支援 Toggle OFF 消除亮燈；排盤按鈕綁定時辰。
          * [Rev.12] 星曜字體還原為 Rev.04 尺寸，徹底修復空白宮位崩潰問題。
-         * [Rev.13] 命例名冊系統：新增 LocalStorage 儲存、讀取、分類（家人/朋友/客戶）管理功能。
+         * [Rev.13] 命例名冊系統：新增 LocalStorage 儲存、讀取、分類管理功能。
+         * [Rev.14] 版本控制與範圍優化：出生年份下限擴展至 1916 年，補回自訂訊息視窗，並重新導入/更新版次紀錄追蹤機制。
+         * [Rev.15] 運限方向校準：依《紫微斗數全書》安星訣，嚴格規範並標註大限(陽順陰逆)、小限(男順女逆)、流年(順行)之命宮走向與12宮推衍邏輯。
          */
     </script>
 </body>
